@@ -1,0 +1,137 @@
+
+body						{ background: #bfbfbf url(../img/design/bg.gif) repeat 0 0; font: 11px Arial, Helvetica, sans-serif; }
+a 							{ text-decoration: none; color: #CC0000; }
+a:hover 					{ text-decoration: underline; }
+p { color:#EEEEEE; margin: 0 0 10px; }
+form { padding: 0; margin: 0; }
+h1 { font-size:19px; color: #fff; line-height: 20px; }
+h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal; margin: 0 0 10px; text-align: left; }
+
+.noSelect { user-select: none; -o-user-select: none; -moz-user-select: none; -khtml-user-select: none; -webkit-user-select: none; }
+
+.ecardBuilder { }
+
+.ecardToolbarLeft { float: left; }
+.ecardToolbarRight { width: 215px; float: left; }
+.ecardToolbarBottom { clear: both; }
+
+.ecardBuilder .ecardViewport{ 
+	box-shadow: 2px 2px 2px #adadad;
+	background-color: #fff; margin: 0 0 20px 10px; border: 2px solid #999; overflow: hidden; position: relative; float: left; 
+}
+
+.ecardBuilder .ecardViewport p {
+	margin: 0;
+	line-height: 120%;
+}
+
+.ecardBuilder .buttonPrimary {
+	height: 16px;
+	background-color: #ededed;
+	border: 1px solid #8b8b8b;
+	display: block;
+	padding: 0 10px;
+	line-height: 16px;
+	color: #000;
+	text-decoration: none;
+	font-size:10px;	
+	margin: 0 0 20px;
+	min-width: 10px;
+	width: auto !important;
+	width: 10px;
+	border-radius: 3px;
+}
+
+.ecardBuilder .buttonDisable {
+	color: #aeacaa;
+	border-color: #b9b9b9;
+	background-color: #e4e4e4;
+	opacity: 0.7;
+}
+
+.ecardBuilder .toolbarModule {
+	width: 195px;
+	float: left;
+	margin: 0 0 10px 10px;
+	overflow: hidden;	
+}
+
+.ecardBuilder .toolbarModule .moduleBody{
+ 	padding: 10px;
+ 	border: 1px solid #282828;
+ 	border-width: 0 1px 1px;
+	background-color: #dbdbdb;	
+	overflow: hidden;
+	display: none;
+}
+
+.ecardBuilder .toolbarModule .moduleBody.tabActive 
+{
+	display: block;
+}
+
+.ecardBuilder .toolbarModule h2 {
+	background-color: #454545;
+	font-size: 11px;
+	margin: 0;
+	color: #c9c9c9;
+	line-height: 20px;
+	font-weight: normal;
+	text-indent: 10px;
+	border: 1px solid #282828;
+	border-radius: 5px 5px 0 0;
+	text-transform: uppercase;
+	height: 11px;
+	text-indent: -9999em;
+	overflow: hidden;
+}
+
+.ecardBuilder .toolbarModule .moduleMenu {
+	height: 17px;
+	background-color: #8d8d8d;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+ 	border: 1px solid #282828;
+ 	border-width: 0 1px 1px;	
+}
+
+.ecardBuilder .toolbarModule .moduleMenu a {
+	height: 14px;
+	background-color: #8d8d8d;
+	border-right: 1px solid #5d5d5d;
+	display: block;
+	padding: 3px 7px 0;
+	color: #000;
+	text-decoration: none;
+	text-transform: uppercase; 
+	font-size:10px; 
+}
+
+.ecardBuilder .toolbarModule .moduleMenu li {
+	float: left;
+}
+
+.ecardBuilder .toolbarModule .moduleMenu .tabActive {
+	height: 15px;
+	background-color: #dbdbdb;
+	border-bottom: 0;	
+}
+
+.ecardBuilder .toolbarModule .moduleSub { 
+	margin-bottom: 10px;
+	padding-bottom: 10px; 
+	border-bottom: 1px solid #909090; 
+	overflow: hidden;
+}
+
+.ecardBuilder .toolbarModule.moduleDisabled .moduleSub
+{
+	opacity: 0.2;
+}
+
+
+.ecardBuilder .toolbarModule .moduleSub label { display: block; margin: 0 0 10px;}
+.ecardBuilder .toolbarModule .moduleSub label:last-child { margin: 0; }
+
+

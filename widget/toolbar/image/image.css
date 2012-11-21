@@ -1,0 +1,54 @@
+.ecardBuilder .imageZoom .track { 
+	background: 	#cdcdcd; 
+	height: 		4px;
+	width: 			140px;
+	margin: 		0 0 5px; 
+	border-radius: 5px;
+	border: 1px solid #aeaeae;
+	border-top: 1px solid #747474;
+	position: 		relative; 
+}
+.ecardBuilder .imageZoom .thumb { 
+	background: 	transparent url(images/image-zoom-thumb.png) no-repeat 0 0; 
+	height: 		10px; 
+	width:			10px; 
+	position: 		absolute; 
+	left:			0; 
+	top:			-4px; 
+	cursor: 		pointer; 
+}
+.ecardBuilder .imageZoom .indicator 
+{
+	font-size: 		10px; 
+	float: 			right; 
+	margin:			-3px 0 0;
+}
+
+.ecardBuilder .imageRotate .track { 
+	background: 	transparent url(images/image-rotate-track.png) no-repeat 0 0; 
+	height: 		83px; 
+	width: 			83px; 
+	position: 		relative; 
+}
+.ecardBuilder .imageRotate .thumb { 
+	background: 	transparent url(images/image-zoom-thumb.png) no-repeat 0 0; 
+	height: 		10px; 
+	width: 			10px; 
+	position:		absolute; 
+	margin:			-5px 0 0 -5px; 
+	top:			8px; 
+	left: 			42px; 
+	cursor: 		pointer; 
+}
+.ecardBuilder .imageRotate .degrees{ 
+	font-size: 		10px; 
+	position:		absolute;
+	left: 			50%; 
+	top: 			50%; 
+	width: 			20px; 
+	line-height: 	14px; 
+	text-align: 	center; 
+	margin:			-7px 0 0 -10px;
+}
+
+.ecardBuilder .canvasBorder { margin: 10px 0 0; }
