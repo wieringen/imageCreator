@@ -9,11 +9,11 @@
 {
     var pluginName = 'slider'
     ,   defaults   = 
-    	{ 
-    		scale : [ 0, 100 ]
-    	,	start : 0
-    	,	unit  : ""
-    	}
+        { 
+            scale : [ 0, 100 ]
+        ,   start : 0
+        ,   unit  : ""
+        }
     ;
 
     function Plugin( element, options )
@@ -28,104 +28,104 @@
 
     Plugin.prototype = 
     {   
-    	$track      : null,
-    	$thumb      : null,
-    	$percentage : null,
-    	mouse       : {},
+        $track      : null,
+        $thumb      : null,
+        $percentage : null,
+        mouse       : {},
 
         init: function()
         {
-			this.$track     = $( this.element ).find( ".track" )
-			this.$thumb     = $( this.element ).find( ".thumb" )
-			this.$indicator = $( this.element ).find( ".indicator" )
+            this.$track     = $( this.element ).find( ".track" )
+            this.$thumb     = $( this.element ).find( ".thumb" )
+            this.$indicator = $( this.element ).find( ".indicator" )
 
-			this.setEvents();
+            this.setEvents();
 
-			this.setPosition( false, this.options.start );
+            this.setPosition( false, this.options.start );
         }, 
         
         setEvents: function()
         {
-        	var _self = this;
+            var _self = this;
 
-			this.$thumb.mousedown( function( event )
-			{ 
-				_self.start( event ); 
+            this.$thumb.mousedown( function( event )
+            { 
+                _self.start( event ); 
 
-				return false; 
-			});
+                return false; 
+            });
 
-			$( this.element ).bind( "setPosition", function( event, position )
-			{ 
-				_self.setPosition( event, position ); 
+            $( this.element ).bind( "setPosition", function( event, position )
+            { 
+                _self.setPosition( event, position ); 
 
-				return false; 
-			});			
+                return false; 
+            });         
         },
 
-		start: function( event )
-		{
-			var _self = this;
+        start: function( event )
+        {
+            var _self = this;
 
-			$( document ).mousemove( function( event )
-			{
-				_self.drag( event );
+            $( document ).mousemove( function( event )
+            {
+                _self.drag( event );
 
-				return false;
-			});
+                return false;
+            });
 
-			$( document ).mouseup( function( event )
-			{
-				_self.end( event );
+            $( document ).mouseup( function( event )
+            {
+                _self.end( event );
 
-				return false;
-			});
+                return false;
+            });
 
-			this.$thumb.mouseup( function( event )
-			{
-				_self.end( event );
+            this.$thumb.mouseup( function( event )
+            {
+                _self.end( event );
 
-				return false;
-			});
-		
-			this.mouse.x = event.pageX;
-		},
-		
-		end: function()
-		{
-			$( document ).unbind( "mousemove", null );
-			$( document ).unbind( "mouseup", null );
-			this.$thumb.unbind( "mouseup", null );
+                return false;
+            });
+        
+            this.mouse.x = event.pageX;
+        },
+        
+        end: function()
+        {
+            $( document ).unbind( "mousemove", null );
+            $( document ).unbind( "mouseup", null );
+            this.$thumb.unbind( "mouseup", null );
 
-			return false;
-		},
+            return false;
+        },
 
-		setPosition: function( event, scale )
-		{
-			var sanitizedScale = Math.min( this.options.scale[ 1 ], Math.max( this.options.scale[ 0 ], scale || 0 ) )
-			,	realScale      = sanitizedScale - this.options.scale[ 0 ]
-			,	position 	   = Math.round( realScale * ( this.$track.width() - this.$thumb.width() ) / ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) )
-			;
+        setPosition: function( event, scale )
+        {
+            var sanitizedScale = Math.min( this.options.scale[ 1 ], Math.max( this.options.scale[ 0 ], scale || 0 ) )
+            ,   realScale      = sanitizedScale - this.options.scale[ 0 ]
+            ,   position       = Math.round( realScale * ( this.$track.width() - this.$thumb.width() ) / ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) )
+            ;
 
-			this.$thumb.css( "left", position );
-			this.$indicator.text( sanitizedScale + this.options.unit );			
-		},
+            this.$thumb.css( "left", position );
+            this.$indicator.text( sanitizedScale + this.options.unit );         
+        },
 
-		drag: function( event )
-		{
-			var position = Math.min( this.$track.width() - this.$thumb.width(), Math.max( 0, this.$thumb[0].offsetLeft + ( event.pageX - this.mouse.x )))
-			,	scale    = Math.round( this.options.scale[ 0 ] + ( position * ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) / ( this.$track.width() - this.$thumb.width() ) ) )
-			;
+        drag: function( event )
+        {
+            var position = Math.min( this.$track.width() - this.$thumb.width(), Math.max( 0, this.$thumb[0].offsetLeft + ( event.pageX - this.mouse.x )))
+            ,   scale    = Math.round( this.options.scale[ 0 ] + ( position * ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) / ( this.$track.width() - this.$thumb.width() ) ) )
+            ;
 
-			this.mouse.x = event.pageX;
+            this.mouse.x = event.pageX;
 
-			this.$thumb.css( "left", position );
-			this.$indicator.text( scale + this.options.unit );
+            this.$thumb.css( "left", position );
+            this.$indicator.text( scale + this.options.unit );
 
-			$( this.element ).trigger( "onDrag", [ scale, position ] );
-			
-			return false;
-		}
+            $( this.element ).trigger( "onDrag", [ scale, position ] );
+            
+            return false;
+        }
 
     };
 

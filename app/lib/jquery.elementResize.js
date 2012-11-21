@@ -12,20 +12,20 @@
         { 
             resizeCallback : null
         ,   directions : 
-    		[
+            [
 
-    			{ 
-    				"name" 	     : "N" 
-    			,	"position"   : [ 50, 0 ]
+                { 
+                    "name"       : "N" 
+                ,   "position"   : [ 50, 0 ]
                 ,   "positive"   : [ true, true ]
                 ,   "compensate" : [ true, true ]
-    			}
-    		, 	{ 
-    				"name" 	     : "E"
-    			,  	"position"   : [ 100, 50 ] 
+                }
+            ,   { 
+                    "name"       : "E"
+                ,   "position"   : [ 100, 50 ] 
                 ,   "positive"   : [ false, true ]
                 ,   "compensate" : [ false, false ]                
-    			}
+                }
             ,   { 
                     "name"       : "S" 
                 ,   "position"   : [ 50, 100 ]
@@ -44,25 +44,25 @@
                 ,   "positive"   : [ false, true ]
                 ,   "compensate" : [ false, true ]                  
                 }               
-    		, 	{ 
-    				"name" 	     : "SE" 
-    			, 	"position"   : [ 100, 100 ] 
+            ,   { 
+                    "name"       : "SE" 
+                ,   "position"   : [ 100, 100 ] 
                 ,   "positive"   : [ false, false ]
                 ,   "compensate" : [ false, false ]                 
-    			}
-    		, 	{ 
-    				"name" 	     : "SW" 
-    			, 	"position"   : [ 0, 100 ] 
+                }
+            ,   { 
+                    "name"       : "SW" 
+                ,   "position"   : [ 0, 100 ] 
                 ,   "positive"   : [ true, false ]
                 ,   "compensate" : [ true, false ]
-    			}
-    		, 	{ 	
-    				"name" 	     : "NW" 
-    			, 	"position"   : [ 0, 0 ] 
+                }
+            ,   {   
+                    "name"       : "NW" 
+                ,   "position"   : [ 0, 0 ] 
                 ,   "positive"   : [ true, true ]
                 ,   "compensate" : [ true, true ]                            
-    			}
-    		]
+                }
+            ]
     }
     ;
 
@@ -78,20 +78,20 @@
 
     Plugin.prototype = 
     {   
-    	$directions : null,
+        $directions : null,
         
         mouse : {},
 
         init: function()
         {
-        	var _self = this;
+            var _self = this;
 
-        	this.createResizer();
+            this.createResizer();
 
-        	$( this.element ).bind( "positionElementResize", function( event, position, size )
-        	{
-        		_self.positionResizer.call( _self, event, position, size );
-        	});
+            $( this.element ).bind( "positionElementResize", function( event, position, size )
+            {
+                _self.positionResizer.call( _self, event, position, size );
+            });
 
             $( this.element ).bind( "visibilityElementResize", function( event, visibility )
             {
@@ -104,44 +104,44 @@
             });  
         }, 
         
-		createResizer: function()
-		{
-			var _self 	    = this
-			,	$direction  = $( "<div class='direction'></div>")
-			;
+        createResizer: function()
+        {
+            var _self       = this
+            ,   $direction  = $( "<div class='direction'></div>")
+            ;
 
-			this.$directions = $( "<div class='directions'></div>")
+            this.$directions = $( "<div class='directions'></div>")
 
-			$.each( this.options.directions, function( directionIndex, direction )
-			{
-				var $clone = $direction.clone()
-				
+            $.each( this.options.directions, function( directionIndex, direction )
+            {
+                var $clone = $direction.clone()
+                
                 $clone.addClass( "direction" + direction.name );
                 
                 $clone.data( "direction", direction);
 
-				$clone.css({
-					"left"       : direction.position[0] + "%"
-				,	"top"        : direction.position[1] + "%"
-				,	"cursor"     : direction.name.toLowerCase() + "-resize" 
-				});
+                $clone.css({
+                    "left"       : direction.position[0] + "%"
+                ,   "top"        : direction.position[1] + "%"
+                ,   "cursor"     : direction.name.toLowerCase() + "-resize" 
+                });
                 
-				_self.$directions.append( $clone );
-			});
+                _self.$directions.append( $clone );
+            });
 
             this.$directions.hide();
 
-			$( _self.element ).append( this.$directions );
-		},
+            $( _self.element ).append( this.$directions );
+        },
 
         positionResizer : function( event, position, size )
         { 
-	    	this.$directions.css({
-					"left"   : position.x
-				,	"top"    : position.y
-				,	"width"  : size.width -2
-				,	"height" : size.height -2
-	    	});
+            this.$directions.css({
+                    "left"   : position.x
+                ,   "top"    : position.y
+                ,   "width"  : size.width -2
+                ,   "height" : size.height -2
+            });
         },
 
         resizeElement : function( event, $direction )
@@ -177,14 +177,14 @@
 
             return false;
         }        
-	
+    
     };
 
     $.fn[ pluginName ] = function( options )
     {
         return this.each(function ()
         {
-        	var dataPlugin = $.data( this, 'plugin_' + pluginName );
+            var dataPlugin = $.data( this, 'plugin_' + pluginName );
 
             if( ! dataPlugin )
             {
@@ -192,10 +192,10 @@
             }
             else
             {
-            	if( 0 === $( this ).find( ".directions" ).length )
-            	{
-            		dataPlugin.createResizer();
-            	}
+                if( 0 === $( this ).find( ".directions" ).length )
+                {
+                    dataPlugin.createResizer();
+                }
             }
         });
     }

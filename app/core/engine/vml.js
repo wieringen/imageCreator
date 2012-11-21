@@ -1,5 +1,5 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description <p>The VML engine implementation.</p>
  *
  * @namespace ecardBuilder.engine
  * @name vml
@@ -10,7 +10,9 @@
  {
     var theApp = $.getAndCreateContext( appName, context )
     ,   utils  = $.getAndCreateContext( "utils", theApp )
-    ,   vml    = {}
+    ,   vml    = { 
+            name : "vml"
+        }
 
     ,   $ecardBuilder
     ,   $ecardViewport
@@ -18,8 +20,6 @@
     ,   canvasWidth
     ,   canvasHeight
     ;
-
-    vml.name = "vml";
 
     theApp.engine = vml;
 

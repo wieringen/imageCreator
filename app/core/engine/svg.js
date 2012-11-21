@@ -1,5 +1,5 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description <p>The SVG engine implementation.</p>
  *
  * @namespace ecardBuilder.engine
  * @name SVG
@@ -10,7 +10,9 @@
  {
     var theApp = $.getAndCreateContext( appName, context )
     ,   utils  = $.getAndCreateContext( "utils", theApp )
-    ,   svg    = {}
+    ,   svg    = { 
+            name = "svg"
+        }
 
     ,   $ecardBuilder
     ,   $ecardViewport
@@ -25,8 +27,6 @@
     ,   canvasWidth
     ,   canvasHeight
     ;
-
-    svg.name = "svg";
 
     theApp.engine = svg;
 

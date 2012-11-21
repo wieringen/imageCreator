@@ -1,5 +1,5 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description <p>The Canvas engine implementation.</p>
  *
  * @namespace ecardBuilder.engine
  * @name canvas
@@ -10,7 +10,9 @@
  {
     var theApp = $.getAndCreateContext( appName, context )
     ,   utils  = $.getAndCreateContext( "utils", theApp )
-    ,   canvas = {}
+    ,   canvas = { 
+            name : "canvas" 
+        }
 
     ,   $ecardBuilder
     ,   $ecardViewport
@@ -20,8 +22,6 @@
     ,   canvasWidth
     ,   canvasHeight
     ;
-
-    canvas.name = "canvas";
 
     theApp.engine = canvas;
 
