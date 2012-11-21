@@ -24,105 +24,105 @@
 
     Plugin.prototype = 
     {   
-    	$track   : null,
-    	$thumb   : null,
-    	$degrees : null,
+        $track   : null,
+        $thumb   : null,
+        $degrees : null,
 
         init: function()
         {
-        	this.$track   = $( this.element ).find( ".track" )
-			this.$thumb   = $( this.element ).find( ".thumb" )
-			this.$degrees = $( this.element ).find( ".degrees" )
+            this.$track   = $( this.element ).find( ".track" )
+            this.$thumb   = $( this.element ).find( ".thumb" )
+            this.$degrees = $( this.element ).find( ".degrees" )
 
-			this.setEvents();
+            this.setEvents();
         }, 
         
         setEvents: function()
         {
-        	var _self = this;
+            var _self = this;
 
-			this.$thumb.mousedown( function( event )
-			{ 
-				_self.start( event ); 
+            this.$thumb.mousedown( function( event )
+            { 
+                _self.start( event ); 
 
-				return false; 
-			});
+                return false; 
+            });
 
-			$( this.element ).bind( "setPosition", function( event, degrees )
-			{ 
-				_self.setPosition( event, degrees ) 
-			});
+            $( this.element ).bind( "setPosition", function( event, degrees )
+            { 
+                _self.setPosition( event, degrees ) 
+            });
         },
 
-		start: function()
-		{
-			var _self = this;
+        start: function()
+        {
+            var _self = this;
 
-			$( document ).mousemove( function( event )
-			{
-				_self.drag( event );
+            $( document ).mousemove( function( event )
+            {
+                _self.drag( event );
 
-				return false;
-			});
+                return false;
+            });
 
-			$( document ).mouseup( function( event )
-			{
-				_self.end( event );
+            $( document ).mouseup( function( event )
+            {
+                _self.end( event );
 
-				return false;
-			});
+                return false;
+            });
 
-			this.$thumb.mouseup( function( event )
-			{
-				_self.end( event );
+            this.$thumb.mouseup( function( event )
+            {
+                _self.end( event );
 
-				return false;
-			});
-		},
-		
-		end: function()
-		{
-			$( document ).unbind( "mousemove", null );
-			$( document ).unbind( "mouseup", null );
-			this.$thumb.unbind( "mouseup", null );
+                return false;
+            });
+        },
+        
+        end: function()
+        {
+            $( document ).unbind( "mousemove", null );
+            $( document ).unbind( "mouseup", null );
+            this.$thumb.unbind( "mouseup", null );
 
-			return false;
-		},
+            return false;
+        },
 
-		setPosition: function( event, degrees )
-		{
-			var sanitizedDegrees = degrees || 0;
+        setPosition: function( event, degrees )
+        {
+            var sanitizedDegrees = degrees || 0;
 
-			this.$degrees.html( sanitizedDegrees + "&deg;" );
+            this.$degrees.html( sanitizedDegrees + "&deg;" );
 
-			this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
-			this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );	
-			this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );		
-		},
+            this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
+            this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );    
+            this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );       
+        },
 
-		drag: function( event )
-		{
-			var position = 
-			{
-				x : event.pageX - this.$track.offset().left -41
-			,	y : event.pageY - this.$track.offset().top  -41
-			}
-			,	angle   = Math.atan2( position.x, -position.y )
-			,	degrees = Math.round( angle * 180 / Math.PI )
-			;
+        drag: function( event )
+        {
+            var position = 
+            {
+                x : event.pageX - this.$track.offset().left -41
+            ,   y : event.pageY - this.$track.offset().top  -41
+            }
+            ,   angle   = Math.atan2( position.x, -position.y )
+            ,   degrees = Math.round( angle * 180 / Math.PI )
+            ;
 
-			degrees = degrees < 0 ? degrees +360 : degrees;
-			
-			this.$degrees.html( degrees + "&deg;" );
+            degrees = degrees < 0 ? degrees +360 : degrees;
+            
+            this.$degrees.html( degrees + "&deg;" );
 
-			this.$thumb.css(  "top", Math.round( -Math.cos( angle ) * 34 +42 ) );
-			this.$thumb.css( "left", Math.round(  Math.sin( angle ) * 34 +42 ) );
-			this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );
+            this.$thumb.css(  "top", Math.round( -Math.cos( angle ) * 34 +42 ) );
+            this.$thumb.css( "left", Math.round(  Math.sin( angle ) * 34 +42 ) );
+            this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );
 
-			$( this.element ).trigger( "onDrag", [ degrees ] );
-			
-			return false;
-		}
+            $( this.element ).trigger( "onDrag", [ degrees ] );
+            
+            return false;
+        }
     };
 
     $.fn[ pluginName ] = function( options )
