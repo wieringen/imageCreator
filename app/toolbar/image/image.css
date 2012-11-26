@@ -52,3 +52,22 @@
 }
 
 .ecardBuilder .canvasBorder { margin: 10px 0 0; }
+
+.ecardBuilder .imageCreate .inputImageUpload {
+	margin: 		0 0 20px;
+	font:		    11px Arial, Helvetica, sans-serif;
+}
+
+.ecardBuilder .buttonImageAdd {
+	margin: 0;
+}
+
+.ecardBuilder #iframeImageUpload {
+	width: 0;
+	height: 0;
+	border: 0;
+}
+
+.ecardBuilder .toolbarModule.moduleDisabled .imageCreate {
+	opacity: 1.0;
+}

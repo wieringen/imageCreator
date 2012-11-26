@@ -1,37 +1,46 @@
 <div class="toolbarModule toolbarImage moduleDisabled">
-	<h2>Image</h2>
+    <h2>Image</h2>
 
-	<ul class="moduleMenu">
-		<li><a class="tabActive" href="#">Image</a></li>
-	</ul>
+    <ul class="moduleMenu">
+        <li><a class="tabActive" href="#">Image</a></li>
+        <li class="toRight"><a href="#">+</a></li>
+    </ul>
 
-	<div class="moduleBody tabActive">
+    <div class="moduleBody tabActive">
 
-		<a class="buttonPrimary buttonImageAdd"><spam>Add Image</span></a>
+        <div class="moduleSub imageZoom">
+            <h3>Zoom</h3>
+            <div class="indicator">100%</div>
+            <div class="track">
+                <div class="thumb"></div>
+            </div>
+        </div>
 
-		<div class="moduleSub imageZoom">
-			<h3>Zoom</h3>
-			<div class="indicator">100%</div>			
-			<div class="track">
-				<div class="thumb"></div>
-			</div>
-		</div>
+        <div class="moduleSub imageRotate">
+            <h3>Rotate</h3>
+            <div class="track">
+                <div class="thumb"></div>
+                <div class="degrees">0&deg;</div>
+            </div>
+        </div>
 
-		<div class="moduleSub imageRotate">
-			<h3>Rotate</h3>
-			<div class="track">
-				<div class="thumb"></div>
-				<div class="degrees">0&deg;</div>
-			</div>
-		</div>		
-	<!--
-		<div class="moduleSub canvasBorder">
-			<h3>Border</h3>
-			<div class="viewport">
-				<img src="" class="borderSnippet" alt="" />
-			</div>
-		</div>-->
+    </div>
 
-	</div>
+    <div class="moduleBody">
+
+        <div class="moduleSub imageCreate">
+            <h3>Add image</h3>
+
+            <form enctype="multipart/form-data" method="post" action="toolbar/image/uploader/upload.processor.php" class="formImageUpload" target="iframeImageUpload">
+                <input type="file" class="inputImageUpload" name="inputImageUpload" />
+                <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
+            </form>
+            
+            <iframe id="iframeImageUpload"></iframe>
+
+            <div class="buttonPrimary buttonImageAdd">Add Image</div>
+        </div>
+
+    </div>
 
 </div>

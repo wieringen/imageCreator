@@ -28,6 +28,7 @@
     {   
         $track  : null,
         $hex    : null,
+        $color  : null,
         $canvas : null,
         context : null,
 
@@ -40,6 +41,8 @@
         {           
             this.$track = $( this.element ).find( ".track" );
             this.$hex   = $( this.element ).find( ".hex" );
+            this.$color = $( this.element ).find( ".color" );
+
             this.canvasHeight = this.$track.height()
             this.canvasWidth  = this.$track.width()
 
@@ -97,6 +100,7 @@
             $( this.element ).bind( "setColor", function( event, hexColor )
             { 
                 _self.$hex.text( hexColor );
+                _self.$color.css( "backgroundColor", hexColor );
             });
         },
 
@@ -109,6 +113,7 @@
                 ;
 
                 this.$hex.text( hexColor );
+                this.$color.css( "backgroundColor", hexColor );
 
                 $( this.element ).trigger( "colorUpdate", [ hexColor, rgbColor ] );
             }

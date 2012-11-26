@@ -33,6 +33,10 @@
 	float: 			left;
 }
 
+.ecardBuilder .moduleDisabled .textColor .track {
+	opacity: 0.5;
+}
+
 .ecardBuilder .textRotate .track { 
 	background: 	transparent url(images/text-rotate-track.png) no-repeat 0 0; 
 	height: 		83px; 
@@ -63,21 +67,36 @@
 .ecardBuilder .textColor .hex { 
 	float: left;
 	font-size: 10px;
-	margin: 67px 0 0;
+	margin: 0 0 0 5px;
+}
+
+.ecardBuilder .textColor .color { 
+	width: 10px;
+	height: 10px;
+	float: left;
+	border-radius: 10px;
+	border: 1px solid #8b8b8b;
+}
+
+.ecardBuilder .moduleDisabled .color,
+.ecardBuilder .moduleDisabled .hex {
+	display: none;
 }
 
 .ecardBuilder .selectTextFont {
-	width: 100%;
+	width: 57%;
+	float: left;
+	margin: 0 5% 0 0;
 }
 
 .ecardBuilder .buttonTextBold {
-	width: 35% !important;
 	float: left;
-	margin: 0;
+	font-weight: bold;
+	margin: 0 5% 0 0;
 }
 
 .ecardBuilder .buttonTextItalic {
-	width: 35% !important;
-	float: right;
+	float: left;
 	margin: 0;
+	font-style: italic;
 }

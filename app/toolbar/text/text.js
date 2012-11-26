@@ -20,6 +20,8 @@
     ,   $textSize
     ,   $textRotate
     ,   $buttonTextAdd
+    ,   $buttonTextBold
+    ,   $buttonTextItalic
     ,   $selectTextFont
 
     ,   layerDefault = 
@@ -63,12 +65,14 @@
 
         // Get module DOM elements.
         //        
-        $module        = $( ".toolbarText" );
-        $textSize      = $module.find( ".textSize" );
-        $textColor     = $module.find( ".textColor" );
-        $textRotate    = $module.find( ".textRotate" );
-        $buttonTextAdd = $module.find( ".buttonTextAdd" ); 
-        $selectTextFont = $module.find( ".selectTextFont" ); 
+        $module           = $( ".toolbarText" );
+        $textSize         = $module.find( ".textSize" );
+        $textColor        = $module.find( ".textColor" );
+        $textRotate       = $module.find( ".textRotate" );
+        $buttonTextAdd    = $module.find( ".buttonTextAdd" );
+        $buttonTextBold   = $module.find( ".buttonTextBold" );
+        $buttonTextItalic = $module.find( ".buttonTextItalic" ); 
+        $selectTextFont   = $module.find( ".selectTextFont" ); 
 
         // Initialize module UI.
         //

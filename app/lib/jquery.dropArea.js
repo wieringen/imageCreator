@@ -78,7 +78,7 @@
                         
                         reader.onload = function(event) 
                         {
-                            $( _self.element ).trigger( "fileUpload", [ event ] );
+                            $( _self.element ).trigger( "fileUpload", [ event.target.result ] );
                         };
 
                         reader.readAsDataURL( file );

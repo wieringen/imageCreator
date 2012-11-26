@@ -8,7 +8,6 @@ h1 { font-size:19px; color: #fff; line-height: 20px; }
 h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal; margin: 0 0 10px; text-align: left; }
 
 .noSelect { user-select: none; -o-user-select: none; -moz-user-select: none; -khtml-user-select: none; -webkit-user-select: none; }
-
 .ecardBuilder { }
 
 .ecardToolbarLeft { float: left; }
@@ -72,9 +71,6 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 	text-decoration: none;
 	font-size:10px;	
 	margin: 0 0 20px;
-	min-width: 10px;
-	width: auto !important;
-	width: 10px;
 	border-radius: 3px;
 }
 
@@ -89,16 +85,24 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 	width: 195px;
 	float: left;
 	margin: 0 0 10px 10px;
-	overflow: hidden;	
+	position: relative;
 }
 
 .ecardBuilder .toolbarModule .moduleBody{
  	padding: 10px;
  	border: 1px solid #282828;
  	border-width: 0 1px 1px;
-	background-color: #dbdbdb;	
-	overflow: hidden;
+	background-color: #dbdbdb;
 	display: none;
+}
+
+.ecardBuilder .toolbarModule .moduleBody:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
 }
 
 .ecardBuilder .toolbarModule .moduleBody.tabActive 
@@ -134,7 +138,14 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 
 .ecardBuilder .toolbarModule .moduleMenu a {
 	height: 14px;
-	background-color: #8d8d8d;
+background: #818181; /* Old browsers */
+background: -moz-linear-gradient(top, #9a9a9a 0%, #818181 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#9a9a9a), color-stop(100%,#818181)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #9a9a9a 0%,#818181 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #9a9a9a 0%,#818181 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #9a9a9a 0%,#818181 100%); /* IE10+ */
+background: linear-gradient(to bottom, #9a9a9a 0%,#818181 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9a9a9a', endColorstr='#818181',GradientType=0 ); /* IE6-9 */
 	border-right: 1px solid #5d5d5d;
 	display: block;
 	padding: 3px 7px 0;
@@ -150,8 +161,24 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 
 .ecardBuilder .toolbarModule .moduleMenu .tabActive {
 	height: 15px;
-	background-color: #dbdbdb;
-	border-bottom: 0;	
+background: #d6d6d6; /* Old browsers */
+background: -moz-linear-gradient(top, #f1f1f1 0%, #d6d6d6 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f1f1f1), color-stop(100%,#d6d6d6)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #f1f1f1 0%,#d6d6d6 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #f1f1f1 0%,#d6d6d6 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #f1f1f1 0%,#d6d6d6 100%); /* IE10+ */
+background: linear-gradient(to bottom, #f1f1f1 0%,#d6d6d6 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', endColorstr='#d6d6d6',GradientType=0 ); /* IE6-9 */
+	border-bottom: 0;
+}
+
+.ecardBuilder .toolbarModule .moduleMenu .toRight {
+	float: right;
+}
+.ecardBuilder .toolbarModule .moduleMenu .toRight a 
+{
+	border-left: 1px solid #5d5d5d;
+	border-right: 0;
 }
 
 .ecardBuilder .toolbarModule .moduleSub { 
@@ -159,6 +186,7 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 	padding-bottom: 10px; 
 	border-bottom: 1px solid #909090; 
 	overflow: hidden;
+	position: relative;
 }
 
 .ecardBuilder .toolbarModule.moduleDisabled .moduleSub

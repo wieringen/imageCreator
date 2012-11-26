@@ -11,7 +11,7 @@
     var theApp = $.getAndCreateContext( appName, context )
     ,   utils  = $.getAndCreateContext( "utils", theApp )
     ,   svg    = { 
-            name = "svg"
+            name : "svg"
         }
 
     ,   $ecardBuilder
@@ -183,8 +183,11 @@
 
         // If we have no layer to select or if its hidden hide the selection rectangle as well.
         //
-        svgSelect.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
-        $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
+        if( event.type == "layerSelect" )
+        {
+            svgSelect.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
+            $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
+        }
     }
 
     function svgLayerVisibility( event, layer )

@@ -107,7 +107,7 @@
  
         // Set Button events.
         //       
-        $buttonImageAdd.click( imageAdd );        
+        $buttonImageAdd.click( imageUpload );        
     };
 
     function imageSelect( event, layer )
@@ -137,10 +137,21 @@
         }
     }
 
-    function imageAdd( event, file )
+    function imageUpload()
     {
-        var url = file && file.target.result;
+        $( ".formImageUpload" ).submit();
 
+        $( "#iframeImageUpload" ).load( function( event )
+        {
+            imageAdd( event, $.parseJSON( this.contentDocument.documentElement.textContent ).src );
+        });
+
+        return false;
+    }
+
+    function imageAdd( event, url )
+    {
+        console.log( url );
         // Temp
         //
         if( ! url )

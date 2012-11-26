@@ -1,45 +1,53 @@
 <div class="toolbarModule toolbarLayers">
-	<h2>Layers</h2>
+    <h2>Layers</h2>
 
-	<ul class="moduleMenu">
-		<li><a class="tabActive" href="#">Layers</a></li>
-		<li><a href="#">Options</a></li>
-	</ul>
+    <ul class="moduleMenu">
+        <li><a class="tabActive" href="#">Layers</a></li>
+        <li><a href="#">Options</a></li>
+    </ul>
 
-	<div class="moduleBody tabActive">
+    <div class="moduleBody tabActive">
 
-		<ul class="objectLayers">
-			<li class="objectLayer">
-				<a class="objectToggle" href="#">toggle</a>
-				<div class="objectThumbContainer">
-					<img />
-				</div>
-				<span class="objectLayerName"></span>
-			</li>
-		</ul>
+        <ul class="objectLayers">
+            <li class="objectLayer">
+                <a class="objectToggle" href="#">toggle</a>
+                <div class="objectThumbContainer">
+                    <img />
+                </div>
+                <span class="objectLayerName"></span>
+            </li>
+        </ul>
 
-		<a class="buttonPrimary buttonLayerRemove buttonDisable"><spam>Remove layer</span></a>
+        <div class="wrapperLayerAdd">
+            <a class="buttonPrimary buttonLayerAdd"><spam>Add layer</span></a>
+            <ul class="menuLayerAdd">
+                <li>Image</li>
+                <li>Text</li>
+            </ul>
+        </div>
 
-	</div>
+        <a class="buttonPrimary buttonLayerRemove buttonDisable"><spam>X</span></a>
 
-	<div class="moduleBody">
+    </div>
 
-		<div class="moduleSub layerSettings">
-			<h3>Viewport</h3>
-			<label>
-				Render engine
-				<select class="selectRenderEngine">
-					<option value="SVG">SVG</option>
-					<option value="Canvas">Canvas</option>
-					<option value="VML">VML</option>
-				</select>
-			</label>
+    <div class="moduleBody">
 
-			<label><input type="checkbox" checked/> Show selection rectangle</label>
-			<label><input type="checkbox" checked/> Constrain layers</label>
-		</div>	
+        <div class="moduleSub layerSettings">
+            <h3>Viewport</h3>
+            <label>
+                Render engine
+                <select class="selectRenderEngine">
+                    <option value="SVG">SVG</option>
+                    <option value="Canvas">Canvas</option>
+                    <option value="VML">VML</option>
+                </select>
+            </label>
 
-	</div>
+            <label><input type="checkbox" checked/> Show selection rectangle</label>
+            <label><input type="checkbox" checked/> Constrain layers</label>
+        </div>  
+
+    </div>
 
 
 </div>
