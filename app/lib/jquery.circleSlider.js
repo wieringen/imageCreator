@@ -5,8 +5,11 @@
  * @version 1.0
  * @author mbaijs
  */
-
-;(function ( $, window, document, undefined )
+define(
+[
+    "jquery"
+],
+function( $ )
 {
     var pluginName = 'circleSlider'
     ,   defaults   = { }
@@ -103,23 +106,32 @@
         drag: function( event )
         {
             var position = 
-            {
-                x : event.pageX - this.$track.offset().left -41
-            ,   y : event.pageY - this.$track.offset().top  -41
-            }
-            ,   angle   = Math.atan2( position.x, -position.y )
-            ,   degrees = Math.round( angle * 180 / Math.PI )
+                {
+                    x : event.pageX - this.$track.offset().left -41
+                ,   y : event.pageY - this.$track.offset().top  -41
+                }
+            ,   radians = Math.atan2( position.x, -position.y )
+            ,   degrees = Math.round( radians * 180 / Math.PI )
+            ,   cos     = Math.cos( radians )
+            ,   sin     = Math.sin( radians )
             ;
 
             degrees = degrees < 0 ? degrees +360 : degrees;
             
             this.$degrees.html( degrees + "&deg;" );
 
-            this.$thumb.css(  "top", Math.round( -Math.cos( angle ) * 34 +42 ) );
-            this.$thumb.css( "left", Math.round(  Math.sin( angle ) * 34 +42 ) );
+            this.$thumb.css( "top",  Math.round( -cos * 34 +42 ) );
+            this.$thumb.css( "left", Math.round(  sin * 34 +42 ) );
             this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );
 
-            $( this.element ).trigger( "onDrag", [ degrees ] );
+            var rotation = {
+                    degrees : degrees
+                ,   radians : radians
+                ,   sin     : sin
+                ,   cos     : cos
+            };
+
+            $( this.element ).trigger( "onDrag", [ rotation ] );
             
             return false;
         }
@@ -135,4 +147,4 @@
             }
         });
     }
-})( jQuery, window, document );
+});

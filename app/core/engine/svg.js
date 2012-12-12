@@ -6,12 +6,24 @@
  * @version 1.0
  * @author mbaijs
  */
- ;( function( $, context, appName )
- {
-    var theApp = $.getAndCreateContext( appName, context )
-    ,   utils  = $.getAndCreateContext( "utils", theApp )
-    ,   svg    = { 
-            name : "svg"
+define(
+[
+    "jquery"
+
+    // jQuery plugins
+    //
+,   "plugins/jquery.elementResize"
+],
+function( $ )
+{
+    var theApp = window[ "imageCreator" ]
+    ,   module =
+        {
+            name        : "svg"
+        ,   initialized : false
+        ,   settings    : 
+            {
+            }
         }
 
     ,   $ecardBuilder
@@ -28,10 +40,10 @@
     ,   canvasHeight
     ;
 
-    theApp.engine = svg;
-
-    svg.initialize = function()
+    module.initialize = function()
     {
+        // Get basic app DOM elements.
+        //
         $ecardBuilder  = $( ".ecardBuilder" );
         $ecardViewport = $( ".ecardViewport" );
         $ecardCanvas   = $( ".ecardCanvas" );
@@ -56,10 +68,11 @@
         // Create a selection rectangle to put around selected layers.
         //
         svgSelect = document.createElementNS( "http://www.w3.org/2000/svg", "rect" );
-        svgSelect.setAttribute("style", "fill: transparent; stroke-dasharray: 5,5; stroke:#666; stroke-width:2;");
-        svgSelect.setAttribute("id", "svgselect" );
+        svgSelect.setAttribute( "style", "fill: transparent; stroke-dasharray: 5,5; stroke:#666; stroke-width:2;");
+        svgSelect.setAttribute( "vector-effect", "non-scaling-stroke" );
+        svgSelect.setAttribute( "id", "svgselect" );
 
-        // Create cool SMIL animtion to give some more flair to the select
+        // Create cool SMIL animtion to give some more flair to the selection.
         //
         svgSelectAnimate = document.createElementNS( "http://www.w3.org/2000/svg", "animate" );
         svgSelectAnimate.setAttribute( "attributeName", "stroke-dashoffset" );
@@ -72,15 +85,19 @@
 
         // Listen to global app events.
         //
-        $ecardBuilder.bind( "layerUpdate", svgLayerCheck );
-        $ecardBuilder.bind( "layerSelect", svgLayerSelect );
-        $ecardBuilder.bind( "layerVisibility", svgLayerVisibility );
-        $ecardBuilder.bind( "layerRemove", svgLayerRemove );
-
-        // Setup the element resizer.
+        if( ! module.initialized )
+        {
+            $ecardBuilder.bind( "layerUpdate", svgLayerCheck );
+            $ecardBuilder.bind( "layerSelect", svgLayerSelect );
+            $ecardBuilder.bind( "layerVisibility", svgLayerVisibility );
+            $ecardBuilder.bind( "layerRemove", svgLayerRemove );
+        }
+        
+        // Setup the layer resizer.
         //
         $ecardViewport.elementResize({
             "resizeCallback" : svgLayerResize
+        ,   "onRotate"       : function(){ return theApp.toolbar.layers.getCurrentLayer(); }
         });
 
         // Do we have any layers allready?
@@ -97,7 +114,7 @@
 
     function svgLayerCheck( event, layer )
     {
-        svgLayerCurrent = $( "#" + layer.id + svg.name )[0];
+        svgLayerCurrent = $( "#" + layer.id + module.name )[0];
 
         // If we dont have a layer in the dom its new so create it.
         //
@@ -126,6 +143,9 @@
         {
             svgLayerCurrent = document.createElementNS( "http://www.w3.org/2000/svg", "image");
             svgLayerCurrent.setAttributeNS('http://www.w3.org/1999/xlink','href',layer.image.src);
+            
+            svgLayerCurrent.setAttribute( 'width', layer.sizeReal.width );  
+            svgLayerCurrent.setAttribute( 'height', layer.sizeReal.height );
         }
 
         if( "text" === layer.type )
@@ -133,12 +153,14 @@
             svgLayerCurrent      = document.createElementNS( "http://www.w3.org/2000/svg", "foreignObject" );
             htmlParagraphCurrent = document.createElement( "p" );
             svgLayerCurrent.appendChild( htmlParagraphCurrent );
+            
+            svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );  
         }
 
         // Set ID.
         //
         svgLayerCurrent.setAttribute( "id", layer.id + "svg" );
-     
+
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //   
         $( svgContainer ).append( svgLayerCurrent );
@@ -147,7 +169,7 @@
 
     function svgLayerUpdate( event, layer )
     {
-        // Set type specific options.
+        // Set type specific attributes.
         // 
         if( "text" === layer.type )
         {
@@ -156,14 +178,14 @@
             htmlParagraphCurrent.style.color      = layer.color; 
             htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";
             htmlParagraphCurrent.style.fontFamily = layer.font;
+
+            svgLayerCurrent.setAttribute( 'height', layer.sizeCurrent.height );
         }
 
-        // Set options.
+        // Set attributes.
         //  
-        svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width);  
-        svgLayerCurrent.setAttribute( 'height', layer.sizeCurrent.height ); 
-        svgLayerCurrent.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );    
-        svgLayerCurrent.setAttribute( 'transform', 'translate(' + layer.position.x + ',' + layer.position.y +') rotate(' + layer.rotation +',' + ( layer.sizeCurrent.width / 2) + ',' + ( layer.sizeCurrent.height / 2 ) + ')' );
+        svgLayerCurrent.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
+        svgLayerCurrent.setAttribute( 'transform', 'matrix(' + layer.matrix[ 0 ][ 0 ] + ',' + layer.matrix[ 1 ][ 0 ] + ',' + layer.matrix[ 0 ][ 1 ] + ',' + layer.matrix[ 1 ][ 1 ] + ',' + layer.matrix[ 0 ][ 2 ] + ',' + layer.matrix[ 1 ][ 2 ] + ')' );
     }
 
     function svgLayerSelect( event, layer )
@@ -174,9 +196,12 @@
         //
         if( layer )
         {
-            svgSelect.setAttribute( 'height', layer.sizeCurrent.height );
-            svgSelect.setAttribute( 'width', layer.sizeCurrent.width ); 
-            svgSelect.setAttribute( 'transform', 'translate(' + layer.position.x + ',' + layer.position.y +') rotate(' + layer.rotation +',' + ( layer.sizeCurrent.width  / 2 ) + ',' + ( layer.sizeCurrent.height / 2 ) + ')' );
+            svgSelect.setAttribute( 'transform', 'matrix(' + layer.matrix[ 0 ][ 0 ] + ',' + layer.matrix[ 1 ][ 0 ] + ',' + layer.matrix[ 0 ][ 1 ] + ',' + layer.matrix[ 1 ][ 1 ] + ',' + layer.matrix[ 0 ][ 2 ] + ',' + layer.matrix[ 1 ][ 2 ] + ')' );
+
+            if( "text" === layer.type )
+            {
+                svgSelect.setAttribute( 'height', layer.sizeCurrent.height );
+            }
 
             $ecardViewport.trigger( "positionElementResize", [ layer.positionRotated, layer.sizeRotated ] );
         }
@@ -186,6 +211,18 @@
         if( event.type == "layerSelect" )
         {
             svgSelect.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
+
+            if( "image" === layer.type )
+            {
+                svgSelect.setAttribute( 'height', layer.sizeReal.height );
+                svgSelect.setAttribute( 'width', layer.sizeReal.width ); 
+            }
+
+            if( "text" === layer.type )
+            {
+                svgSelect.setAttribute( 'width', layer.sizeCurrent.width );  
+            }
+
             $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
         }
     }
@@ -224,4 +261,5 @@
         $ecardBuilder.trigger( "layerResize", [ delta, direction ] );
     }
 
-} )( jQuery, window, "ecardBuilder" );
+    return module;
+});

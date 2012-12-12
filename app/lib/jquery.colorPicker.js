@@ -5,7 +5,11 @@
  * @version 1.0
  * @author mbaijs
  */
-;(function ( $, window, document, undefined )
+define(
+[
+    "jquery"
+],
+function( $ )
 {
     var pluginName = "colorPicker"
     ,   defaults   = 
@@ -141,4 +145,4 @@
             }
         });
     }
-})( jQuery, window, document );
+});

@@ -6,12 +6,28 @@
  * @version 1.0
  * @author mbaijs
  */
- ;( function( $, context, appName )
- {
-    var theApp = $.getAndCreateContext( appName, context )
-    ,   utils  = $.getAndCreateContext( "utils", theApp )
-    ,   canvas = { 
-            name : "canvas" 
+define(
+[
+    "jquery"
+
+    // App core modules.
+    //
+,   "utils"
+
+    // jQuery plugins
+    //
+,   "plugins/jquery.elementResize"
+],
+function( $, utils )
+{
+    var theApp = window[ "imageCreator" ]
+    ,   module =
+        {
+            name        : "canvas"
+        ,   initialized : false
+        ,   settings    : 
+            {
+            }
         }
 
     ,   $ecardBuilder
@@ -23,10 +39,10 @@
     ,   canvasHeight
     ;
 
-    theApp.engine = canvas;
-
-    canvas.initialize = function()
+    module.initialize = function()
     {
+        // Get basic app DOM elements.
+        //        
         $ecardBuilder  = $( ".ecardBuilder" );
         $ecardViewport = $( ".ecardViewport" );
         $ecardCanvas   = $( ".ecardCanvas" );
@@ -49,10 +65,13 @@
 
         // Listen to global app events.
         //
-        $ecardBuilder.bind( "layerUpdate", canvasBuildLayers );
-        $ecardBuilder.bind( "layerSelect", canvasBuildLayers );
-        $ecardBuilder.bind( "layerVisibility", canvasBuildLayers );
-        $ecardBuilder.bind( "layerRemove", canvasBuildLayers );
+        if( ! module.initialized )
+        {        
+            $ecardBuilder.bind( "layerUpdate", canvasBuildLayers );
+            $ecardBuilder.bind( "layerSelect", canvasBuildLayers );
+            $ecardBuilder.bind( "layerVisibility", canvasBuildLayers );
+            $ecardBuilder.bind( "layerRemove", canvasBuildLayers );
+        }
 
         // Setup the element resizer.
         //
@@ -71,32 +90,34 @@
         ,   layerCurrent = false
         ;
 
+        // Empty canvas.
+        //
         context.clearRect( 0, 0, canvasWidth, canvasHeight );
 
+        // Draw all the layers.
+        //
         $.each( layersObject.layers || [], function( index, layer )
         {
+            // Store reference to selected layer in memory.
+            //
             if( layer.selected )
             {
                 layerCurrent = layer;
             }
 
-            canvasLayerCreate( false, layer );
+            // If layer is visible than draw it.
+            //
+            if( layer.visible )
+            {
+                canvasLayerCreate( false, layer );
+            }
         });
 
+        // Set the selection rectangle around the current layer.
+        //
         if( layerCurrent && layerCurrent.visible )
         {
-            context.save();
-
-            context.translate( layerCurrent.position.x + ( layerCurrent.sizeCurrent.width / 2 ), layerCurrent.position.y + ( layerCurrent.sizeCurrent.height / 2 ) );
-            context.rotate( utils.toRadians( layerCurrent.rotation ) );
-            context.translate( -( layerCurrent.position.x + ( layerCurrent.sizeCurrent.width / 2 ) ), -( layerCurrent.position.y + (layerCurrent.sizeCurrent.height / 2 ) ) );           
-            context.strokeStyle = "#666";
-            context.lineWidth = 2;
-            context.strokeRect( layerCurrent.position.x, layerCurrent.position.y, layerCurrent.sizeCurrent.width, layerCurrent.sizeCurrent.height ); 
-    
-            context.restore();
-
-            $ecardViewport.trigger( "positionElementResize", [ layerCurrent.positionRotated, layerCurrent.sizeRotated ] );
+            canvasLayerSelect( false, layerCurrent );
         }
 
         $ecardViewport.trigger( "visibilityElementResize", [ layerCurrent.visible ] );
@@ -106,10 +127,10 @@
     {
         context.save();
 
-        if( layer.visible && "image" === layer.type )
+        if( "image" === layer.type )
         {
             context.translate( layer.position.x + ( layer.sizeCurrent.width / 2 ), layer.position.y + ( layer.sizeCurrent.height / 2 ) );
-            context.rotate( utils.toRadians( layer.rotation ) );
+            context.rotate( layer.rotation.radians );
             context.translate( -( layer.position.x + ( layer.sizeCurrent.width / 2 ) ), -( layer.position.y + (layer.sizeCurrent.height / 2 ) ) );
             context.drawImage( layer.image, layer.position.x, layer.position.y, layer.sizeCurrent.width, layer.sizeCurrent.height );
         }
@@ -117,9 +138,26 @@
         context.restore();
     }
 
+    function canvasLayerSelect( event, layer )
+    {
+        context.save();
+
+        context.translate( layer.position.x + ( layer.sizeCurrent.width / 2 ), layer.position.y + ( layer.sizeCurrent.height / 2 ) );
+        context.rotate( layer.rotation.radians );
+        context.translate( -( layer.position.x + ( layer.sizeCurrent.width / 2 ) ), -( layer.position.y + (layer.sizeCurrent.height / 2 ) ) );           
+        context.strokeStyle = "#666";
+        context.lineWidth = 2;
+        context.strokeRect( layer.position.x, layer.position.y, layer.sizeCurrent.width, layer.sizeCurrent.height ); 
+
+        context.restore();
+
+        $ecardViewport.trigger( "positionElementResize", [ layer.positionRotated, layer.sizeRotated ] );
+    }
+
     function canvasLayerResize( delta, direction )
     {
         $ecardBuilder.trigger( "layerResize", [ delta, direction ] );
     }
 
-} )( jQuery, window, "ecardBuilder" );
+    return module;
+} );

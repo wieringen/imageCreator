@@ -1,20 +1,44 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description <p></p>
  *
  * @namespace ecardBuilder.toolbar
  * @name image
  * @version 1.0
- * @author mbaij
+ * @author mbaijs
  */
- ;( function( $, context, appName )
- {
+define(
+[
+    "jquery"
 
-    var theApp        = $.getAndCreateContext( appName, context )
-    ,   utils         = $.getAndCreateContext( "utils", theApp )
-    ,   settings      = {}
-    ,   image         = {}
+    // Module HTML template.
+    //
+,   "text!toolbar/image/image.html"
 
-    ,   moduleEnabled = true
+    // App core modules.
+    //
+,   "utils"
+
+    // jQuery plugins.
+    //
+,   "plugins/jquery.tabular"
+,   "plugins/jquery.slider"
+,   "plugins/jquery.circleSlider"
+,   "plugins/jquery.dropArea"    
+],
+function( $, moduleHTML, utils )
+{
+    var theApp = window[ "imageCreator" ]
+    ,   module =
+        {
+            name     : "image"
+        ,   target   : ".toolbarImage"
+        ,   enabled  : true
+        ,   settings : 
+            {
+                imageDownScale : 3
+            ,   imageZoomScale : [ 30, 300 ]
+            }
+        }
 
     ,   $ecardBuilder
     ,   $viewport
@@ -23,10 +47,13 @@
     ,   $imageRotate
     ,   $buttonImageAdd
 
+    // The default properties of a image layer.
+    //
     ,   layerDefault = 
         {
             id              : null
         ,   type            : "image"
+        ,   visible         : true
 
         ,   image           : null
         ,   sizeReal        : { "width": 0, "height": 0 }
@@ -40,13 +67,16 @@
         //
         ,   sizeRotated     : { "width": 0, "height": 0 }
         ,   positionRotated : { "x": 0, "y": 0 } 
-        ,   rotation        : 0
 
         // Difference between unrotated and rotated size.
         //
         ,   offset          : { "x": 0, "y": 0 }
 
-        ,   visible         : true
+        // Matrix calculations.
+        //
+        ,   scale           : 1
+        ,   rotation        : { degrees: 0, radians : 0, sin: 0, cos: 1 }
+        ,   matrix          : [ 1, 0, 0, 1, 0, 0 ]
         }
 
     // The curent layer that is being edited.
@@ -54,20 +84,14 @@
     ,   layerCurrent = false   
     ;
 
-    theApp.toolbar.image = image;
-
-    /**
-     * @description 
-     *
-     * @namespace ecardBuilder.toolbar.image
-     * @name initialize
-     * 
-     * @param
-     */
-    image.initialize = function( options )
+    module.initialize = function( options )
     {
-        settings = options;
+        // Append module HTML.
+        //
+        $( module.target ).replaceWith( moduleHTML );
 
+        // Get basic app DOM elements.
+        //
         $ecardBuilder  = $( ".ecardBuilder" );
         $ecardViewport = $( ".ecardViewport" );
 
@@ -82,16 +106,18 @@
         //
         $module.tabular(
         {
-            "menu" : ".moduleMenu"
-        ,   "tabs" : ".moduleBody"
+            "menu"  : ".moduleMenu"
+        ,   "tabs"  : "a"
+        ,   "pages" : ".moduleBody"
         });
         $imageZoom.slider( 
         { 
             "start" : 100
-        ,   "scale" : settings.imageZoomScale
+        ,   "scale" : module.settings.imageZoomScale
         ,   "unit"  : "%"
         });
         $imageRotate.circleSlider();
+        $ecardViewport.dropArea();
 
         // Listen to global app events.
         //
@@ -99,6 +125,10 @@
         $ecardBuilder.bind( "layerSelect", imageSelect );
         $ecardBuilder.bind( "layerResize", imageResize );
         $ecardViewport.bind( "fileUpload", imageAdd );
+
+        // Listen to selection events.
+        //        
+        $ecardViewport.bind( "onRotate", imageRotate );
 
         // Listen to UI module events.
         //    
@@ -114,36 +144,55 @@
     {
         // Enable module if layer is of the correct type.
         //
-        moduleEnabled = layer.type === "image" || false;
-        $module.toggleClass( "moduleDisabled", ! moduleEnabled ); 
+        module.enabled = layer.type === "image" || false;
+        $module.toggleClass( "moduleDisabled", ! module.enabled ); 
 
-        if( moduleEnabled )
+        if( module.enabled )
         {
             layerCurrent = layer;
             
             // Set the UI to match the selected layers properties.
             //
-            $imageRotate.trigger( "setPosition", [ layerCurrent.rotation ] );
-            $imageZoom.trigger( "setPosition", [ layer ? Math.round( layerCurrent.sizeCurrent.width * settings.imageZoomScale[ 1 ] / layerCurrent.sizeReal.width ) : 0 ] );        
+            $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
+            $imageZoom.trigger( "setPosition", [ layer ? Math.round( layerCurrent.sizeCurrent.width * module.settings.imageZoomScale[ 1 ] / layerCurrent.sizeReal.width ) : 0 ] );        
         }
     }
 
     function imageResize( event, delta, direction )
     {
-        if( moduleEnabled && layerCurrent && layerCurrent.visible )
+        if( module.enabled && layerCurrent && layerCurrent.visible )
         {
+/*
+            layerCurrent.scale  = layerCurrent.scale - ((( delta.x + delta.y ) / 100 )/2);
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+            layerCurrent.sizeCurrent = {
+                    width  : Math.round( layerCurrent.scale * layerCurrent.sizeReal.width  )
+                ,   height : Math.round( layerCurrent.scale * layerCurrent.sizeReal.height )
+            };
+            layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
+
+            layerCurrent.position.x = Math.round( layerCurrent.positionRotated.x + ( layerCurrent.sizeRotated.width - layerCurrent.sizeCurrent.width ) / 2  );
+            layerCurrent.position.y = Math.round( layerCurrent.positionRotated.y + ( layerCurrent.sizeRotated.height - layerCurrent.sizeCurrent.height ) / 2 );
+
+            imagePosition( false, { x : -delta.x, y: -delta.y }, true );
+
+            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );*/
         }
     }
 
     function imageUpload()
     {
+        // Temp
+        //
         $( ".formImageUpload" ).submit();
 
-        $( "#iframeImageUpload" ).load( function( event )
+        $( "#iframeImageUpload" ).unbind( "load" ).load( function( event )
         {
-            imageAdd( event, $.parseJSON( this.contentDocument.documentElement.textContent ).src );
+            var json = $.parseJSON( $( this ).contents().text() );
+
+            $( ".message" ).html( json.message );
+
+            imageAdd( event, json.src );
         });
 
         return false;
@@ -151,7 +200,6 @@
 
     function imageAdd( event, url )
     {
-        console.log( url );
         // Temp
         //
         if( ! url )
@@ -172,8 +220,8 @@
 
         // Set image loading events.
         //
-        $( layerCurrent.image ).load( imageLoadSuccess );
-        $( layerCurrent.image ).error( imageLoadError );
+        layerCurrent.image.onload  = imageLoadSuccess;
+        layerCurrent.image.onerror = imageLoadError;
 
         layerCurrent.image.src = url;
 
@@ -184,7 +232,7 @@
     {
         // Since loading of the image is a success we can enable the module.
         //
-        moduleEnabled = true;
+        module.enabled = true;
 
         // Set the unmanipulated size of the image.
         //
@@ -193,19 +241,21 @@
 
         // Scale the unrotated size of the image also downscale it a bit.
         //
-        layerCurrent.sizeCurrent.width  = Math.round( this.width / settings.imageDownScale );
-        layerCurrent.sizeCurrent.height = Math.round( this.height / settings.imageDownScale );
- 
+        layerCurrent.sizeCurrent.width  = Math.round( this.width / module.settings.imageDownScale );
+        layerCurrent.sizeCurrent.height = Math.round( this.height / module.settings.imageDownScale );
+
         // In this stage no manipulation has happend so rotated size is the same as the unrotated size.
         //       
         layerCurrent.sizeRotated = layerCurrent.sizeCurrent;
+
+        layerCurrent.scale = 1 / module.settings.imageDownScale;
 
         // Set the layer's position to the center of the viewport. 
         //   
         var position = 
         {
             x : ( theApp.settings.viewportWidth / 2 ) - ( layerCurrent.sizeCurrent.width / 2 )
-        ,   y : ( theApp.settings.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2 )
+        ,   y : ( theApp.settings.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2)
         };
 
         imagePosition( false, position, true );
@@ -220,14 +270,19 @@
 
     }
 
-    function imageRotate( event, degrees )
+    function imageRotate( event, rotation )
     {
-        if( moduleEnabled && layerCurrent && layerCurrent.visible )
+        if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.rotation    = degrees;
-            
-            layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, degrees );
+            if( "onRotate" === event.type )
+            {
+                $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
+            }
 
+            layerCurrent.rotation = rotation;
+
+            layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, rotation );
+    
             imagePosition( false, { x: 0, y: 0 }, true );
 
             // Tell the app there a change in the current layer's rotation.
@@ -236,14 +291,14 @@
         }
     }
 
-    function imageZoom( event, scale )
+    function imageZoom( event, sliderScale )
     {
-        if( moduleEnabled && layerCurrent && layerCurrent.visible )
+        if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             var sizeNew = 
                 {
-                    width  : Math.round( scale * layerCurrent.sizeReal.width / settings.imageZoomScale[ 1 ] )
-                ,   height : Math.round( scale * layerCurrent.sizeReal.height / settings.imageZoomScale[ 1 ] )
+                    width  : Math.round( sliderScale * layerCurrent.sizeReal.width / module.settings.imageZoomScale[ 1 ] )
+                ,   height : Math.round( sliderScale * layerCurrent.sizeReal.height / module.settings.imageZoomScale[ 1 ] )
                 }
             ,   newPosition =
                 {
@@ -253,6 +308,7 @@
             ;
 
             layerCurrent.sizeCurrent = sizeNew;
+            layerCurrent.scale       = ( sliderScale / module.settings.imageDownScale ) / 100;
             layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
 
             imagePosition( false, newPosition, true )
@@ -263,7 +319,7 @@
 
     function imagePosition( event, delta, internal )
     {
-        if( moduleEnabled && layerCurrent && layerCurrent.visible )
+        if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             layerCurrent.position.x = Math.round( layerCurrent.position.x + delta.x );
             layerCurrent.position.y = Math.round( layerCurrent.position.y + delta.y );
@@ -276,6 +332,8 @@
 
             imageConstrain();
 
+            layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, layerCurrent.scale, layerCurrent.position, layerCurrent.sizeReal );
+
             if( ! internal )
             {
                 $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
@@ -285,6 +343,11 @@
 
     function imageConstrain()
     {
+        if( theApp.toolbar.layers && ! theApp.toolbar.layers.settings.constrainLayers )
+        {
+            return false;
+        }
+
         var ratio = { 
             width  : theApp.settings.viewportWidth - layerCurrent.sizeRotated.width
         ,   height : theApp.settings.viewportHeight - layerCurrent.sizeRotated.height
@@ -314,4 +377,5 @@
         layerCurrent.position.y = Math.round( layerCurrent.positionRotated.y + layerCurrent.offset.y );
     }
 
-} )( jQuery, window, "ecardBuilder" );
+    return module;
+} );

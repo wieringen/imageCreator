@@ -6,50 +6,95 @@
  * @version 1.0
  * @author mbaijs
  */
- ;( function( $, context, appName )
- {
+define(
+[
+    "jquery"
 
-    var theApp      = $.getAndCreateContext( appName, context )
-    ,   utils       = $.getAndCreateContext( "utils", theApp )
-    ,   layers      = {}
+    // Module HTML template
+    //
+,   "text!toolbar/layers/layers.html"
 
-    ,   settings    = {}
-    ,	snippets    = {}
+    // App core modules
+    //
+
+    // jQuery plugins
+    //
+,   "plugins/jquery.tabular"
+],
+function( $, moduleHTML )
+{
+    var theApp = window[ "imageCreator" ]
+    ,   module =
+        {
+            name     : "layers"
+        ,   target   : ".toolbarLayers"
+        ,   enabled  : false
+        ,   settings : 
+            {
+                constrainLayers : true
+            }
+        ,   snippets : {}
+        }
 
     ,   $ecardBuilder 
     ,   $module
-    ,	$objectLayers
+    ,   $objectLayers
     ,   $buttonLayerRemove
 
+    // The curent layer that is being edited.
+    //
     ,   $currentLayer = false
     ;
 
-    theApp.toolbar.layers = layers;
+    module.initialize = function( options )
+    {        
+        // Append module HTML.
+        //
+        $( module.target ).replaceWith( moduleHTML );
 
-    layers.initialize = function( options )
-    {
-    	settings = options;
-        
+        // Get basic app DOM elements.
+        //       
         $ecardBuilder      = $( ".ecardBuilder" );
 
         // Get module DOM elements.
         //
-        $module             = $( ".toolbarLayers" );
-        $objectLayers       = $module.find( ".objectLayers" );
-        $buttonLayerRemove  = $module.find( ".buttonLayerRemove" );
-        $selectRenderEngine = $module.find( ".selectRenderEngine" );
+        $module               = $( ".toolbarLayers" );
+        $objectLayers         = $module.find( ".objectLayers" );
+        $buttonLayerRemove    = $module.find( ".buttonLayerRemove" );
+        $selectRenderEngine   = $module.find( ".selectRenderEngine" );
+        $inputConstrainLayers = $module.find( ".inputConstrainLayers" );
 
         // Initialize module UI.
         //
         $module.tabular(
         {
-            "menu" : ".moduleMenu"
-        ,   "tabs" : ".moduleBody" 
+            "menu"  : ".moduleMenu"
+        ,   "tabs"  : "a"
+        ,   "pages" : ".moduleBody" 
         });
 
         // Get snippets.
         //
-        snippets.$objectLayerSnippet = $module.find( ".objectLayer" ).remove();
+        module.snippets.$objectLayerSnippet = $module.find( ".objectLayer" ).remove();
+        module.snippets.$engineSnippet      = $module.find( ".selectRenderEngineItem" ).remove();
+
+        // Set options.
+        //
+        $inputConstrainLayers.attr( "checked", module.settings.constrainLayers );
+        $.each( theApp.settings.engine, function( index, engine )
+        {
+            if( engine.support() )
+            {
+                var $engineClone = module.snippets.$engineSnippet.clone();
+                
+                $engineClone.attr( "value", engine.name );
+                $engineClone.text( engine.name );
+                $engineClone.attr( "selected", engine.name === theApp.engine.name );
+                $engineClone.data( "engine", engine );
+
+                $selectRenderEngine.append( $engineClone );
+            }
+        }); 
 
         // Listen to global app events.
         //
@@ -60,10 +105,11 @@
         $objectLayers.delegate( ".objectLayer", "click", layerSelect );
         $objectLayers.delegate( ".objectToggle", "click", layerToggle );
         $buttonLayerRemove.click( layerRemove );
-        $selectRenderEngine.change( renderEngineSelect );
+        $selectRenderEngine.change( optionRenderEngineSelect );
+        $inputConstrainLayers.change( optionConstrainLayersToggle );
     };
 
-    layers.getAllLayers = function()
+    module.getAllLayers = function()
     {
         var layers           = []
         ,   currentLayerData = $currentLayer && $currentLayer.data( "layer" );
@@ -77,7 +123,7 @@
         return { active : currentLayerData, layers : layers };
     };
 
-    layers.getCurrentLayer = function()
+    module.getCurrentLayer = function()
     {
         return $objectLayers.find( ".active" ).data( "layer" );
     };
@@ -120,39 +166,39 @@
 
     function layerUpdate( event, objectLayer )
     {
-    	$currentLayer = $objectLayers.find( "#objectLayer" + objectLayer.id );
-    	
-        var	$layerClone = null;
+        $currentLayer = $objectLayers.find( "#objectLayer" + objectLayer.id );
+        
+        var $layerClone = null;
 
         // This is a new layer. Create and select it.
         //
-    	if( 0 === $currentLayer.length )
-    	{
-    		$layerClone = snippets.$objectLayerSnippet.clone();
-    		$layerClone.attr( "id", "objectLayer" + objectLayer.id );
-    		$layerClone.data( "layer", objectLayer );
+        if( 0 === $currentLayer.length )
+        {
+            $layerClone = module.snippets.$objectLayerSnippet.clone();
+            $layerClone.attr( "id", "objectLayer" + objectLayer.id );
+            $layerClone.data( "layer", objectLayer );
             $layerClone.find( ".objectLayerName" ).text( objectLayer.layerName );
-    		
+            
             if( objectLayer.image )
-    		{
-    			$layerClone.find( "img" ).attr( "src", objectLayer.image.src );
-    		}
+            {
+                $layerClone.find( "img" ).attr( "src", objectLayer.image.src );
+            }
 
             if( objectLayer.text )
             {
                 //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );   
             }
 
-    		$objectLayers.prepend( $layerClone );
+            $objectLayers.prepend( $layerClone );
 
-    		layerSelect.call( $layerClone[0] );
-    	}
+            layerSelect.call( $layerClone[0] );
+        }
         // Update layer
         //
-    	else
-    	{
-    		$currentLayer.data( "layer", objectLayer );
-    	}    
+        else
+        {
+            $currentLayer.data( "layer", objectLayer );
+        }    
     }
 
     function layerToggle( event )
@@ -196,9 +242,15 @@
         return false;
     }
 
-    function renderEngineSelect( event )
+    function optionRenderEngineSelect( event )
     {
-        $ecardBuilder.trigger( "loadEngine", [ { name : event.target.value } ] );
+        $ecardBuilder.trigger( "loadEngine", [ $( this ).find( ":selected" ).data( "engine" ) ] );
     }
 
-} )( jQuery, window, "ecardBuilder" );
+    function optionConstrainLayersToggle( event )
+    {
+         module.settings.constrainLayers = $inputConstrainLayers.attr( "checked" );
+    }
+
+    return module;
+} );

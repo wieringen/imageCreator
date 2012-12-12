@@ -49,15 +49,70 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 {
 	border: 1px #ccc solid;
 	position: absolute;
+	z-index: 999;
 }
 
-.ecardBuilder .direction {
-	width: 3px;
-	height: 3px;
+.ecardBuilder .gripSize {
+	width: 4px;
+	height: 4px;
 	position: absolute;
 	background-color: #fff;
 	border: 1px #666 solid;
-	margin: -2px 0 0 -2px;
+}
+
+.ecardBuilder .directionN,
+.ecardBuilder .directionNE,
+.ecardBuilder .directionNW {
+	margin-top: -30px;
+}
+.ecardBuilder .directionN,
+.ecardBuilder .directionS{
+	margin-left: -15px;	
+}
+.ecardBuilder .directionW,
+.ecardBuilder .directionE{
+	margin-top: -15px;	
+}
+.ecardBuilder .directionW,
+.ecardBuilder .directionSW,
+.ecardBuilder .directionNW {
+	margin-left: -30px;
+}
+
+.ecardBuilder .directionN .gripSize,
+.ecardBuilder .directionNE .gripSize,
+.ecardBuilder .directionNW .gripSize{
+	bottom: -3px;
+}
+.ecardBuilder .directionS .gripSize,
+.ecardBuilder .directionSE .gripSize,
+.ecardBuilder .directionSW .gripSize{
+	top: -3px;
+}
+.ecardBuilder .directionN .gripSize,
+.ecardBuilder .directionS .gripSize{
+	left: 12px;
+}
+.ecardBuilder .directionW .gripSize,
+.ecardBuilder .directionE .gripSize{
+	top: 12px;	
+}
+.ecardBuilder .directionW .gripSize,
+.ecardBuilder .directionSW .gripSize,
+.ecardBuilder .directionNW .gripSize{
+	right: -3px;
+}
+.ecardBuilder .directionNE .gripSize,
+.ecardBuilder .directionE .gripSize,
+.ecardBuilder .directionSE .gripSize{
+	left: -3px;
+}
+
+.ecardBuilder .gripRotate {
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	cursor:url('../images/cursor-rotate.png') 12 12, auto;
 }
 
 .ecardBuilder .buttonPrimary {
@@ -72,6 +127,8 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
 	font-size:10px;	
 	margin: 0 0 20px;
 	border-radius: 3px;
+	overflow: hidden;
+	zoom: 1;
 }
 
 .ecardBuilder .buttonDisable {
@@ -94,6 +151,7 @@ h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal;
  	border-width: 0 1px 1px;
 	background-color: #dbdbdb;
 	display: none;
+	zoom: 1;
 }
 
 .ecardBuilder .toolbarModule .moduleBody:after {
@@ -153,6 +211,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9a9a9a', end
 	text-decoration: none;
 	text-transform: uppercase; 
 	font-size:10px; 
+	white-space: nowrap;
+	min-width: 5px;
+	width: auto !important;
+	width: 5px;
 }
 
 .ecardBuilder .toolbarModule .moduleMenu li {
@@ -191,7 +253,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', end
 
 .ecardBuilder .toolbarModule.moduleDisabled .moduleSub
 {
-	opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+  -moz-opacity: 0.2;
+  -khtml-opacity: 0.2;
+  opacity: 0.2;
 }
 
 

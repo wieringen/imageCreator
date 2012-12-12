@@ -31,12 +31,14 @@
         <div class="moduleSub imageCreate">
             <h3>Add image</h3>
 
-            <form enctype="multipart/form-data" method="post" action="toolbar/image/uploader/upload.processor.php" class="formImageUpload" target="iframeImageUpload">
+            <form method="post" action="toolbar/image/uploader/upload.processor.php" class="formImageUpload" target="iframeImageUpload">
                 <input type="file" class="inputImageUpload" name="inputImageUpload" />
                 <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
             </form>
             
-            <iframe id="iframeImageUpload"></iframe>
+            <div class="message"></div>
+
+            <iframe id="iframeImageUpload" name="iframeImageUpload"></iframe>
 
             <div class="buttonPrimary buttonImageAdd">Add Image</div>
         </div>

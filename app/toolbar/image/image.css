@@ -69,5 +69,9 @@
 }
 
 .ecardBuilder .toolbarModule.moduleDisabled .imageCreate {
-	opacity: 1.0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  -moz-opacity: 1.0;
+  -khtml-opacity: 1.0;
+  opacity: 1.0;
 }

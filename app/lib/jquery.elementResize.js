@@ -5,17 +5,22 @@
  * @version 1.0
  * @author mbaijs
  */
-;(function ( $, window, document, undefined )
+define(
+[
+    "jquery"
+],
+function( $ )
 {
     var pluginName = "elementResize"
     ,   defaults   =
         { 
             resizeCallback : null
+        ,   onRotate       : null
         ,   directions : 
             [
 
                 { 
-                    "name"       : "N" 
+                    "name"       : "N"
                 ,   "position"   : [ 50, 0 ]
                 ,   "positive"   : [ true, true ]
                 ,   "compensate" : [ true, true ]
@@ -33,7 +38,7 @@
                 ,   "compensate" : [ false, false ]                
                 }
             ,   { 
-                    "name"       : "W" 
+                    "name"       : "W"
                 ,   "position"   : [ 0, 50 ]     
                 ,   "positive"   : [ true, true ]
                 ,   "compensate" : [ true, true ]
@@ -98,16 +103,16 @@
                 _self.$directions.toggle( visibility || false );
             });  
 
-            $( this.element ).delegate( ".direction", "mousedown", function( event )
+            $( this.element ).delegate( ".gripRotate", "mousedown", function( event )
             {
-                _self.resizeElement.call( _self, event, $( this ) );
+                _self.rotateElement.call( _self, event, $( this ) );
             });  
         }, 
         
         createResizer: function()
         {
             var _self       = this
-            ,   $direction  = $( "<div class='direction'></div>")
+            ,   $direction  = $( "<div class='direction gripRotate'><div class='gripSize'></div></div>")
             ;
 
             this.$directions = $( "<div class='directions'></div>")
@@ -118,14 +123,15 @@
                 
                 $clone.addClass( "direction" + direction.name );
                 
-                $clone.data( "direction", direction);
+                $clone.data( "direction", direction );
 
                 $clone.css({
-                    "left"       : direction.position[0] + "%"
-                ,   "top"        : direction.position[1] + "%"
-                ,   "cursor"     : direction.name.toLowerCase() + "-resize" 
+                    "left" : direction.position[0] + "%"
+                ,   "top"  : direction.position[1] + "%"
                 });
                 
+                $clone.find( ".gripSize" ).css( "cursor", direction.name.toLowerCase() + "-resize" );
+
                 _self.$directions.append( $clone );
             });
 
@@ -137,10 +143,10 @@
         positionResizer : function( event, position, size )
         { 
             this.$directions.css({
-                    "left"   : position.x
-                ,   "top"    : position.y
-                ,   "width"  : size.width -2
-                ,   "height" : size.height -2
+                    "left"   : position.x -2
+                ,   "top"    : position.y -2
+                ,   "width"  : size.width +2
+                ,   "height" : size.height +2
             });
         },
 
@@ -176,8 +182,51 @@
             });
 
             return false;
-        }        
-    
+        },        
+
+        rotateElement : function( event, $direction )
+        {
+            var _self = this
+            ,   direction = $direction.data( "direction" )
+            ,   layer = _self.options.onRotate()
+            ;
+
+            $( document ).mousemove( function( event )
+            {
+                var position = 
+                    {
+                        x : event.pageX - _self.$directions.offset().left - ( _self.$directions.width() / 2 )
+                    ,   y : event.pageY - _self.$directions.offset().top  - ( _self.$directions.height() / 2 )
+                    }
+                ,   radians = Math.atan2( position.x, -position.y )
+                ,   degrees = Math.round( radians * 180 / Math.PI )
+                ,   cos     = Math.cos( radians )
+                ,   sin     = Math.sin( radians )
+                ;
+
+                degrees = degrees < 0 ? degrees +360 : degrees;
+
+                var rotation = {
+                        degrees : degrees
+                    ,   radians : radians
+                    ,   sin     : sin
+                    ,   cos     : cos
+                };
+
+                $( _self.element ).trigger( "onRotate", [ rotation ] );
+            });
+
+            $( document ).mouseup( function( event )
+            {
+                $( document ).unbind( "mousemove" );
+                $( document ).unbind( "mouseup" );
+
+                return false;
+            });
+
+            return false;
+        }
+
     };
 
     $.fn[ pluginName ] = function( options )
@@ -199,4 +248,4 @@
             }
         });
     }
-})( jQuery, window, document );
+});

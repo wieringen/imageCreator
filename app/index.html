@@ -7,27 +7,8 @@
         <meta name="robots" content="all" />
 
         <link rel="stylesheet" type="text/css" href="css/style.css" />
-
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-
-        <!--@@js-dev-start@@ -->
-        
-        <script src="lib/context.js"></script>
-
-        <!-- UI -->
-        <script src="lib/jquery.dropArea.js"></script>
-        <script src="lib/jquery.circleSlider.js"></script>
-        <script src="lib/jquery.colorPicker.js"></script>
-        <script src="lib/jquery.elementResize.js"></script>
-        <script src="lib/jquery.slider.js"></script> 
-        <script src="lib/jquery.tabular.js"></script>
-
-        <!-- Core -->
-        <script src="core/utils.js"></script>
-        <script src="core/controller.js"></script>
-
-        <!--@@js-dev-end@@ -->
-
+ 
+        <script type="text/javascript" src="lib/require/require.js" data-main="core/controller.js"> </script>
     </head>
     <body>
 
@@ -39,9 +20,15 @@
                 <div class="ecardCanvas"></div>
             </div>
 
-            <div class="ecardToolbarRight"></div>
+            <div class="ecardToolbarRight">
+                <div class="toolbarLayers"></div>
+                <div class="toolbarInfo"></div>
+            </div>
 
-            <div class="ecardToolbarBottom"></div>
+            <div class="ecardToolbarBottom">
+                <div class="toolbarImage"></div>
+                <div class="toolbarText"></div>
+            </div>
         </div>
         
     </body>

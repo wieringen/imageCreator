@@ -6,68 +6,74 @@
  * @version 1.0
  * @author mbaijs
  */
-;( function( $, context, appName )
-{
-    var theApp   = $.getAndCreateContext( appName, context )
-    ,   services = $.getAndCreateContext( "services", theApp )
 
-    ,   mouse    = {}  
+ // Set up the paths and inital modules for the app.
+ //
+requirejs.config({
+    paths: {
+        // jQuery
+        //
+        "jquery"      : "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min"
+        
+        // App paths
+        //
+    ,   "toolbar"     : "../toolbar"
+    ,   "plugins"     : "../lib"
+    ,   "engine"      : "engine"
+
+        // Require plugins
+        //
+    ,   "domReady"    : "../lib/require/domReady"
+    ,   "text"        : "../lib/require/text"
+    ,   "lazyRequire" : "../lib/require/lazyRequire"
+    }
+});
+
+require(
+[
+    "jquery"
+,   "lazyRequire"
+,   "utils"
+,   "domReady!"
+],
+function( $, lazyRequire, utils )
+{   
+    var theApp = window[ "imageCreator" ] = 
+        {
+            engine  : ""
+        ,   toolbar : {}
+        }
+    ,   mouse  = {}
 
     ,   $ecardBuilder  = null
     ,   $ecardViewport = null
     ;
 
-    theApp.toolbar = {};
-
     var settings = theApp.settings = $.extend(
     {
         viewportWidth  : 520
     ,   viewportHeight : 360
- 
-    ,   enginePath     : "core/engine/"
 
     ,   engine : 
         [ 
             {
-                name    : "SVG"
+                name    : "svg"
+            ,   support : utils.testForSVG
             ,   order   : 1
             }
         ,   {
-                name    : "Canvas"            
+                name    : "vml"
+            ,   support : utils.testForVML
             ,   order   : 2
             }
         ,   {
-                name    : "VML"
+                name    : "canvas"
+            ,   support : utils.testForCanvas
             ,   order   : 3
-            }
+            }          
         ]
 
-    ,   toolbar :
-        [
-            {
-                name           : "image"
-            ,   target         : ".ecardToolbarBottom"
-            ,   imageDownScale : 3
-            ,   imageZoomScale : [ 30, 300 ]
-            }
-
-        ,   {
-                name           : "text"
-            ,   target         : ".ecardToolbarBottom"
-            ,   textSizeScale  : [ 10, 100 ]
-            ,   font           : "Arial"
-            }
-
-        ,   {
-                name           : "info"
-            ,   target         : ".ecardToolbarRight"
-            }
-
-        ,   {
-                name           : "layers"
-            ,   target         : ".ecardToolbarRight"
-            }                    
-        ]
+    ,   toolbar : [ "layers", "image", "text", "info" ]
 
     }, theApp.settings );
 
@@ -80,7 +86,7 @@
         //
         $ecardViewport.mousedown( viewportDragStart );
 
-        //  Set engine precedence.
+        // Set engine precedence.
         //
         settings.engine.sort( function( engineA, engineB )
         {
@@ -91,78 +97,56 @@
 
         $ecardBuilder.bind( "loadEngine", loadEngine );
 
-        //  Create toolbar.
+        // Create toolbar.
         //
         $.each( settings.toolbar || [], loadTool );
 
         $ecardBuilder.bind( "loadTool", loadTool );
-
-        //  Fileupload.
-        //
-        $ecardViewport.imageUpload();
     } );
-
-    theApp.supportEngine = function( engineName )
-    {
-        var engineTests = 
-        {
-            SVG     :   function()
-                        {
-                            return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg', "svg").createSVGRect;
-                        }
-        ,   Canvas  :   function()
-                        {
-                            return !!document.createElement("canvas").getContext;
-                        }
-        ,   VML     :   function()
-                        {
-                            return "object" === typeof document.namespaces;
-                        }
-        };
-
-        if( engineTests.hasOwnProperty( engineName ) )
-        {
-            return engineTests[ engineName ]();
-        }
-        else
-        {
-            return false;
-        }
-    };
 
     function loadEngine( event, engineObject )
     {
-        if( theApp.supportEngine( engineObject.name ) || ( "function" === typeof engineObject.support && engineObject.support() ) )
+        if( "function" === typeof engineObject.support && engineObject.support() )
         {
-            $.getScript( settings.enginePath + engineObject.name.toLowerCase() + ".js", function( data ) 
-            {
-                theApp.engine.initialize();
-            });
+            var requireOnce = lazyRequire.once();
+
+            requireOnce(
+                [
+                    "engine/" + engineObject.name
+                ]
+            ,   function( engine )
+                {
+                    theApp.engine = engine;
+                }
+            ,   function()
+                {
+                    theApp.engine.initialize();
+                }
+            );
 
             return false;
         }
-        else
-        {
-            //alert( engineObject.name + " is not supported in your browser!" );
-        }
     }
 
-    function loadTool( event, toolOptions )
+    function loadTool( event, toolName )
     {
-        $( "<link/>", { rel: "stylesheet", href: "toolbar/" + toolOptions.name + "/" + toolOptions.name + ".css" }).appendTo( "head" );
+        var requireOnce = lazyRequire.once();
 
-        $.ajax({
-                url     : "toolbar/" + toolOptions.name + "/" + toolOptions.name + ".html"
-            ,   success : function( html ) 
-                {
-                    $( toolOptions.target ).append( html );
-                    
-                    $.getScript( "toolbar/" + toolOptions.name + "/" + toolOptions.name + ".js", function( data ) 
-                    {
-                        theApp.toolbar[ toolOptions.name ].initialize( toolOptions );
-                    });
-                }
-        });
+        $( "<link/>", { type: "text/css", rel: "stylesheet", href: "toolbar/" + toolName + "/" + toolName + ".css" }).appendTo( "head" );
+  
+        requireOnce(
+            [
+                "toolbar/" + toolName + "/" + toolName
+            ]
+        ,   function( tool )
+            {
+                theApp.toolbar[ toolName ] = tool;
+            }
+        ,   function()
+            {   
+                theApp.toolbar[ toolName ].initialize();
+            }
+        );
     }
 
     function viewportDragStart( event )
@@ -204,4 +188,4 @@
         return false;      
     }
 
-} )( jQuery, window, "ecardBuilder" );
+} );

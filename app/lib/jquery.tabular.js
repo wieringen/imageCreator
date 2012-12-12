@@ -9,10 +9,11 @@
 {
     var pluginName = 'tabular'
     ,   defaults   = 
-    	{ 
-	        menu : ""
-	    ,   tabs : "" 
-	    }
+        {
+            menu  : "" 
+        ,   tabs  : ""
+        ,   pages : ""
+        }
     ;
 
     function Plugin( element, options )
@@ -27,45 +28,50 @@
 
     Plugin.prototype = 
     {   
-    	$menu      : null,
-    	$menuItems : null,
-    	$tabs      : null,
+        $menu  : null
+    ,   $tabs  : null
+    ,   $pages : null
 
-        init: function()
+    ,   init: function()
         {
-        	this.$menu      = $( this.element ).find( this.options.menu );
-        	this.$menuItems = this.$menu.find( "a" );
-        	this.$tabs 	    = $( this.element ).find( this.options.tabs );
-
-			this.setEvents();
-        }, 
+            this.$menu  = $( this.element ).find( this.options.menu );
+            this.$tabs  = $( this.element ).find( this.options.tabs );
+            this.$pages = $( this.element ).find( this.options.pages );
+            
+            this.setEvents();
+        } 
         
-        setEvents: function()
+    ,   setEvents: function()
         {
-        	var _self = this;
+            var _self = this;
 
-			this.$menu.delegate( "a", "click", function( event )
-			{ 
-				var tabIndex = _self.$menuItems.index( this );
+            this.$menu.delegate( this.options.tabs, "click", function( event )
+            { 
+                var tabIndex = _self.$tabs.index( this );
 
-				_self.setTab( event, tabIndex );
+                _self.setTab( event, tabIndex );
 
-				return false; 
-			});
+                return false; 
+            });
 
-			$( this.element ).bind( "setTab", function( event, index )
-			{ 
-				_self.setTab( event, index );
-			});
-        },
+            $( this.element ).bind( "setTab", function( event, index )
+            {
+                _self.setTab( event, index );
+            });
+        }
 
-        setTab: function( event, index )
+    ,   setTab: function( event, index )
         {
-        	this.$menu.find( ".tabActive" ).removeClass( "tabActive" );
-        	$( this.$menuItems[ index ] ).addClass( "tabActive" );
+            this.$menu.find( ".tabActive" ).removeClass( "tabActive" );
+            $( this.$tabs[ index ] ).addClass( "tabActive" );
 
-        	this.$tabs.filter( ".tabActive" ).removeClass( "tabActive" );
-        	$( this.$tabs[ index ] ).addClass( "tabActive" );
+            this.$pages.filter( ".tabActive" ).removeClass( "tabActive" );
+            $( this.$pages[ index ] ).addClass( "tabActive" );
+
+            if( "function" === typeof this.options.callback )
+            {
+               this.options.callback( $( this.$pages[ index ] ) );
+            }
         }
 
     };
