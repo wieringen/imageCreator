@@ -1,4 +1,4 @@
-.ecardBuilder .textSize .track { 
+.imageCreator .textSize .track { 
 	background: 	#cdcdcd; 
 	height: 		4px;
 	width: 			140px;
@@ -8,7 +8,7 @@
 	border-top: 1px solid #747474;
 	position: 		relative; 
 }
-.ecardBuilder .textSize .thumb { 
+.imageCreator .textSize .thumb { 
 	background: 	transparent url(images/text-zoom-thumb.png) no-repeat 0 0; 
 	height: 		10px; 
 	width:			10px; 
@@ -17,15 +17,15 @@
 	top:			-4px; 
 	cursor: 		pointer; 
 }
-.ecardBuilder .textSize .indicator 
+.imageCreator .textSize .indicator 
 {
 	font-size: 		10px; 
 	float: 			right; 
 	margin:			-3px 0 0;
 }
 
-.ecardBuilder .textColor .track { 
-	background: 	transparent url(images/text-color.png) no-repeat 0 0; 
+.imageCreator .textColor .track { 
+	background: 	transparent url(images/text-color.png) no-repeat 0 0;
 	height: 		83px; 
 	width: 			83px; 
 	position: 		relative; 
@@ -33,17 +33,17 @@
 	float: 			left;
 }
 
-.ecardBuilder .moduleDisabled .textColor .track {
+.imageCreator .moduleDisabled .textColor .track {
 	opacity: 0.5;
 }
 
-.ecardBuilder .textRotate .track { 
+.imageCreator .textRotate .track { 
 	background: 	transparent url(images/text-rotate-track.png) no-repeat 0 0; 
 	height: 		83px; 
 	width: 			83px; 
 	position: 		relative; 
 }
-.ecardBuilder .textRotate .thumb { 
+.imageCreator .textRotate .thumb { 
 	background: 	transparent url(images/text-zoom-thumb.png) no-repeat 0 0; 
 	height: 		10px; 
 	width: 			10px; 
@@ -53,7 +53,7 @@
 	left: 			42px; 
 	cursor: 		pointer; 
 }
-.ecardBuilder .textRotate .degrees{ 
+.imageCreator .textRotate .degrees{ 
 	font-size: 		10px; 
 	position:		absolute;
 	left: 			50%; 
@@ -64,13 +64,13 @@
 	margin:			-7px 0 0 -10px;
 }
 
-.ecardBuilder .textColor .hex { 
+.imageCreator .textColor .hex { 
 	float: left;
 	font-size: 10px;
 	margin: 0 0 0 5px;
 }
 
-.ecardBuilder .textColor .color { 
+.imageCreator .textColor .color { 
 	width: 10px;
 	height: 10px;
 	float: left;
@@ -78,25 +78,33 @@
 	border: 1px solid #8b8b8b;
 }
 
-.ecardBuilder .moduleDisabled .color,
-.ecardBuilder .moduleDisabled .hex {
+.imageCreator .moduleDisabled .color,
+.imageCreator .moduleDisabled .hex {
 	display: none;
 }
 
-.ecardBuilder .selectTextFont {
-	width: 57%;
+.imageCreator .selectTextFont {
+	width: 65%;
 	float: left;
+	height: 22px;
+	line-height: 22px;
 	margin: 0 5% 0 0;
 }
 
-.ecardBuilder .buttonTextBold {
+.imageCreator .buttonTextWeight {
 	float: left;
 	font-weight: bold;
 	margin: 0 5% 0 0;
 }
 
-.ecardBuilder .buttonTextItalic {
+.imageCreator .buttonTextStyle {
 	float: left;
 	margin: 0;
 	font-style: italic;
+}
+
+.imageCreator .areaTextEdit {
+	min-height: 128px;
+	width: 167px;
+	margin: 0;
 }

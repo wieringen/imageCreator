@@ -1,7 +1,7 @@
 /**
  * @description <p></p>
  *
- * @namespace ecardBuilder.toolbar
+ * @namespace imageCreator.toolbar
  * @name image
  * @version 1.0
  * @author mbaijs
@@ -40,9 +40,10 @@ function( $, moduleHTML, utils )
             }
         }
 
-    ,   $ecardBuilder
-    ,   $viewport
+    ,   $imageCreator
+    ,   $ecardViewport
     ,   $module
+    ,   $selection   
     ,   $imageZoom
     ,   $imageRotate
     ,   $buttonImageAdd
@@ -52,6 +53,7 @@ function( $, moduleHTML, utils )
     ,   layerDefault = 
         {
             id              : null
+        ,   name            : ""
         ,   type            : "image"
         ,   visible         : true
 
@@ -92,8 +94,9 @@ function( $, moduleHTML, utils )
 
         // Get basic app DOM elements.
         //
-        $ecardBuilder  = $( ".ecardBuilder" );
+        $imageCreator  = $( ".imageCreator" );
         $ecardViewport = $( ".ecardViewport" );
+        $selection     = $ecardViewport.find( ".selection" );
 
         // Get module DOM elements.
         //
@@ -121,14 +124,15 @@ function( $, moduleHTML, utils )
 
         // Listen to global app events.
         //
-        $ecardBuilder.bind( "viewportMove", imagePosition );
-        $ecardBuilder.bind( "layerSelect", imageSelect );
-        $ecardBuilder.bind( "layerResize", imageResize );
+        $imageCreator.bind( "viewportMove", imagePosition );
+        $imageCreator.bind( "layerSelect", imageSelect );
+        $imageCreator.bind( "layerVisibility", imageSelect );
         $ecardViewport.bind( "fileUpload", imageAdd );
 
         // Listen to selection events.
         //        
-        $ecardViewport.bind( "onRotate", imageRotate );
+        $selection.bind( "onRotate", imageRotate );
+        $selection.bind( "onResize", imageResize );
 
         // Listen to UI module events.
         //    
@@ -142,9 +146,16 @@ function( $, moduleHTML, utils )
 
     function imageSelect( event, layer )
     {
-        // Enable module if layer is of the correct type.
+        // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
         //
-        module.enabled = layer.type === "image" || false;
+        if( event.type === "layerVisibility" && ! layer.selected )
+        {
+            return false;
+        }
+
+        // Enable module if layer is of the correct type and layer is visible.
+        //
+        module.enabled = layer.visible && layer.type === "image" || false;
         $module.toggleClass( "moduleDisabled", ! module.enabled ); 
 
         if( module.enabled )
@@ -162,13 +173,11 @@ function( $, moduleHTML, utils )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-/*
-            layerCurrent.scale  = layerCurrent.scale - ((( delta.x + delta.y ) / 100 )/2);
-
             layerCurrent.sizeCurrent = {
                     width  : Math.round( layerCurrent.scale * layerCurrent.sizeReal.width  )
                 ,   height : Math.round( layerCurrent.scale * layerCurrent.sizeReal.height )
             };
+
             layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
 
             layerCurrent.position.x = Math.round( layerCurrent.positionRotated.x + ( layerCurrent.sizeRotated.width - layerCurrent.sizeCurrent.width ) / 2  );
@@ -176,7 +185,7 @@ function( $, moduleHTML, utils )
 
             imagePosition( false, { x : -delta.x, y: -delta.y }, true );
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );*/
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -190,7 +199,7 @@ function( $, moduleHTML, utils )
         {
             var json = $.parseJSON( $( this ).contents().text() );
 
-            $( ".message" ).html( json.message );
+            $( ".message" ).html( json.message ).show();
 
             imageAdd( event, json.src );
         });
@@ -214,9 +223,9 @@ function( $, moduleHTML, utils )
 
         // Set layer options.
         //
-        layerCurrent.id        = "image" + new Date().getTime().toString();        
-        layerCurrent.image     = new Image();
-        layerCurrent.layerName = url.substring( url.lastIndexOf("/") + 1 );
+        layerCurrent.id    = "image" + new Date().getTime().toString();        
+        layerCurrent.image = new Image();
+        layerCurrent.name  = url.substring( url.lastIndexOf("/") + 1 );
 
         // Set image loading events.
         //
@@ -244,11 +253,13 @@ function( $, moduleHTML, utils )
         layerCurrent.sizeCurrent.width  = Math.round( this.width / module.settings.imageDownScale );
         layerCurrent.sizeCurrent.height = Math.round( this.height / module.settings.imageDownScale );
 
+        // Adjust the scale to reflect the initial downscale.
+        //
+        layerCurrent.scale = 1 / module.settings.imageDownScale;
+
         // In this stage no manipulation has happend so rotated size is the same as the unrotated size.
         //       
         layerCurrent.sizeRotated = layerCurrent.sizeCurrent;
-
-        layerCurrent.scale = 1 / module.settings.imageDownScale;
 
         // Set the layer's position to the center of the viewport. 
         //   
@@ -262,7 +273,7 @@ function( $, moduleHTML, utils )
 
         // Tell the app we have a new layer.
         //
-        $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+        $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
     }
 
     function imageLoadError()
@@ -287,7 +298,7 @@ function( $, moduleHTML, utils )
 
             // Tell the app there a change in the current layer's rotation.
             //
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -295,10 +306,13 @@ function( $, moduleHTML, utils )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
+
+           layerCurrent.scale = ( sliderScale / module.settings.imageDownScale ) / 100;
+
             var sizeNew = 
                 {
-                    width  : Math.round( sliderScale * layerCurrent.sizeReal.width / module.settings.imageZoomScale[ 1 ] )
-                ,   height : Math.round( sliderScale * layerCurrent.sizeReal.height / module.settings.imageZoomScale[ 1 ] )
+                    width  : Math.round( layerCurrent.scale * layerCurrent.sizeReal.width )
+                ,   height : Math.round( layerCurrent.scale * layerCurrent.sizeReal.height )
                 }
             ,   newPosition =
                 {
@@ -308,12 +322,11 @@ function( $, moduleHTML, utils )
             ;
 
             layerCurrent.sizeCurrent = sizeNew;
-            layerCurrent.scale       = ( sliderScale / module.settings.imageDownScale ) / 100;
             layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
 
             imagePosition( false, newPosition, true )
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -336,7 +349,7 @@ function( $, moduleHTML, utils )
 
             if( ! internal )
             {
-                $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+                $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
             }
         }
     }

@@ -1,7 +1,7 @@
 /**
  * @description <p>The Canvas engine implementation.</p>
  *
- * @namespace ecardBuilder.engine
+ * @namespace imageCreator.engine
  * @name canvas
  * @version 1.0
  * @author mbaijs
@@ -13,10 +13,6 @@ define(
     // App core modules.
     //
 ,   "utils"
-
-    // jQuery plugins
-    //
-,   "plugins/jquery.elementResize"
 ],
 function( $, utils )
 {
@@ -24,13 +20,12 @@ function( $, utils )
     ,   module =
         {
             name        : "canvas"
-        ,   initialized : false
         ,   settings    : 
             {
             }
         }
 
-    ,   $ecardBuilder
+    ,   $imageCreator
     ,   $ecardViewport
     ,   $canvas
     ,   $context
@@ -43,7 +38,7 @@ function( $, utils )
     {
         // Get basic app DOM elements.
         //        
-        $ecardBuilder  = $( ".ecardBuilder" );
+        $imageCreator  = $( ".imageCreator" );
         $ecardViewport = $( ".ecardViewport" );
         $ecardCanvas   = $( ".ecardCanvas" );
         
@@ -63,21 +58,16 @@ function( $, utils )
 
         context = $canvas[0].getContext( "2d" );
 
+        // Remove other engines that may be listening.
+        //
+        $imageCreator.unbind( ".engine" );
+
         // Listen to global app events.
         //
-        if( ! module.initialized )
-        {        
-            $ecardBuilder.bind( "layerUpdate", canvasBuildLayers );
-            $ecardBuilder.bind( "layerSelect", canvasBuildLayers );
-            $ecardBuilder.bind( "layerVisibility", canvasBuildLayers );
-            $ecardBuilder.bind( "layerRemove", canvasBuildLayers );
-        }
-
-        // Setup the element resizer.
-        //
-        $ecardViewport.elementResize({
-            "resizeCallback" : canvasLayerResize
-        });
+        $imageCreator.bind( "layerUpdate.engine", canvasBuildLayers );
+        $imageCreator.bind( "layerSelect.engine", canvasBuildLayers );
+        $imageCreator.bind( "layerVisibility.engine", canvasBuildLayers );
+        $imageCreator.bind( "layerRemove.engine", canvasBuildLayers );
 
         // Do we have any layers allready?
         //
@@ -119,8 +109,6 @@ function( $, utils )
         {
             canvasLayerSelect( false, layerCurrent );
         }
-
-        $ecardViewport.trigger( "visibilityElementResize", [ layerCurrent.visible ] );
     }
 
     function canvasLayerCreate( event, layer )
@@ -128,11 +116,9 @@ function( $, utils )
         context.save();
 
         if( "image" === layer.type )
-        {
-            context.translate( layer.position.x + ( layer.sizeCurrent.width / 2 ), layer.position.y + ( layer.sizeCurrent.height / 2 ) );
-            context.rotate( layer.rotation.radians );
-            context.translate( -( layer.position.x + ( layer.sizeCurrent.width / 2 ) ), -( layer.position.y + (layer.sizeCurrent.height / 2 ) ) );
-            context.drawImage( layer.image, layer.position.x, layer.position.y, layer.sizeCurrent.width, layer.sizeCurrent.height );
+        {   
+            context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
+            context.drawImage( layer.image, 0, 0, layer.sizeReal.width, layer.sizeReal.height );
         }
 
         context.restore();
@@ -141,22 +127,14 @@ function( $, utils )
     function canvasLayerSelect( event, layer )
     {
         context.save();
-
-        context.translate( layer.position.x + ( layer.sizeCurrent.width / 2 ), layer.position.y + ( layer.sizeCurrent.height / 2 ) );
-        context.rotate( layer.rotation.radians );
-        context.translate( -( layer.position.x + ( layer.sizeCurrent.width / 2 ) ), -( layer.position.y + (layer.sizeCurrent.height / 2 ) ) );           
+        
+        context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
         context.strokeStyle = "#666";
-        context.lineWidth = 2;
-        context.strokeRect( layer.position.x, layer.position.y, layer.sizeCurrent.width, layer.sizeCurrent.height ); 
+        context.lineWidth = 2 / layer.scale;
 
+        context.strokeRect( 0, 0, ( layer.sizeReal ? layer.sizeReal.width : layer.sizeCurrent.width ), ( layer.sizeReal ? layer.sizeReal.height : layer.sizeCurrent.height ) ); 
+        
         context.restore();
-
-        $ecardViewport.trigger( "positionElementResize", [ layer.positionRotated, layer.sizeRotated ] );
-    }
-
-    function canvasLayerResize( delta, direction )
-    {
-        $ecardBuilder.trigger( "layerResize", [ delta, direction ] );
     }
 
     return module;

@@ -1,4 +1,4 @@
-.ecardBuilder .imageZoom .track { 
+.imageCreator .imageZoom .track { 
 	background: 	#cdcdcd; 
 	height: 		4px;
 	width: 			140px;
@@ -8,7 +8,7 @@
 	border-top: 1px solid #747474;
 	position: 		relative; 
 }
-.ecardBuilder .imageZoom .thumb { 
+.imageCreator .imageZoom .thumb { 
 	background: 	transparent url(images/image-zoom-thumb.png) no-repeat 0 0; 
 	height: 		10px; 
 	width:			10px; 
@@ -17,20 +17,20 @@
 	top:			-4px; 
 	cursor: 		pointer; 
 }
-.ecardBuilder .imageZoom .indicator 
+.imageCreator .imageZoom .indicator 
 {
 	font-size: 		10px; 
 	float: 			right; 
 	margin:			-3px 0 0;
 }
 
-.ecardBuilder .imageRotate .track { 
+.imageCreator .imageRotate .track { 
 	background: 	transparent url(images/image-rotate-track.png) no-repeat 0 0; 
 	height: 		83px; 
 	width: 			83px; 
 	position: 		relative; 
 }
-.ecardBuilder .imageRotate .thumb { 
+.imageCreator .imageRotate .thumb { 
 	background: 	transparent url(images/image-zoom-thumb.png) no-repeat 0 0; 
 	height: 		10px; 
 	width: 			10px; 
@@ -40,7 +40,7 @@
 	left: 			42px; 
 	cursor: 		pointer; 
 }
-.ecardBuilder .imageRotate .degrees{ 
+.imageCreator .imageRotate .degrees{ 
 	font-size: 		10px; 
 	position:		absolute;
 	left: 			50%; 
@@ -51,24 +51,34 @@
 	margin:			-7px 0 0 -10px;
 }
 
-.ecardBuilder .canvasBorder { margin: 10px 0 0; }
+.imageCreator .canvasBorder { margin: 10px 0 0; }
 
-.ecardBuilder .imageCreate .inputImageUpload {
+.imageCreator .imageCreate .inputImageUpload {
 	margin: 		0 0 20px;
 	font:		    11px Arial, Helvetica, sans-serif;
+	width: 			100%;
 }
 
-.ecardBuilder .buttonImageAdd {
+.imageCreator .buttonImageAdd {
 	margin: 0;
+	display: block;
 }
 
-.ecardBuilder #iframeImageUpload {
+.imageCreator #iframeImageUpload {
 	width: 0;
 	height: 0;
 	border: 0;
+	position: absolute;
 }
 
-.ecardBuilder .toolbarModule.moduleDisabled .imageCreate {
+.imageCreator .toolbarImage .message{
+	background-color: #ccc;
+	margin: 0 0 10px;
+	display: none;
+	padding: 10px;
+}
+
+.imageCreator .toolbarModule.moduleDisabled .imageCreate {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
   filter: alpha(opacity=100);
   -moz-opacity: 1.0;

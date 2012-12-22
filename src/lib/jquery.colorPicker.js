@@ -43,6 +43,7 @@ function( $ )
 
         init: function()
         {           
+            var _self   = this;
             this.$track = $( this.element ).find( ".track" );
             this.$hex   = $( this.element ).find( ".hex" );
             this.$color = $( this.element ).find( ".color" );
@@ -50,28 +51,35 @@ function( $ )
             this.canvasHeight = this.$track.height()
             this.canvasWidth  = this.$track.width()
 
-            if( !!document.createElement("canvas").getContext ){
-            this.$canvas = $( "<canvas></canvas>" );
-            this.$canvas.attr( "width", this.canvasWidth );
-            this.$canvas.attr( "height", this.canvasHeight );    
-            this.$track.html( this.$canvas );
+            var hasCanvas = !!document.createElement("canvas").getContext;
 
-            this.context = this.$canvas[0].getContext( "2d" );
+            if( hasCanvas )
+            {
+                this.$canvas = $( "<canvas></canvas>" );
+                this.$canvas.attr( "width", this.canvasWidth );
+                this.$canvas.attr( "height", this.canvasHeight );    
+                this.$track.html( this.$canvas );
 
-            this.setImage();
-            this.setEvents();
+                this.context = this.$canvas[0].getContext( "2d" );
+
+                this.setImage();
+
+                this.setEvents();
             }
         }, 
         
         setImage: function()
         {
-            var backgroundUrl = this.$track.css( "background-image" ).replace( "url(", "" ).replace( ")", "" )
-            ,   image         = new Image()
+            var _self       = this
+            ,   colorPicker = new Image()
             ;
+    
+            colorPicker.onload = function()
+            {
+                _self.context.drawImage( colorPicker, 0, 0, _self.canvasWidth, _self.canvasHeight );
+            };
 
-            image.src = backgroundUrl;
-
-            this.context.drawImage( image, 0, 0, this.canvasWidth, this.canvasHeight );
+            colorPicker.src = this.$track.css( "background-image" ).replace( "url(", "" ).replace( ")", "" );
         },
 
         setEvents: function()
@@ -115,7 +123,7 @@ function( $ )
                 var rgbColor = this.context.getImageData( event.offsetX, event.offsetY, 1, 1 ).data
                 ,   hexColor = this.rgbToHex( rgbColor )
                 ;
-
+                
                 this.$hex.text( hexColor );
                 this.$color.css( "backgroundColor", hexColor );
 
@@ -124,11 +132,11 @@ function( $ )
         },
 
         rgbToHex: function( rgb ) 
-        { 
+        {
             function hex( x ) 
             {
-                hexDigits = new Array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"); 
-                return isNaN( x ) ? "00" : hexDigits[ (x - x % 16 ) / 16 ] + hexDigits[ x % 16 ];
+                hexDigits = new Array( "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ); 
+                return isNaN( x ) ? "00" : hexDigits[ ( x - x % 16 ) / 16 ] + hexDigits[ x % 16 ];
             }
 
             return "#" + hex( rgb[0] ) + hex( rgb[1] ) + hex( rgb[2] ); 

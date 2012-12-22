@@ -1,7 +1,7 @@
 /**
  * @description <p>The SVG engine implementation.</p>
  *
- * @namespace ecardBuilder.engine
+ * @namespace imageCreator.engine
  * @name SVG
  * @version 1.0
  * @author mbaijs
@@ -9,10 +9,6 @@
 define(
 [
     "jquery"
-
-    // jQuery plugins
-    //
-,   "plugins/jquery.elementResize"
 ],
 function( $ )
 {
@@ -20,31 +16,29 @@ function( $ )
     ,   module =
         {
             name        : "svg"
-        ,   initialized : false
         ,   settings    : 
             {
             }
         }
 
-    ,   $ecardBuilder
+    ,   $imageCreator
     ,   $ecardViewport
     ,   $ecardCanvas 
     ,   svgContainer
 
-    ,   svgSelect
+    ,   canvasWidth
+    ,   canvasHeight
 
     ,   svgLayerCurrent
     ,   htmlParagraphCurrent
-
-    ,   canvasWidth
-    ,   canvasHeight
+    ,   svgSelect
     ;
 
     module.initialize = function()
     {
         // Get basic app DOM elements.
         //
-        $ecardBuilder  = $( ".ecardBuilder" );
+        $imageCreator  = $( ".imageCreator" );
         $ecardViewport = $( ".ecardViewport" );
         $ecardCanvas   = $( ".ecardCanvas" );
 
@@ -57,9 +51,9 @@ function( $ )
 
         // Create and add SVG container.
         //
-        svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svgContainer.setAttribute("version", "1.2");
-        svgContainer.setAttribute("baseProfile", "tiny");
+        svgContainer = document.createElementNS( "http://www.w3.org/2000/svg", "svg" );
+        svgContainer.setAttribute( "version", "1.2");
+        svgContainer.setAttribute( "baseProfile", "tiny" );
         
         $( svgContainer ).css( { width : canvasWidth, height : canvasHeight } );
 
@@ -68,7 +62,7 @@ function( $ )
         // Create a selection rectangle to put around selected layers.
         //
         svgSelect = document.createElementNS( "http://www.w3.org/2000/svg", "rect" );
-        svgSelect.setAttribute( "style", "fill: transparent; stroke-dasharray: 5,5; stroke:#666; stroke-width:2;");
+        svgSelect.setAttribute( "style", "fill: transparent; stroke-dasharray: 5,5; stroke:#666; stroke-width:2;" );
         svgSelect.setAttribute( "vector-effect", "non-scaling-stroke" );
         svgSelect.setAttribute( "id", "svgselect" );
 
@@ -83,22 +77,16 @@ function( $ )
         svgSelectAnimate.setAttribute( "repeatCount", "indefinite" );
         svgSelect.appendChild( svgSelectAnimate );
 
+        // Remove other engines that may be listening.
+        //
+        $imageCreator.unbind( ".engine" );
+
         // Listen to global app events.
         //
-        if( ! module.initialized )
-        {
-            $ecardBuilder.bind( "layerUpdate", svgLayerCheck );
-            $ecardBuilder.bind( "layerSelect", svgLayerSelect );
-            $ecardBuilder.bind( "layerVisibility", svgLayerVisibility );
-            $ecardBuilder.bind( "layerRemove", svgLayerRemove );
-        }
-        
-        // Setup the layer resizer.
-        //
-        $ecardViewport.elementResize({
-            "resizeCallback" : svgLayerResize
-        ,   "onRotate"       : function(){ return theApp.toolbar.layers.getCurrentLayer(); }
-        });
+        $imageCreator.bind( "layerUpdate.engine" , svgLayerCheck );
+        $imageCreator.bind( "layerSelect.engine", svgLayerSelect );
+        $imageCreator.bind( "layerVisibility.engine", svgLayerVisibility );
+        $imageCreator.bind( "layerRemove.engine", svgLayerRemove );
 
         // Do we have any layers allready?
         //
@@ -141,11 +129,11 @@ function( $ )
         //
         if( "image" === layer.type )
         {
-            svgLayerCurrent = document.createElementNS( "http://www.w3.org/2000/svg", "image");
-            svgLayerCurrent.setAttributeNS('http://www.w3.org/1999/xlink','href',layer.image.src);
+            svgLayerCurrent = document.createElementNS( "http://www.w3.org/2000/svg", "image" );
+            svgLayerCurrent.setAttributeNS( "http://www.w3.org/1999/xlink", "href", layer.image.src );
             
-            svgLayerCurrent.setAttribute( 'width', layer.sizeReal.width );  
-            svgLayerCurrent.setAttribute( 'height', layer.sizeReal.height );
+            svgLayerCurrent.setAttribute( "width", layer.sizeReal.width );  
+            svgLayerCurrent.setAttribute( "height", layer.sizeReal.height );
         }
 
         if( "text" === layer.type )
@@ -153,8 +141,6 @@ function( $ )
             svgLayerCurrent      = document.createElementNS( "http://www.w3.org/2000/svg", "foreignObject" );
             htmlParagraphCurrent = document.createElement( "p" );
             svgLayerCurrent.appendChild( htmlParagraphCurrent );
-            
-            svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );  
         }
 
         // Set ID.
@@ -163,8 +149,8 @@ function( $ )
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //   
+        $( svgContainer ).append( svgSelect );  
         $( svgContainer ).append( svgLayerCurrent );
-        $( svgContainer ).append( svgSelect );      
     }
 
     function svgLayerUpdate( event, layer )
@@ -173,19 +159,23 @@ function( $ )
         // 
         if( "text" === layer.type )
         {
-            htmlParagraphCurrent = $( svgLayerCurrent ).find( "p" )[0];
-            htmlParagraphCurrent.innerHTML        = layer.text;
-            htmlParagraphCurrent.style.color      = layer.color; 
-            htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";
-            htmlParagraphCurrent.style.fontFamily = layer.font;
-
-            svgLayerCurrent.setAttribute( 'height', layer.sizeCurrent.height );
+            htmlParagraphCurrent = $( svgLayerCurrent ).find( "p" );
+            htmlParagraphCurrent.html( layer.text );
+            htmlParagraphCurrent.css(
+            {   color      : layer.color
+            ,   fontSize   : layer.fontSize
+            ,   fontFamily : layer.font
+            ,   fontWeight : layer.weight ? "bold" : "normal"
+            ,   fontStyle  : layer.style ? "italic" : "normal"
+            });
+            svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
+            svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );
         }
 
         // Set attributes.
         //  
-        svgLayerCurrent.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
-        svgLayerCurrent.setAttribute( 'transform', 'matrix(' + layer.matrix[ 0 ][ 0 ] + ',' + layer.matrix[ 1 ][ 0 ] + ',' + layer.matrix[ 0 ][ 1 ] + ',' + layer.matrix[ 1 ][ 1 ] + ',' + layer.matrix[ 0 ][ 2 ] + ',' + layer.matrix[ 1 ][ 2 ] + ')' );
+        svgLayerCurrent.setAttribute( "visibility", layer.visible ? "visible" : "hidden" );
+        svgLayerCurrent.setAttribute( "transform", 'matrix(' + layer.matrix[ 0 ] + ',' + layer.matrix[ 3 ] + ',' + layer.matrix[ 1 ] + ',' + layer.matrix[ 4 ] + ',' + layer.matrix[ 2 ] + ',' + layer.matrix[ 5 ] + ')' );
     }
 
     function svgLayerSelect( event, layer )
@@ -196,34 +186,30 @@ function( $ )
         //
         if( layer )
         {
-            svgSelect.setAttribute( 'transform', 'matrix(' + layer.matrix[ 0 ][ 0 ] + ',' + layer.matrix[ 1 ][ 0 ] + ',' + layer.matrix[ 0 ][ 1 ] + ',' + layer.matrix[ 1 ][ 1 ] + ',' + layer.matrix[ 0 ][ 2 ] + ',' + layer.matrix[ 1 ][ 2 ] + ')' );
+            svgSelect.setAttribute( "transform", 'matrix(' + layer.matrix[ 0 ] + ',' + layer.matrix[ 3 ] + ',' + layer.matrix[ 1 ] + ',' + layer.matrix[ 4 ] + ',' + layer.matrix[ 2 ] + ',' + layer.matrix[ 5 ] + ')' );
 
             if( "text" === layer.type )
             {
-                svgSelect.setAttribute( 'height', layer.sizeCurrent.height );
+                svgSelect.setAttribute( "height", layer.sizeCurrent.height );
             }
-
-            $ecardViewport.trigger( "positionElementResize", [ layer.positionRotated, layer.sizeRotated ] );
         }
 
         // If we have no layer to select or if its hidden hide the selection rectangle as well.
         //
-        if( event.type == "layerSelect" )
+        if( event.type !== "layerUpdate" )
         {
-            svgSelect.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
+            svgSelect.setAttribute( "visibility", layer.visible ? "visible" : "hidden" );
 
             if( "image" === layer.type )
             {
-                svgSelect.setAttribute( 'height', layer.sizeReal.height );
-                svgSelect.setAttribute( 'width', layer.sizeReal.width ); 
+                svgSelect.setAttribute( "height", layer.sizeReal.height );
+                svgSelect.setAttribute( "width", layer.sizeReal.width ); 
             }
 
             if( "text" === layer.type )
             {
-                svgSelect.setAttribute( 'width', layer.sizeCurrent.width );  
+                svgSelect.setAttribute( "width", layer.sizeCurrent.width );  
             }
-
-            $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
         }
     }
 
@@ -231,14 +217,13 @@ function( $ )
     {
         var $svgLayerToToggle = $( "#" + layer.id + "svg" );
 
-        $svgLayerToToggle.attr( 'visibility', layer.visible ? 'visible' : 'hidden' );
+        $svgLayerToToggle.attr( "visibility", layer.visible ? "visible" : "hidden" );
 
         // We only want to hide the selection layer if its around the currently selected layer.
         //
         if( layer.selected )
         {
-            svgSelect.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
-            $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
+            svgSelect.setAttribute( "visibility", layer.visible ? "visible" : "hidden" );
         }
     }
 
@@ -252,13 +237,7 @@ function( $ )
         
         // Hide selection rectangles.
         //
-        svgSelect.setAttribute( 'visibility', 'hidden' );
-        $ecardViewport.trigger( "visibilityElementResize", [ false ] );
-    }
-
-    function svgLayerResize( delta, direction )
-    {
-        $ecardBuilder.trigger( "layerResize", [ delta, direction ] );
+        svgSelect.setAttribute( "visibility", "hidden" );
     }
 
     return module;

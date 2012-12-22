@@ -11,7 +11,7 @@ define(
 ],
 function( $ )
 {
-    var pluginName = 'circleSlider'
+    var pluginName = "circleSlider"
     ,   defaults   = { }
     ;
 
@@ -103,6 +103,12 @@ function( $ )
             this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );       
         },
 
+        sanitizeRadians: function( radians )
+        {
+            var max = 2 * Math.PI;
+            return radians < 0 ? max + radians : ( radians > max ? radians - max : radians );
+        },
+
         drag: function( event )
         {
             var position = 
@@ -110,16 +116,13 @@ function( $ )
                     x : event.pageX - this.$track.offset().left -41
                 ,   y : event.pageY - this.$track.offset().top  -41
                 }
-            ,   radians = Math.atan2( position.x, -position.y )
+            ,   radians = this.sanitizeRadians( Math.atan2( position.x, -position.y ) )
             ,   degrees = Math.round( radians * 180 / Math.PI )
             ,   cos     = Math.cos( radians )
             ,   sin     = Math.sin( radians )
             ;
-
-            degrees = degrees < 0 ? degrees +360 : degrees;
-            
+ 
             this.$degrees.html( degrees + "&deg;" );
-
             this.$thumb.css( "top",  Math.round( -cos * 34 +42 ) );
             this.$thumb.css( "left", Math.round(  sin * 34 +42 ) );
             this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );

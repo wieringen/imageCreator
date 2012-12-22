@@ -1,7 +1,7 @@
 /**
  * @description 
  *
- * @namespace ecardBuilder
+ * @namespace imageCreator
  * @name controller
  * @version 1.0
  * @author mbaijs
@@ -34,9 +34,10 @@ require(
     "jquery"
 ,   "lazyRequire"
 ,   "utils"
+,   "selection"
 ,   "domReady!"
 ],
-function( $, lazyRequire, utils )
+function( $, lazyRequire, utils, selection )
 {   
     var theApp = window[ "imageCreator" ] = 
         {
@@ -45,7 +46,7 @@ function( $, lazyRequire, utils )
         }
     ,   mouse  = {}
 
-    ,   $ecardBuilder  = null
+    ,   $imageCreator  = null
     ,   $ecardViewport = null
     ;
 
@@ -73,14 +74,18 @@ function( $, lazyRequire, utils )
             }          
         ]
 
-    ,   toolbar : [ "layers", "image", "text", "info" ]
+    ,   toolbar : [ "info", "layers", "image", "text" ]
 
     }, theApp.settings );
 
     $( document ).ready( function()
     {
-        $ecardBuilder  = $( ".ecardBuilder" );
+        $imageCreator  = $( ".imageCreator" );
         $ecardViewport = $( ".ecardViewport" );
+
+        // Setup the layer resizer/rotater selection.
+        //
+        selection.initialize();
 
         // Set viewport events.
         //
@@ -93,15 +98,17 @@ function( $, lazyRequire, utils )
             return engineA.order - engineB.order;
         });
 
+        // Load engine
+        //
         $.each( settings.engine || [], loadEngine );
 
-        $ecardBuilder.bind( "loadEngine", loadEngine );
+        $imageCreator.bind( "loadEngine", loadEngine );
 
         // Create toolbar.
         //
         $.each( settings.toolbar || [], loadTool );
 
-        $ecardBuilder.bind( "loadTool", loadTool );
+        $imageCreator.bind( "loadTool", loadTool );
     } );
 
     function loadEngine( event, engineObject )
@@ -130,10 +137,19 @@ function( $, lazyRequire, utils )
 
     function loadTool( event, toolName )
     {
-        var requireOnce = lazyRequire.once();
+        var requireOnce = lazyRequire.once()
+        ,   cssUrl      = "toolbar/" + toolName + "/" + toolName + ".css"
+        ;
 
-        $( "<link/>", { type: "text/css", rel: "stylesheet", href: "toolbar/" + toolName + "/" + toolName + ".css" }).appendTo( "head" );
-  
+        if ( document.createStyleSheet )
+        {
+            document.createStyleSheet( cssUrl );
+        }
+        else
+        {
+            $( "<link/>", { rel: "stylesheet", href: cssUrl }).appendTo( "head" );
+        }
+        
         requireOnce(
             [
                 "toolbar/" + toolName + "/" + toolName
@@ -151,11 +167,6 @@ function( $, lazyRequire, utils )
 
     function viewportDragStart( event )
     {
-        if( $( event.target ).hasClass( "direction" ) ) 
-        {
-            return false;
-        }
-
         mouse.x = event.clientX;
         mouse.y = event.clientY;
 
@@ -180,7 +191,7 @@ function( $, lazyRequire, utils )
         ,   y : event.clientY - mouse.y
         };
 
-        $ecardBuilder.trigger( "viewportMove", delta );
+        $imageCreator.trigger( "viewportMove", delta );
 
         mouse.x = event.clientX;
         mouse.y = event.clientY;

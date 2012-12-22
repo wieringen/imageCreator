@@ -34,6 +34,13 @@ function( $ )
 
         init: function()
         {
+            var testFileApi = !!window.FileReader;
+
+            if( ! testFileApi )
+            {
+                return false;
+            };
+
             this.createDropArea();
             this.setEvents();
         }, 

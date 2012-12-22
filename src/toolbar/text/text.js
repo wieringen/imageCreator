@@ -1,7 +1,7 @@
  /**
  * @description <p></p>
  *
- * @namespace ecardBuilder.toolbar
+ * @namespace imageCreator.toolbar
  * @name text
  * @version 1.0
  * @author mbaijs
@@ -40,14 +40,17 @@ function( $, moduleHTML, utils )
             }
         }
 
-    ,   $ecardBuilder
+    ,   $imageCreator
+    ,   $ecardViewport
     ,   $module
+    ,   $selection  
     ,   $textSize
     ,   $textRotate
     ,   $buttonTextAdd
-    ,   $buttonTextBold
-    ,   $buttonTextItalic
+    ,   $buttonTextWeight
+    ,   $buttonTextStyle
     ,   $selectTextFont
+    ,   $areaTextEdit
 
     // The default properties of a text layer.
     //
@@ -57,10 +60,12 @@ function( $, moduleHTML, utils )
         ,   type            : "text"
         ,   visible         : true
 
-        ,   text            : ""
+        ,   text            : "Your text here..."
         ,   color           : "#000000"
         ,   fontSize        : 14
         ,   font            : "Arial"
+        ,   weight          : false
+        ,   style           : false
 
         // Unrotated position and size.
         //
@@ -85,7 +90,7 @@ function( $, moduleHTML, utils )
 
     // The curent layer that is being edited.
     //
-    ,   layerCurrent = {}
+    ,   layerCurrent = false
     ;
 
     module.initialize = function( options )
@@ -96,7 +101,9 @@ function( $, moduleHTML, utils )
 
         // Get basic app DOM elements.
         //
-        $ecardBuilder  = $( ".ecardBuilder" );
+        $imageCreator  = $( ".imageCreator" );
+        $ecardViewport = $( ".ecardViewport" );
+        $selection     = $ecardViewport.find( ".selection" );
 
         // Get module DOM elements.
         //        
@@ -105,8 +112,9 @@ function( $, moduleHTML, utils )
         $textColor        = $module.find( ".textColor" );
         $textRotate       = $module.find( ".textRotate" );
         $buttonTextAdd    = $module.find( ".buttonTextAdd" );
-        $buttonTextBold   = $module.find( ".buttonTextBold" );
-        $buttonTextItalic = $module.find( ".buttonTextItalic" ); 
+        $buttonTextWeight = $module.find( ".buttonTextWeight" );
+        $buttonTextStyle  = $module.find( ".buttonTextStyle" ); 
+        $areaTextEdit     = $module.find( ".areaTextEdit" );
         $selectTextFont   = $module.find( ".selectTextFont" ); 
 
         // Initialize module UI.
@@ -128,13 +136,15 @@ function( $, moduleHTML, utils )
 
         // Listen to global app events.
         //
-        $ecardBuilder.bind( "viewportMove", textPosition );
-        $ecardBuilder.bind( "layerSelect", layerSelect );
-        $ecardBuilder.bind( "layerResize", textResize );
+        $imageCreator.bind( "viewportMove", textPosition );
+        $imageCreator.bind( "layerSelect", textSelect );
+        $imageCreator.bind( "layerVisibility", textSelect );
+        $imageCreator.bind( "layerResize", textResize );
 
         // Listen to selection events.
         //        
-        $ecardViewport.bind( "onRotate", textRotate );
+        $selection.bind( "onRotate", textRotate );
+        $selection.bind( "onResize", textResize );
 
         // Listen to UI module events.
         //           
@@ -142,17 +152,27 @@ function( $, moduleHTML, utils )
         $textRotate.bind( "onDrag", textRotate );
         $textColor.bind( "colorUpdate", textColor );
 
-        // Set Button events.
+        // Set module input / button events.
         //             
         $buttonTextAdd.click( textAdd );
+        $buttonTextWeight.click( textWeight );
+        $buttonTextStyle.click( textStyle );
+        $areaTextEdit.bind( "change, keyup", textEdit );
         $selectTextFont.change( textFont );
     };
 
-    function layerSelect( event, layer )
+    function textSelect( event, layer )
     {
-        // Enable module if layer is of the correct type.
+        // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
         //
-        module.enabled = layer.type === "text" || false;
+        if( event.type === "layerVisibility" && ! layer.selected )
+        {
+            return false;
+        }
+
+        // Enable module if layer is of the correct type and is visible.
+        //
+        module.enabled = layer.visible && layer.type === "text" || false;
         $module.toggleClass( "moduleDisabled", ! module.enabled ); 
 
         if( module.enabled )
@@ -164,6 +184,9 @@ function( $, moduleHTML, utils )
             $textRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
             $textSize.trigger( "setPosition", [ layerCurrent.fontSize ] );
             $textColor.trigger( "setColor", [ layerCurrent.color ] );
+            $buttonTextWeight.toggleClass( "active", layerCurrent.weight ); 
+            $buttonTextStyle.toggleClass( "active", layerCurrent.style ); 
+            $areaTextEdit.val( layerCurrent.text );
         }
     }
 
@@ -181,7 +204,7 @@ function( $, moduleHTML, utils )
 
             textPosition( false, { x : ( direction.compensate[0] ? delta.x : 0 ), y: ( direction.compensate[1] ? delta.y : 0 ) }, true );
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -197,21 +220,30 @@ function( $, moduleHTML, utils )
 
         // Set layer options.
         //       
-        layerCurrent.id        = "text" + new Date().getTime().toString();        
-        layerCurrent.text      = "Dit is een tekst.";
+        layerCurrent.id        = "text" + new Date().getTime().toString();
         layerCurrent.layerName = layerCurrent.text;
         layerCurrent.font      = module.settings.font;
 
         layerCurrent.sizeCurrent.width  = 200;
-        layerCurrent.sizeCurrent.height = 15;
+        layerCurrent.sizeCurrent.height = 50;
 
         layerCurrent.sizeRotated = layerCurrent.sizeCurrent;
 
         textPosition( false, { y : 200, x : 50 }, true )
 
-        $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+        $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
 
         return false;
+    }
+
+    function textEdit( event )
+    {       
+        if( module.enabled && layerCurrent && layerCurrent.visible )
+        { 
+            layerCurrent.text = this.value.replace(/\n/g, "<br/>");
+
+            textSize( false, layerCurrent.fontSize );
+        }
     }
 
     function textSize( event, fontSize )
@@ -220,7 +252,7 @@ function( $, moduleHTML, utils )
         {
             layerCurrent.fontSize = fontSize;
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
             
             // Ieeuw there is no way to calculate the height so i need to get it from the dom :(
             //
@@ -230,7 +262,7 @@ function( $, moduleHTML, utils )
             {
                 $textLayer = $textLayer.find( "p" );  
             }
-            
+
             layerCurrent.sizeCurrent.height = $textLayer.height();
             
             layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
@@ -240,7 +272,7 @@ function( $, moduleHTML, utils )
 
             layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, 1, layerCurrent.position, layerCurrent.sizeCurrent );
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
@@ -250,7 +282,7 @@ function( $, moduleHTML, utils )
         {
             layerCurrent.font = $( this ).val();
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
@@ -260,7 +292,31 @@ function( $, moduleHTML, utils )
         {
             layerCurrent.color = hexColor;
 
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+        }
+    }
+
+    function textWeight( event )
+    {
+        if( module.enabled && layerCurrent && layerCurrent.visible )
+        {
+            layerCurrent.weight = ! layerCurrent.weight;
+
+            $buttonTextWeight.toggleClass( "active", layerCurrent.weight ); 
+
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+        }
+    }
+
+    function textStyle( event )
+    {
+        if( module.enabled && layerCurrent && layerCurrent.visible )
+        {
+            layerCurrent.style = ! layerCurrent.style;
+
+            $buttonTextStyle.toggleClass( "active", layerCurrent.style ); 
+
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
@@ -278,9 +334,7 @@ function( $, moduleHTML, utils )
 
             textPosition( false, { x: 0, y: 0 }, true );
 
-            // Tell the app there a change in the current layer's rotation.
-            //
-            $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -303,7 +357,7 @@ function( $, moduleHTML, utils )
 
             if( ! internal )
             {
-                $ecardBuilder.trigger( "layerUpdate", [ layerCurrent ] );
+                $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
             }
         }
     }

@@ -1,7 +1,7 @@
 /**
  * @description <p>The VML engine implementation.</p>
  *
- * @namespace ecardBuilder.engine
+ * @namespace imageCreator.engine
  * @name vml
  * @version 1.0
  * @author mbaijs
@@ -9,10 +9,6 @@
 define(
 [
     "jquery"
-
-    // jQuery plugins
-    //
-,   "plugins/jquery.elementResize"
 ],
 function( $ )
 {
@@ -20,35 +16,37 @@ function( $ )
     ,   module =
         {
             name        : "vml"
-        ,   initialized : false
         ,   settings    : 
             {
             }
         }
 
-    ,   $ecardBuilder
+    ,   $imageCreator
     ,   $ecardViewport
+    ,   $ecardCanvas
 
     ,   canvasWidth
     ,   canvasHeight
 
     ,   vmlLayerCurrent
     ,   htmlParagraphCurrent
+    //,   vmlSelect
     ;
 
     module.initialize = function()
     {
         // Get basic app DOM elements.
         //
-        $ecardBuilder  = $( ".ecardBuilder" );
+        $imageCreator  = $( ".imageCreator" );
         $ecardViewport = $( ".ecardViewport" );
+        $ecardCanvas   = $( ".ecardCanvas" );
 
         // Set the viewport's dimensions.
         //
         canvasWidth  = theApp.settings.viewportWidth;
         canvasHeight = theApp.settings.viewportHeight;
 
-        $ecardViewport.css( { width : canvasWidth, height : canvasHeight } );
+        $ecardCanvas.css( { width : canvasWidth, height : canvasHeight } );
 
         // Initialize VML.
         //
@@ -62,23 +60,18 @@ function( $ )
         // Create a selection rectangle to put around selected layers.
         //
         var vmlSelect = $( "<rvml:rect id='vmlSelect' strokecolor='#666' strokeweight='1px'><rvml:stroke dashstyle='dash'></rvml:stroke></rvml:rect>" )[0];
-        $ecardViewport.append( vmlSelect );
+        $ecardCanvas.html( vmlSelect );
+
+        // Remove other engines that may be listening.
+        //
+        $imageCreator.unbind( ".engine" );
 
         // Listen to global app events.
         //
-        if( ! module.initialized )
-        {
-            $ecardBuilder.bind( "layerUpdate", vmlLayerCheck );
-            $ecardBuilder.bind( "layerSelect", vmlLayerSelect );
-            $ecardBuilder.bind( "layerVisibility", vmlLayerVisibility );
-            $ecardBuilder.bind( "layerRemove", vmlLayerRemove );
-        }
-
-        // Setup the element resizer.
-        //
-        $ecardViewport.elementResize({
-            "resizeCallback" : vmlLayerResize
-        });
+        $imageCreator.bind( "layerUpdate.engine", vmlLayerCheck );
+        $imageCreator.bind( "layerSelect.engine", vmlLayerSelect );
+        $imageCreator.bind( "layerVisibility.engine", vmlLayerVisibility );
+        $imageCreator.bind( "layerRemove.engine", vmlLayerRemove );
 
         // Do we have any layers allready?
         //
@@ -137,7 +130,7 @@ function( $ )
             vmlLayerCurrent.appendChild( htmlParagraphCurrent );
         }
 
-        // Set ID.
+        // Set attributes.
         //
         vmlLayerCurrent.setAttribute( "id", layer.id + module.name );
         vmlLayerCurrent.style.setAttribute( "zoom", "1" );
@@ -145,8 +138,8 @@ function( $ )
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //   
-        $ecardViewport.append( vmlLayerCurrent );
-        $ecardViewport.append( vmlSelect );      
+        $ecardCanvas.append( vmlLayerCurrent );
+        $ecardCanvas.append( vmlSelect );      
     }
 
     function vmlLayerUpdate( event, layer )
@@ -160,20 +153,29 @@ function( $ )
             htmlParagraphCurrent.style.color      = layer.color; 
             htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";
             htmlParagraphCurrent.style.fontFamily = layer.font;
+            htmlParagraphCurrent.style.fontWeight = layer.weight ? "bold" : "normal";
+            htmlParagraphCurrent.style.fontStyle  = layer.style ? "italic" : "normal";
 
             vmlLayerCurrent.style.setAttribute( 'height', layer.sizeCurrent.height + "px" );
         }
-
-        // Set attributes.
+ 
+        // Only use the icky filter matrix if the browser is pre ie9.
         //
-        vmlLayerCurrent.style.setAttribute( "filter", 'progid:DXImageTransform.Microsoft.Matrix(' + 'M11=' + layer.matrix[ 0 ][ 0 ] + ', M12=' + layer.matrix[ 0 ][ 1 ] + ', M21=' + layer.matrix[ 1 ][ 0 ] + ', M22=' + layer.matrix[ 1 ][ 1 ] + ', sizingMethod=\'auto expand\'' + ')' );
+        if( ! document.addEventListener )
+        {
+            vmlLayerCurrent.style.setAttribute( "filter", 'progid:DXImageTransform.Microsoft.Matrix(' + 'M11=' + layer.matrix[ 0 ] + ', M12=' + layer.matrix[ 1 ] + ', M21=' + layer.matrix[ 3 ] + ', M22=' + layer.matrix[ 4 ] + ', sizingMethod=\'auto expand\'' + ')' );
 
-        // Since we unfortunately do not have the possibility to use translate with sizing method 'auto expand', we need to do
-        // something hacky to work around supporting the transform-origin property.
-        //
-        var originCorrection = ieCorrectOrigin( layer.sizeCurrent, layer.rotation.radians );
-        vmlLayerCurrent.style.setAttribute( "top",  layer.position.y + originCorrection.y + "px" );
-        vmlLayerCurrent.style.setAttribute( "left", layer.position.x + originCorrection.x + "px" );
+            // Since we unfortunately do not have the possibility to use translate with sizing method 'auto expand', we need to do
+            // something hacky to work around supporting the transform-origin property.
+            //
+            var originCorrection = ieCorrectOrigin( layer.sizeCurrent, layer.rotation.radians );
+            vmlLayerCurrent.style.setAttribute( "top",  layer.position.y + originCorrection.y + "px" );
+            vmlLayerCurrent.style.setAttribute( "left", layer.position.x + originCorrection.x + "px" );
+        }
+        else
+        {
+            $( vmlLayerCurrent ).css( "msTransform", 'matrix(' + layer.rotation.cos + ',' + layer.rotation.sin + ',' + -layer.rotation.sin + ',' + layer.rotation.cos + ',' + layer.position.x + ',' + layer.position.y + ')' );
+        }
 
         // It is no longer possible to create a VML element outside of the DOM in >= ie8. This hack fixes that.
         //
@@ -205,16 +207,13 @@ function( $ )
             // Somehow the fillcolor only works after we have done the hack above :/
             //
             vmlSelect.fillcolor = "none";
-            
-            $ecardViewport.trigger( "positionElementResize", [ layer.positionRotated, layer.sizeRotated ] );
         }
 
         // If we have no layer to select or if its hidden hide the selection rectangle as well.
         //
-        if( event.type == "layerSelect" )
+        if( event.type !== "layerUpdate" )
         {
             vmlSelect.style.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
-            $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
         }
     }
 
@@ -229,7 +228,6 @@ function( $ )
         if( layer.selected )
         {
             vmlSelect.style.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
-            $ecardViewport.trigger( "visibilityElementResize", [ layer.visible ] );
         }
     }
 
@@ -244,32 +242,19 @@ function( $ )
         // Hide selection rectangles.
         //
         vmlSelect.setAttribute( 'visibility', 'hidden' );
-        $ecardViewport.trigger( "visibilityElementResize", [ false ] );
-    }
-
-    function vmlLayerResize( delta, direction )
-    {
-        $ecardBuilder.trigger( "layerResize", [ delta, direction ] );
     }
 
     // http://balzerg.blogspot.co.il/2012/08/analytical-fix-for-ie-rotation-origin.html
     //
     function ieCorrectOrigin( size, radians )
     {
-        var rad = radians;
-        rad %= 2 * Math.PI;
-        
-        if (rad < 0)
-        { 
-            rad += 2 * Math.PI;
-        }
-
-        rad %= Math.PI;
-        
-        if (rad > Math.PI / 2)
+        var rad = radians %= Math.PI;
+    
+        if( rad > Math.PI / 2 )
         {
             rad = Math.PI - rad;
         }
+
         var sin = Math.sin( -rad )
         ,   cos = Math.cos(  rad )
         ;

@@ -3,7 +3,7 @@
 .toolbarLayers .objectLayers {
 	list-style:		 	none;
 	padding: 			0;
-	margin: 			0 0 15px;
+	margin: 			0 0 10px;
 	border-top: 1px solid #909090;
 }
 
@@ -43,12 +43,16 @@
 	border: 1px solid #000;	
 	margin: 3px 3px 0;
 	background-color: #fff;
+	overflow: hidden;
+	position: relative;
 }
 
 .toolbarLayers .objectThumbContainer img {
 	height: 20px;
 	display: block;
-	margin: 0 auto;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .toolbarLayers .objectLayerName {
@@ -60,48 +64,11 @@
 	white-space: nowrap;
 }
 
-.toolbarLayers  .wrapperLayerAdd {
-	width: 77%;
-	margin: 0 5% 0 0;
-	float: left;
-	position: relative;
-}
 
-.toolbarLayers .buttonLayerAdd {
-	margin: 0;
-}
-
-.toolbarLayers .menuLayerAdd {
- 	display: none;
- 	position: absolute;
- 	left: 0;
- 	list-style: none;
- 	margin: 0;
- 	padding: 0;
- 	width: 126px;
- 	z-index: 10;
- 	margin: 0 0 0 3px;
- 	background-color: #ededed;
- 	border: 1px solid #a5a5a5;
- 	border-width: 0 1px;
-
-}
-
-.toolbarLayers .menuLayerAdd li {
-	padding: 5px;
-	border-bottom: 1px solid #a5a5a5;
-	font-size:10px;	
-}
-
-.toolbarLayers .menuLayerAdd li:hover {
-	background-color: #b5d5ff;
-} 
-
-.toolbarLayers  .wrapperLayerAdd:hover .menuLayerAdd {
-	display: block;
+.toolbarLayers .buttonImageSave {
+	width: 74%;
 }
 
 .toolbarLayers .buttonLayerRemove {
-	margin: 0;
-	float: left;
+	margin: 0 0 0 3%;
 }

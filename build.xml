@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<project name="apxendexStatisticsWidget" default="dist">
+<project name="imageCreator" default="dist">
     <property name="dist.dir"    value="dist" />
     <property name="src.dir"     value="${dist.dir}/src" />
     <property name="docs.dir"    value="docs" />
-    <property name="widget.name" value="apxendexStatisticsWidget" />
+    <property name="widget.name" value="imageCreator" />
 
     <!-- specify timestamps -->
     <tstamp>

@@ -21,9 +21,10 @@ $errors = array(1 => 'php.ini max file size exceeded',
                 3 => 'file upload was only partial', 
                 4 => 'no file was attached');
 
-// check for standard uploading errors
-($_FILES[$fieldname]['error'] == 0) or error($errors[$_FILES[$fieldname]['error']]);
-	
+// check for PHP's built-in uploading errors 
+($_FILES[$fieldname]['error'] == 0) 
+    or error( $errors[$_FILES[$fieldname]['error']] ); 
+
 // check that the file we are working on really was an HTTP upload
 @is_uploaded_file($_FILES[$fieldname]['tmp_name'])
 	or error('not an HTTP upload');
@@ -56,7 +57,7 @@ $resizeObj -> saveImage($uploadsDirectory.$now.'-'.$_FILES[$fieldname]['name'], 
 
 // If you got this far, everything has worked and the file has been successfully saved.
 header('content-type: text/html');
-echo json_encode( array( "src" => "toolbar/image/uploader/uploaded_files/" .$now.'-'.$_FILES[$fieldname]['name'] ) );
+echo json_encode( array( "message" => "Image uploaded succesfully.", "src" => "toolbar/image/uploader/uploaded_files/" .$now.'-'.$_FILES[$fieldname]['name'] ) );
 
 // make an error handler which will be used if the upload fails
 function error( $error )

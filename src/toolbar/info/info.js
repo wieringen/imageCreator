@@ -31,7 +31,7 @@ function( $, moduleHTML, utils )
             }
         }
 
-    ,   $ecardBuilder
+    ,   $imageCreator
     ,   $module
     , 	$layerName
     ,	$layerRotationValue
@@ -53,7 +53,7 @@ function( $, moduleHTML, utils )
 
         // Get basic app DOM elements.
         //
-        $ecardBuilder = $( ".ecardBuilder" );
+        $imageCreator = $( ".imageCreator" );
 
         // Get module DOM elements.
         //
@@ -67,15 +67,20 @@ function( $, moduleHTML, utils )
 
         // Listen to global app events.
         //
-    	$ecardBuilder.bind( "layerSelect", infoUpdate );
-    	$ecardBuilder.bind( "layerUpdate", infoUpdate );
+    	$imageCreator.bind( "layerSelect", infoUpdate );
+    	$imageCreator.bind( "layerUpdate", infoUpdate );
     };
 
     function infoUpdate( event, layer )
     {
-    	$layerName.text( layer.layerName || "" );
-    	
-        $layerRotationValue.text( layer.rotation.degrees );
+        $layerName.text( layer.name ? layer.name : "" );
+        
+        if( layer.text )
+        {
+            $layerName.text( layer.text.replace( "<br/>", "" ) );
+        } 
+
+        $layerRotationValue.text( layer.rotation && layer.rotation.degrees || 0 );
     	
         $layerPositionXValue.text( layer.positionRotated && layer.positionRotated.x || 0 );
     	$layerPositionYValue.text( layer.positionRotated && layer.positionRotated.y || 0 );

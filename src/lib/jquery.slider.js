@@ -35,7 +35,7 @@ function( $ )
         $track      : null,
         $thumb      : null,
         $percentage : null,
-        mouse       : {},
+        mouse       : { x : 0, y : 0 },
 
         init: function()
         {
@@ -117,7 +117,7 @@ function( $ )
 
         drag: function( event )
         {
-            var position = Math.min( this.$track.width() - this.$thumb.width(), Math.max( 0, this.$thumb[0].offsetLeft + ( event.pageX - this.mouse.x )))
+            var position = Math.min( this.$track.width() - this.$thumb.width(), Math.max( 0, this.$thumb.position().left + ( event.pageX - this.mouse.x )))
             ,   scale    = Math.round( this.options.scale[ 0 ] + ( position * ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) / ( this.$track.width() - this.$thumb.width() ) ) )
             ;
 

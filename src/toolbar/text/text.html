@@ -3,12 +3,19 @@
 
     <ul class="moduleMenu">
         <li><a class="tabActive" href="#">Text</a></li>
+        <li><a href="#">Style</a></li>
         <li><a href="#">Dimensions</a></li>
         <li class="toRight"><a href="#" class="buttonTextAdd">+</a></li>
     </ul>
 
     <div class="moduleBody tabActive">
+        <div class="moduleSub textEdit">
+            <h3>Text</h3>
+            <textarea class="areaTextEdit"></textarea>
+        </div>
+    </div>
 
+    <div class="moduleBody">
         <div class="moduleSub textFont">
             <h3>Font</h3>
             <select class="selectTextFont">
@@ -18,8 +25,8 @@
                 <option value="Arial">Arial</option>
                 <option value="Courier">Courier</option>
             </select>
-            <div class="buttonPrimary buttonTextBold">T<span class="indicator"></span></div>
-            <div class="buttonPrimary buttonTextItalic">T<span class="indicator"></span></div>
+            <div class="btn btn-mini buttonTextWeight">T</div>
+            <div class="btn btn-mini buttonTextStyle">T</div>
         </div>
 
         <div class="moduleSub textColor">

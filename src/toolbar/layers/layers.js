@@ -1,7 +1,7 @@
 /**
  * @description <p>A toolbar module that keeps track of all the layers.</p>
  *
- * @namespace ecardBuilder.toolbar
+ * @namespace imageCreator.toolbar
  * @name layers
  * @version 1.0
  * @author mbaijs
@@ -36,7 +36,7 @@ function( $, moduleHTML )
         ,   snippets : {}
         }
 
-    ,   $ecardBuilder 
+    ,   $imageCreator 
     ,   $module
     ,   $objectLayers
     ,   $buttonLayerRemove
@@ -54,7 +54,7 @@ function( $, moduleHTML )
 
         // Get basic app DOM elements.
         //       
-        $ecardBuilder      = $( ".ecardBuilder" );
+        $imageCreator      = $( ".imageCreator" );
 
         // Get module DOM elements.
         //
@@ -98,7 +98,7 @@ function( $, moduleHTML )
 
         // Listen to global app events.
         //
-        $ecardBuilder.bind( "layerUpdate", layerUpdate );
+        $imageCreator.bind( "layerUpdate", layerUpdate );
 
         // Set Button events.
         //  
@@ -155,11 +155,11 @@ function( $, moduleHTML )
 
         // Activate UI controls
         //
-        $buttonLayerRemove.removeClass( "buttonDisable" );
+        $buttonLayerRemove.removeClass( "disabled" );
 
         // Tell the app what layer is now selected.
         //
-        $ecardBuilder.trigger( "layerSelect", [ newLayerData ] );
+        $imageCreator.trigger( "layerSelect", [ newLayerData ] );
 
         return false;
     }
@@ -177,15 +177,16 @@ function( $, moduleHTML )
             $layerClone = module.snippets.$objectLayerSnippet.clone();
             $layerClone.attr( "id", "objectLayer" + objectLayer.id );
             $layerClone.data( "layer", objectLayer );
-            $layerClone.find( ".objectLayerName" ).text( objectLayer.layerName );
-            
+
             if( objectLayer.image )
             {
+                $layerClone.find( ".objectLayerName" ).text( objectLayer.name );
                 $layerClone.find( "img" ).attr( "src", objectLayer.image.src );
             }
 
             if( objectLayer.text )
             {
+                $layerClone.find( ".objectLayerName" ).text( objectLayer.text );
                 //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );   
             }
 
@@ -197,8 +198,13 @@ function( $, moduleHTML )
         //
         else
         {
+            if( objectLayer.text )
+            {
+                $currentLayer.find( ".objectLayerName" ).text( objectLayer.text.replace( "<br/>", "" ) );
+            } 
+
             $currentLayer.data( "layer", objectLayer );
-        }    
+        }
     }
 
     function layerToggle( event )
@@ -213,7 +219,7 @@ function( $, moduleHTML )
         
         $layerToToggle.data( "layer", layerToToggleData );
 
-        $ecardBuilder.trigger( "layerVisibility", [ layerToToggleData ] );
+        $imageCreator.trigger( "layerVisibility", [ layerToToggleData ] );
 
         return false;
     }
@@ -231,12 +237,12 @@ function( $, moduleHTML )
 
             // Tell the app to remove this layer and unselect it.
             //
-            $ecardBuilder.trigger( "layerRemove", [ currentLayerData ] );
-            $ecardBuilder.trigger( "layerSelect", [ false ] );
-            
+            $imageCreator.trigger( "layerRemove", [ currentLayerData ] );
+            $imageCreator.trigger( "layerSelect", [ false ] );
+
             // Disable UI.
             //
-            $buttonLayerRemove.addClass( "buttonDisable" );
+            $buttonLayerRemove.addClass( "disabled" );
         }
 
         return false;
@@ -244,7 +250,7 @@ function( $, moduleHTML )
 
     function optionRenderEngineSelect( event )
     {
-        $ecardBuilder.trigger( "loadEngine", [ $( this ).find( ":selected" ).data( "engine" ) ] );
+        $imageCreator.trigger( "loadEngine", [ $( this ).find( ":selected" ).data( "engine" ) ] );
     }
 
     function optionConstrainLayersToggle( event )
