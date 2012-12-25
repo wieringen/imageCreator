@@ -1,0 +1,63 @@
+.toolbarLayers { }
+.toolbarLayers .objectLayers {
+	list-style:		 	none;
+	padding: 			0;
+	margin: 			0 0 10px;
+	border-top: 1px solid #909090;
+}
+.toolbarLayers .objectLayer {
+	height: 28px;
+	border-bottom: 1px solid #909090;
+	cursor: pointer;
+}
+.toolbarLayers .objectLayer.active {
+	background-color : #b5d5ff;
+}
+.toolbarLayers .objectToggle {
+	height: 16px;
+	width:  16px;
+	text-indent: -9999em;
+	overflow: hidden;
+	display: block;
+	margin: 5px 3px 0;
+	float: left;
+	border-top: 1px solid #909090;
+	border-left: 1px solid #909090;	
+	border-bottom: 1px solid #e4e4e4;
+	border-right: 1px solid #e4e4e4;
+	background: url("../images/layers-eye.png") no-repeat 50% 50%;	
+}
+.toolbarLayers .objectLayer.hide .objectToggle {
+	background: transparent none;
+}
+.toolbarLayers .objectThumbContainer {
+	float: left;
+	width: 30px;
+	height: 20px;
+	border: 1px solid #000;	
+	margin: 3px 3px 0;
+	background-color: #fff;
+	overflow: hidden;
+	position: relative;
+}
+.toolbarLayers .objectThumbContainer img {
+	height: 20px;
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.toolbarLayers .objectLayerName {
+	line-height: 28px;
+	text-overflow: ellipsis;
+	display: inline-block;
+	width: 105px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.toolbarLayers .buttonImageSave {
+	width: 74%;
+}
+.toolbarLayers .buttonLayerRemove {
+	margin: 0 0 0 3%;
+}
