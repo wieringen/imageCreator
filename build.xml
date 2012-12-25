@@ -1,117 +1,195 @@
 <?xml version="1.0"?>
+
 <project name="imageCreator" default="dist">
-    <property name="dist.dir"    value="dist" />
-    <property name="src.dir"     value="${dist.dir}/src" />
-    <property name="docs.dir"    value="docs" />
-    <property name="widget.name" value="imageCreator" />
 
-    <!-- specify timestamps -->
-    <tstamp>
-        <format property="version.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" locale="nl,NL" />
-    </tstamp>
-    <tstamp>
-        <format property="version.date" pattern="yyyyMMdd" locale="nl,NL" />
-    </tstamp>
-    <tstamp>
-        <format property="copyright.year" pattern="yyyy" locale="nl,NL" />
-    </tstamp>
-    <tstamp>
-        <format property="version.build" pattern="yyyyMMddHHmmss" locale="nl,NL" />
-    </tstamp>
+    <description>imageCreator Build</description>
 
-    <!-- bamboo.buildNumber will be set by Bamboo, but for local builds this fallback to a timestamp -->
-    <target name="setBuildNumber" unless="bamboo.buildNumber">
-        <echo>Setting local build number</echo>
-        <tstamp>
-            <format property="bamboo.buildNumber" pattern="yyyyMMddHHmmss" locale="nl,NL" />
-        </tstamp>
+    <target name="-load.properties" description="Set properties for this build.">
+        <property name="yui.jar"   value="tools/yuicompressor/yuicompressor-2.4.2.jar"/>
+        <property name="jsdoc"     value="tools/jsdoc-toolkit"/>
+
+        <property name="dist.dir" value="dist" />
+        <property name="src.dir"  value="${dist.dir}/src" />
+        <property name="docs.dir" value="docs" />
+        <property name="app.dir"  value="src" />
+        <property name="widget.name" value="imageCreator" />
     </target>
+       
+    <!-- Create build directory structure. -->
+    <target name="-init" description="Create build directory structure.">        
+        <echo>Clean dist directory.</echo>
+        <delete dir="${dist.dir}"/>
 
-    <!-- bamboo.buildKey will be set by Bamboo, but for local builds this fallback to LOCAL -->
-    <target name="setBuildKey" unless="bamboo.buildKey">
-        <echo>Setting local build key</echo>
-
-        <property name="bamboo.buildKey" value="LOCAL" />
-    </target>
-
-    <!-- Cleanup any (previous) distribution files -->
-    <target name="clean" depends="cleandocs" description="Removes all intermediate files">
-        <echo>Cleaning distribution files...</echo>
-        <delete dir="${dist.dir}" />
-    </target>
-
-    <target name="pre-dist">
-        <mkdir dir="${src.dir}" />
-
-        <!-- Copy the source files -->
-        <copy todir="${src.dir}/">
-            <fileset dir="." excludes="${dist.dir}/, build.xml" />
+        <echo>Create build directory structure...</echo>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${src.dir}"/>
+        
+        <copy todir="${src.dir}/css">
+            <fileset dir="${app.dir}/css" includes="**/*" />
         </copy>
+
+        <copy todir="${src.dir}/core">
+            <fileset dir="${app.dir}/core" includes="**/*" />
+        </copy>   
+
+        <copy todir="${src.dir}/lib">
+            <fileset dir="${app.dir}/lib" includes="**/*" />
+        </copy>
+
+        <copy todir="${src.dir}/images">
+            <fileset dir="${app.dir}/images" includes="**/*" />
+        </copy>  
+
+         <copy file="${app.dir}/index.html"  todir="${src.dir}" />                   
     </target>
 
-    <!-- Documentation related (jsDocs) -->
-    <target name="cleandocs">
-        <echo>Cleaning documentation files...</echo>
-        <!-- Cleanup old documentation files -->
-        <delete dir="${docs.dir}/symbols" failonerror="false">
-            <fileset dir="${docs.dir}" includes="**/*" />
+    <!-- Set build number. -->
+    <target name="-set.builds" description="Set build numbers.">
+        <echo>Set build number...</echo>
+
+        <replaceregexp flags="sg">
+            <regexp pattern="@@tinyscrollbar-build-number@@" />
+            <substitution expression="${tinyscrollbar.version}" />
+
+            <fileset dir="${src.dir}">
+                <include name="index.html" />
+                <include name="projects/tinyscrollbar/index.html" />
+                <include name="projects/tinyscrollbar/js/jquery.tinyscrollbar.js" />
+            </fileset>
+        </replaceregexp>
+    </target>
+
+   <!-- Concatenate CSS files -->
+    <target name="-css.concat">
+        <!-- Combine all the individual CSS resources -->
+        <echo>Concatenating Web application CSS files...</echo>
+        <concat destfile="${src.dir}/css/imageCreator.css">
+            <fileset file="${src.dir}/css/base.css" />
+            <fileset file="${src.dir}/css/buttons.css" />
+            <fileset dir="${src.dir}/css" includes="*.css" excludes="style.css, base.css, buttons.css" />
+        </concat>
+
+        <!-- Cleanup combined files -->
+        <delete includeemptydirs="true">
+            <fileset dir="${src.dir}/css" includes="*.css" excludes="imageCreator.css" />
         </delete>
     </target>
 
-    <target name="docs" depends="cleandocs">
-        <echo>Building documentation files...</echo>
+    <!-- Compile CSS source files using YUI compressor -->
+    <target name="-css.compile">
+        <echo>Compressing Web application CSS files...</echo>
 
-        <!-- Build the documentation using jsDoc Toolkit -->
-        <apply executable="java" parallel="true" verbose="true" dir="." relative="true">
-            <arg value="-jar" />
-            <arg value="lib/jsdoc-toolkit/jsrun.jar" />
-            <arg value="lib/jsdoc-toolkit/app/run.js" />
-            <!--<arg value="-a" />-->
-            <arg value="-t=lib/jsdoc-toolkit/templates/marviq" />
-            <arg value="-d=${docs.dir}" />
+        <apply executable="java" parallel="false" verbose="true" dest="${src.dir}/css">
+            <fileset dir="${src.dir}/css" includes="imageCreator.css"/>
+            <arg value="-jar"/>
+            <arg path="${yui.jar}"/>
+            <arg value="--type"/>
+            <arg value="css"/>
+            <arg value="--charset"/>
+            <arg value="utf-8"/>
+            <srcfile/>
+            <arg value="-o"/>
+            <mapper type="glob" from="*.css" to="*-compiled.css"/>
+            <targetfile/>
+        </apply>
 
-            <fileset dir=".">
-                <include name="*.js" />
+         <!-- Move and replace original files -->
+        <move todir="${src.dir}" includeemptydirs="false">
+            <fileset dir="${src.dir}" includes="css/*.css"/>
+            <mapper type="glob" from="*-compiled.css" to="*.css"/>
+        </move>
+    </target>
+
+    <!-- Concatinate javascript files -->
+    <target name="-js.concat">
+        <echo>Concatenating javascript files...</echo>
+
+        <concat destfile="${src.dir}/jquery.${widget.name}.js">
+            <!-- RequireJS Libraries -->
+            <fileset file="${src.dir}/lib/require/almond.js" />
+            <fileset file="${src.dir}/lib/require/domReady.js" />
+            <fileset file="${src.dir}/lib/require/lazyRequire.js" />
+            <fileset file="${src.dir}/lib/require/text.js" />
+    
+            <!-- jQuery plugins -->
+            <fileset file="${src.dir}/lib/jquery.circleSlider.js" />
+            <fileset file="${src.dir}/lib/jquery.colorPicker.js" />
+            <fileset file="${src.dir}/lib/jquery.dropArea.js" />
+            <fileset file="${src.dir}/lib/jquery.slider.js" />
+            <fileset file="${src.dir}/lib/jquery.tabular.js" />
+
+            <!-- Core -->
+            <fileset file="${src.dir}/core/utils.js" />
+            <fileset file="${src.dir}/core/selection.js" />
+
+            <fileset file="${src.dir}/core/toolbar/image.js" />
+            <fileset file="${src.dir}/core/toolbar/text.js" />
+            <fileset file="${src.dir}/core/toolbar/info.js" />
+            <fileset file="${src.dir}/core/toolbar/layers.js" />
+
+            <fileset file="${src.dir}/core/engine/svg.js" />
+            <fileset file="${src.dir}/core/engine/vml.js" />
+            <fileset file="${src.dir}/core/engine/canvas.js" />
+
+            <fileset file="${src.dir}/core/main.js" />
+        </concat>
+
+        <!-- Cleanup combined files -->
+        <delete includeemptydirs="true">
+            <fileset dir="${src.dir}/lib" />
+            <fileset dir="${src.dir}/core" />
+        </delete>
+    </target>
+
+    <!-- Validate javascript files. failonerror="true -->
+    <target name="-js.lint" description="Validate javascript files.">
+        <echo>Validate javascript files...</echo>
+
+        <apply executable="java" parallel="false">
+            <arg value="-jar"/>
+            <arg value="${rhino.jar}"/>
+            <arg value="${jshint.js}"/>
+            <srcfile/>
+
+            <fileset dir="${src.dir}/projects" includes="**/*.js">
+                <contains text="baijs" casesensitive="no"/>
             </fileset>
         </apply>
     </target>
 
-    <!-- Concatinate javascript files -->
-    <target name="js.concat">
-        <echo>Concatenating javascript files for ${widget.name}...</echo>
+    <!-- Compress project Javascript -->
+    <target name="-js.compress" description="Compress project Javascript.">
+        <echo>Compressing javascript files...</echo>
 
-        <!-- Combine all the libraries with the widget -->
-        <concat destfile="${src.dir}/${widget.name}.js">
-            <!-- Libraries -->
-            <fileset file="${src.dir}/lib/jquery.tinyscrollbar.js" />
-            <fileset file="${src.dir}/lib/highcharts.js" />
-            <fileset file="${src.dir}/lib/context.js" />
-            <fileset file="${src.dir}/lib/xdm.js" />
+        <apply executable="java" parallel="false" verbose="true" dest="${src.dir}">
+            <arg value="-jar"/>
+            <arg path="${yui.jar}"/>
+            <arg value="-v"/>
+            <arg value="--type"/>
+            <arg value="js"/>
+            <arg value="--charset"/>
+            <arg value="utf-8"/>
+            <srcfile/>
+            <arg value="-o"/>
+            <targetfile/>
 
-            <fileset file="${src.dir}/core/utilities.js" />
-            <fileset file="${src.dir}/core/services.js" />
-            <fileset file="${src.dir}/core/chart.js" />
-            <fileset file="${src.dir}/core/table.js" />
-            <fileset file="${src.dir}/core/controller.js" />
-        </concat>
+            <fileset dir="${src.dir}" includes="jquery.${widget.name}.js"></fileset>
 
-        <!-- Cleanup combined files -->
-        <delete>
-            <fileset dir="${src.dir}/lib" />
-            <fileset dir="${src.dir}/core" />
-        </delete>
+            <mapper type="glob" from="*.js" to="*.min.js"/>
+        </apply>
 
-        <!-- Set the build number -->
-        <replaceregexp flags="sg">
-            <regexp pattern="(/\*\s*)?@@build-nr-start@@[^\@]*@@build-nr-end@@(\s*\*/)?" />
-            <substitution expression="${version.build}" />
-            <fileset dir="${src.dir}">
-                <include name="**/*.js" />
-                <include name="**/*.html" />
-            </fileset>
-        </replaceregexp>
+         <!-- Move and replace original files -->
+        <move todir="${src.dir}" includeemptydirs="false">
+            <fileset dir="${src.dir}"/>
+            <mapper type="glob" from="*-min.js" to="*.js"/>
+        </move>
+    </target>
 
-        <!-- Changed the includes in html files -->
+
+    <!-- Set production links -->
+    <target name="-set.links" description="Set production links.">
+        <echo>Compressing javascript files...</echo>
+
         <replaceregexp flags="sg">
             <regexp pattern="@@js-dev-start@@[^\@]*@@js-dev-end@@" />
             <substitution expression="" />
@@ -128,67 +206,76 @@
         </replaceregexp>
     </target>
 
-    <target name="js.compile.yui" depends="js.concat">
-        <echo>Compressing javascript files...</echo>
-        <!-- Compile javascript source files using YUI compressor -->
-        <apply executable="java" parallel="false" verbose="true" dest="${src.dir}">
-            <fileset dir="${src.dir}" includes="*.js"/>
-            <arg value="-jar"/>
-            <arg path="lib/yuicompressor/yuicompressor-2.4.2.jar"/>
-            <arg value="-v"/>
-            <arg value="--type"/>
-            <arg value="js"/>
-            <arg value="--charset"/>
-            <arg value="utf-8"/>
-            <srcfile/>
-            <arg value="-o"/>
-            <mapper type="glob" from="*.js" to="*-compiled.js"/>
-            <targetfile/>
+    <!-- Pack the project examples. -->
+    <target name="-examples.pack" description="Pack the project examples.">
+        
+        <copy file="${src.dir}/projects/tinycircleslider/js/jquery.tinycircleslider.min.js" todir="${src.dir}/projects/tinycircleslider/example/js" />  
+        <copy file="${src.dir}/projects/tinyscrollbar/js/jquery.tinyscrollbar.min.js" todir="${src.dir}/projects/tinyscrollbar/example/js" />  
+        <copy file="${src.dir}/projects/tinycarousel/js/jquery.tinycarousel.min.js" todir="${src.dir}/projects/tinycarousel/example/js" />  
+
+        <echo>Zip the project examples...</echo>
+
+        <zip destfile="${src.dir}/projects/tinycircleslider/example.zip" basedir="${src.dir}/projects/tinycircleslider/example"/> 
+        <zip destfile="${src.dir}/projects/tinyscrollbar/example.zip"    basedir="${src.dir}/projects/tinyscrollbar/example"/> 
+        <zip destfile="${src.dir}/projects/tinycarousel/example.zip"     basedir="${src.dir}/projects/tinycarousel/example"/>
+
+        <echo>Tar and gzip the project examples...</echo>
+
+        <tar    destfile="${src.dir}/projects/tinycarousel/example.tar" basedir="${src.dir}/projects/tinycarousel/example"/>
+        <gzip   destfile="${src.dir}/projects/tinycarousel/example.tar.gz"  src="${src.dir}/projects/tinycarousel/example.tar"/>
+        <delete file="${src.dir}/projects/tinycarousel/example.tar"/>
+        <delete dir="${src.dir}/projects/tinycarousel/example"/> 
+
+        <copy   file="${src.dir}/projects/tinyscrollbar/js/jquery.tinyscrollbar.min.js"  todir="${src.dir}/projects/tinyscrollbar/example/js" /> 
+        <tar    destfile="${src.dir}/projects/tinyscrollbar/example.tar" basedir="${src.dir}/projects/tinyscrollbar/example"/>
+        <gzip   destfile="${src.dir}/projects/tinyscrollbar/example.tar.gz"  src="${src.dir}/projects/tinyscrollbar/example.tar"/> 
+        <delete file="${src.dir}/projects/tinyscrollbar/example.tar"/>
+        <delete dir="${src.dir}/projects/tinyscrollbar/example"/> 
+
+        <tar    destfile="${src.dir}/projects/tinycircleslider/example.tar" basedir="${src.dir}/projects/tinycircleslider/example"/>
+        <gzip   destfile="${src.dir}/projects/tinycircleslider/example.tar.gz"  src="${src.dir}/projects/tinycircleslider/example.tar"/>
+        <delete file="${src.dir}/projects/tinycircleslider/example.tar"/>    
+        <delete dir="${src.dir}/projects/tinycircleslider/example"/>        
+    </target>
+
+    <!-- Build the documentation using jsDoc Toolkit -->
+    <target name="-docs" description="Build the documentation.">
+        <echo>Cleaning documentation files...</echo>
+        <delete dir="${docs.dir}"/>
+
+        <echo>Create documentation directory structure...</echo>
+        <mkdir dir="${docs.dir}"/>
+        
+        <echo>Building documentation files...</echo>
+
+        <apply executable="java" parallel="true" verbose="true" dir="." relative="true">
+            <arg value="-jar" />
+            <arg value="${jsdoc}/jsrun.jar" />
+            <arg value="${jsdoc}/app/run.js" />
+            <!--<arg value="-a" />-->
+            <arg value="-t=${jsdoc}/templates/jsdoc" />
+            <arg value="-d=${docs.dir}" />
+
+            <fileset dir=".">
+                <include name="projects/tinycircleslider/js/jquery.tinycircleslider.js" />
+                <include name="projects/tinyscrollbar/js/jquery.tinyscrollbar.js" />
+                <include name="projects/tinycarousel/js/jquery.tinycarousel.js" />
+            </fileset>
         </apply>
-
-        <!-- Move and replace original files -->
-        <move todir="${src.dir}" includeemptydirs="false">
-            <fileset dir="${src.dir}" includes="*.js"/>
-            <mapper type="glob" from="*-compiled.js" to="*.js"/>
-        </move>
     </target>
 
-    <target name="dist" depends="clean, setBuildNumber, setBuildKey, docs, pre-dist, js.compile.yui" description="Package distribution files">
-        <echo>Building distribution artifacts...</echo>
-
-        <!-- Remove development files -->
-        <delete dir="${src.dir}/lib" />
-        <delete dir="${src.dir}/core" />
-        <delete dir="${src.dir}/docs/src" />
-        <delete dir="${src.dir}/tests" />
-
-        <!-- Create the zip archive -->
-        <zip destfile="${dist.dir}/${widget.name}_${bamboo.buildKey}-${bamboo.buildNumber}.zip" basedir="${src.dir}">
-            <exclude name="docs/" />
-            <include name="**" />
-        </zip>
-
-        <zip destfile="${dist.dir}/${widget.name}_docs_${bamboo.buildKey}-${bamboo.buildNumber}.zip" basedir="${src.dir}/docs">
-            <include name="**" />
-        </zip>
+    <!--Build-->
+    <target name="dist" 
+            description="Builds project files for production use"
+            depends="
+                -load.properties, 
+                -init,
+                -set.builds,
+                -css.concat,
+                -css.compile,
+                -js.concat,
+                -js.compress,
+                -set.links">
     </target>
 
-    <target name="debug" depends="clean, setBuildNumber, setBuildKey,  docs, pre-dist, js.concat" description="Package debug files">
-        <echo>Building debug artifacts...</echo>
-
-        <!-- Remove development files -->
-        <delete dir="${src.dir}/lib" />
-        <delete dir="${src.dir}/docs/src" />
-        <delete dir="${src.dir}/tests" />
-
-        <!-- Create the zip archive -->
-        <zip destfile="${dist.dir}/${widget.name}_${bamboo.buildKey}-${bamboo.buildNumber}.zip" basedir="${src.dir}">
-            <exclude name="docs/" />
-            <include name="**" />
-        </zip>
-
-        <zip destfile="${dist.dir}/${widget.name}_docs_${bamboo.buildKey}-${bamboo.buildNumber}.zip" basedir="${src.dir}/docs">
-            <include name="**" />
-        </zip>
-    </target>
 </project>

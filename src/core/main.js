@@ -17,9 +17,10 @@ requirejs.config({
         
         // App paths
         //
-    ,   "toolbar"     : "../toolbar"
     ,   "plugins"     : "../lib"
     ,   "engine"      : "engine"
+    ,   "toolbar"     : "toolbar"
+    ,   "templates"   : "../templates"
 
         // Require plugins
         //
@@ -137,22 +138,11 @@ function( $, lazyRequire, utils, selection )
 
     function loadTool( event, toolName )
     {
-        var requireOnce = lazyRequire.once()
-        ,   cssUrl      = "toolbar/" + toolName + "/" + toolName + ".css"
-        ;
+        var requireOnce = lazyRequire.once();
 
-        if ( document.createStyleSheet )
-        {
-            document.createStyleSheet( cssUrl );
-        }
-        else
-        {
-            $( "<link/>", { rel: "stylesheet", href: cssUrl }).appendTo( "head" );
-        }
-        
         requireOnce(
             [
-                "toolbar/" + toolName + "/" + toolName
+                "toolbar/" + toolName
             ]
         ,   function( tool )
             {
