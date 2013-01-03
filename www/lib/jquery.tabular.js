@@ -5,7 +5,10 @@
  * @version 1.0
  * @author mbaijs
  */
-;(function ( $, window, document, undefined )
+define(
+[
+],
+function()
 {
     var pluginName = 'tabular'
     ,   defaults   = 
@@ -86,4 +89,4 @@
             }
         });
     }
-})( jQuery, window, document );
+});

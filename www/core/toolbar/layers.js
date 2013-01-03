@@ -8,11 +8,9 @@
  */
 define(
 [
-    "jquery"
-
     // Module HTML template
     //
-,   "text!templates/layers.html"
+    "text!templates/layers.html"
 
     // App core modules
     //
@@ -21,7 +19,7 @@ define(
     //
 ,   "plugins/jquery.tabular"
 ],
-function( $, moduleHTML )
+function( moduleHTML )
 {
     var theApp = window[ "imageCreator" ]
     ,   module =

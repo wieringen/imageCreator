@@ -6,10 +6,8 @@
  * @author mbaijs
  */
 define(
-[
-    "jquery"
-],
-function( $ )
+[],
+function()
 {
     var pluginName = "circleSlider"
     ,   defaults   = { }

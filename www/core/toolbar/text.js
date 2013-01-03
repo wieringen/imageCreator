@@ -8,11 +8,9 @@
  */
 define(
 [
-    "jquery"
-
     // Module HTML template.
     //
-,   "text!templates/text.html"
+    "text!templates/text.html"
 
     // App core modules.
     //
@@ -25,7 +23,7 @@ define(
 ,   "plugins/jquery.circleSlider"
 ,   "plugins/jquery.colorPicker"
 ],
-function( $, moduleHTML, utils )
+function( moduleHTML, utils )
 {
     var theApp = window[ "imageCreator" ]
     ,   module =

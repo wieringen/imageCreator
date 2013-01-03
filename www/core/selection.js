@@ -7,10 +7,9 @@
  */
 define(
 [
-    "jquery"
-,   "utils"
+    "utils"
 ],
-function( $, utils )
+function( utils )
 {
     var theApp = window[ "imageCreator" ]
     ,   module =

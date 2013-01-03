@@ -11,34 +11,27 @@
  //
 requirejs.config({
     paths: {
-        // jQuery
-        //
-        "jquery"      : "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min"
-        
         // App paths
         //
-    ,   "plugins"     : "../lib"
+        "plugins"     : "../lib"
     ,   "engine"      : "engine"
     ,   "toolbar"     : "toolbar"
     ,   "templates"   : "../templates"
 
         // Require plugins
         //
-    ,   "domReady"    : "../lib/require/domReady"
-    ,   "text"        : "../lib/require/text"
     ,   "lazyRequire" : "../lib/require/lazyRequire"
+    ,   "text" : "../lib/require/text"
     }
 });
 
 require(
 [
-    "jquery"
-,   "lazyRequire"
+    "lazyRequire"
 ,   "utils"
 ,   "selection"
-,   "domReady!"
 ],
-function( $, lazyRequire, utils, selection )
+function( lazyRequire, utils, selection )
 {   
     var theApp = window[ "imageCreator" ] = 
         {

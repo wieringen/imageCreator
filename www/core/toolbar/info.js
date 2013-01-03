@@ -8,17 +8,15 @@
  */
 define(
 [
-    "jquery",
-
     // Module HTML template.
     //
-    "text!templates/info.html",
+    "text!templates/info.html"
 
     // App core modules.
     //
-    "utils",
+,   "utils"
 ],
-function( $, moduleHTML, utils )
+function( moduleHTML, utils )
 {
     var theApp = window[ "imageCreator" ]
     ,   module =

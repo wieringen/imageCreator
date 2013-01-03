@@ -7,10 +7,8 @@
  * @author mbaijs
  */
 define(
-[
-    "jquery"
-],
-function( $ )
+[],
+function()
 {
     var theApp = window[ "imageCreator" ]
     ,   module =

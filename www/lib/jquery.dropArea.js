@@ -7,9 +7,8 @@
  */
 define(
 [
-    "jquery"
 ],
-function( $ )
+function()
 {
     var pluginName = "dropArea"
     ,   defaults   =
