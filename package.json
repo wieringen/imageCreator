@@ -1,0 +1,28 @@
+{
+    "name"        : "imageCreator"
+,   "version"     : "0.5.0"
+,   "description" : "A image creator tool."
+,   "homepage"    : "http://www.baijs.com/imageCreator"
+    
+,   "author" : 
+    {
+        "name" : "Maarten Baijs"
+    ,   "url"  : "http://www.baijs.com"
+    }
+
+,   "repository" : 
+    {
+        "type" : "git"
+    ,   "url"  : "https://github.com/wieringen/imageCreator.git"
+    }
+
+,   "devDependencies" : 
+    {
+        "grunt-clean"          : "~0.3.0"
+    ,   "grunt-contrib-copy"   : "~0.3.2"
+    ,   "grunt-css"            : "~0.3.2"
+    ,   "grunt-requirejs"      : "~0.3.1"
+    ,   "grunt-string-replace" : "~0.1.1-1"
+    ,   "grunt"                : "~0.3.17"
+    }
+}
