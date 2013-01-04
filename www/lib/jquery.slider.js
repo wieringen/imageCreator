@@ -6,8 +6,7 @@
  * @author mbaijs
  */
 define(
-[
-],
+[],
 function()
 {
     var pluginName = 'slider'

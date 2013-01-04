@@ -7,8 +7,7 @@
  * @author mbaijs
  */
 define(
-[
-],
+[],
 function()
 {
     var theApp = window[ "imageCreator" ]

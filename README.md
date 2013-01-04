@@ -1,3 +1,57 @@
+[imageCreator](http://baijs.com/imagecreator) 
+==================================================
+
+What you need to build your own version of imageCreator
+--------------------------------------
+
+In order to build imageCreator, you need to have Node.js/npm installed, and git 1.7 or later.
+
+
+Questions?
+----------
+
+If you have any questions, please feel free to email me.
+
+
+How to build your own imageCreator
+----------------------------
+
+First, clone a copy of the main imageCreator git repo by running:
+
+```bash
+git clone git://github.com/wieringen/imageCreator.git
+```
+
+Install the grunt-cli package so that you will have the correct version of grunt available from any project that needs it. This should be done as a global install:
+
+```bash
+npm install -g grunt-cli
+```
+
+Enter the imageCreator directory and install the Node dependencies, this time *without* specifying a global install:
+
+```bash
+cd imageCreator && npm install
+```
+
+Make sure you have `grunt` installed by testing:
+
+```bash
+grunt -version
+```
+
+Then, to get a complete, minified (w/ Uglify.js), linted (w/ JSHint) version of imageCreator, type the following:
+
+```bash
+grunt
+```
+
+The built version of imageCreator will be put in the `dist/` subdirectory, along with the minified copy and associated map file.
+
+
+Letter
+----------------------------
+
 Hey all,
 
 I have been working on a webapp for some time now and i wanted to share the result with you. Joel's presentation on RequireJS inspired me to start working on it again. RequireJs provided the structure and frame of mind i was looking for. Thanks dude :P
