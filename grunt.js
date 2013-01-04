@@ -5,15 +5,6 @@ module.exports = function(grunt)
     {
         pkg  : "<json:package.json>"
         
-    ,   meta : 
-        {
-           banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
-        }
-
     //  Remove old build.
     //
     ,   clean : 
@@ -31,8 +22,9 @@ module.exports = function(grunt)
                 {
                     "dist/" : 
                     [ 
-                        "www/images/*"
-                    ,   "www/index.html" 
+                        "src/images/*"
+                    ,   "src/temp/*"
+                    ,   "src/index.html"
                     ]
                 }
             }
@@ -65,7 +57,7 @@ module.exports = function(grunt)
                     }
 
                 ,   name    : "main"
-                ,   baseUrl : "www/core"
+                ,   baseUrl : "src/core"
                 ,   out     : "dist/jquery.imageCreator.js"
                 ,   wrap    : true
                 ,   almond  : true
@@ -88,12 +80,12 @@ module.exports = function(grunt)
             {
                 src : 
                 [
-                    "www/css/core-base.css"
-                ,   "www/css/core-buttons.css"
-                ,   "www/css/toolbar-image.css"
-                ,   "www/css/toolbar-text.css"
-                ,   "www/css/toolbar-info.css"
-                ,   "www/css/toolbar-layers.css"
+                    "src/css/core-base.css"
+                ,   "src/css/core-buttons.css"
+                ,   "src/css/toolbar-image.css"
+                ,   "src/css/toolbar-text.css"
+                ,   "src/css/toolbar-info.css"
+                ,   "src/css/toolbar-layers.css"
                 ]
 
             ,   dest : "dist/imageCreator.css"

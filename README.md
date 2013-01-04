@@ -7,12 +7,6 @@ What you need to build your own version of imageCreator
 In order to build imageCreator, you need to have Node.js/npm installed, and git 1.7 or later.
 
 
-Questions?
-----------
-
-If you have any questions, please feel free to email me.
-
-
 How to build your own imageCreator
 ----------------------------
 
@@ -47,6 +41,13 @@ grunt
 ```
 
 The built version of imageCreator will be put in the `dist/` subdirectory, along with the minified copy and associated map file.
+
+
+Questions?
+----------
+
+If you have any questions, please feel free to email me.
+
 
 
 Letter
