@@ -7,10 +7,12 @@
  * @author mbaijs
  */
 
- // Set up the paths and inital modules for the app.
- //
-requirejs.config({
-    paths: {
+// Set up the paths and inital modules for the app.
+//
+requirejs.config(
+{
+    paths : 
+    {
         // App paths
         //
         "plugins"     : "../lib"
@@ -21,60 +23,31 @@ requirejs.config({
         // Require plugins
         //
     ,   "lazyRequire" : "../lib/require/lazyRequire"
-    ,   "text" : "../lib/require/text"
+    ,   "text"        : "../lib/require/text"
     }
 });
 
 require(
 [
-    "lazyRequire"
+    "config"
+,   "lazyRequire"
 ,   "utils"
 ,   "selection"
 ],
-function( lazyRequire, utils, selection )
+function( config, lazyRequire, utils, selection )
 {   
-    var theApp = window[ "imageCreator" ] = 
-        {
-            engine  : ""
-        ,   toolbar : {}
-        }
-    ,   mouse  = {}
+    var mouse   = {}
+    ,   toolbar = {}
 
-    ,   $imageCreator  = null
-    ,   $ecardViewport = null
+    ,   $imageCreator 
+    ,   $ecardViewport
     ;
-
-    var settings = theApp.settings = $.extend(
-    {
-        viewportWidth  : 520
-    ,   viewportHeight : 360
-
-    ,   engine : 
-        [ 
-            {
-                name    : "svg"
-            ,   support : utils.testForSVG
-            ,   order   : 1
-            }
-        ,   {
-                name    : "vml"
-            ,   support : utils.testForVML
-            ,   order   : 2
-            }
-        ,   {
-                name    : "canvas"
-            ,   support : utils.testForCanvas
-            ,   order   : 3
-            }          
-        ]
-
-    ,   toolbar : [ "info", "layers", "image", "text" ]
-
-    }, theApp.settings );
 
     $( document ).ready( function()
     {
-        $imageCreator  = $( ".imageCreator" );
+        // Get basic app DOM elements.
+        //
+        $imageCreator  = $( ".imageCreator"  );
         $ecardViewport = $( ".ecardViewport" );
 
         // Setup the layer resizer/rotater selection.
@@ -85,43 +58,47 @@ function( lazyRequire, utils, selection )
         //
         $ecardViewport.mousedown( viewportDragStart );
 
-        // Set engine precedence.
-        //
-        settings.engine.sort( function( engineA, engineB )
-        {
-            return engineA.order - engineB.order;
-        });
-
-        // Load engine
-        //
-        $.each( settings.engine || [], loadEngine );
-
-        $imageCreator.bind( "loadEngine", loadEngine );
-
         // Create toolbar.
         //
-        $.each( settings.toolbar || [], loadTool );
+        $.each( config.options.toolbar || [], loadTool );
 
-        $imageCreator.bind( "loadTool", loadTool );
+        $imageCreator.bind( "loadTool", function( event, toolName, toolOptions )
+        { 
+            loadTool( toolName, toolOptions );
+        });
+
+        // Load engine.
+        //
+        $.each( config.options.engineOrder || [], function( engineIndex, engineName )
+        {
+            return loadEngine( engineName );
+        });
+
+        $imageCreator.bind( "loadEngine", function( event, engineName )
+        { 
+            loadEngine( engineName );
+        });
     } );
 
-    function loadEngine( event, engineObject )
+    function loadEngine( engineNane )
     {
+        var engineObject = config.options.engines[ engineNane ];
+
         if( "function" === typeof engineObject.support && engineObject.support() )
         {
             var requireOnce = lazyRequire.once();
 
             requireOnce(
                 [
-                    "engine/" + engineObject.name
+                    "engine/" + engineNane
                 ]
             ,   function( engine )
                 {
-                    theApp.engine = engine;
+                    config.setEngine( engine );
                 }
             ,   function()
                 {
-                    theApp.engine.initialize();
+                    config.engine.initialize();
                 }
             );
 
@@ -129,23 +106,26 @@ function( lazyRequire, utils, selection )
         }
     }
 
-    function loadTool( event, toolName )
+    function loadTool( toolName, toolOptions )
     {
-        var requireOnce = lazyRequire.once();
+        if( config.options.toolbar[ toolName ] )
+        {
+            var requireOnce = lazyRequire.once();
 
-        requireOnce(
-            [
-                "toolbar/" + toolName
-            ]
-        ,   function( tool )
-            {
-                theApp.toolbar[ toolName ] = tool;
-            }
-        ,   function()
-            {   
-                theApp.toolbar[ toolName ].initialize();
-            }
-        );
+            requireOnce(
+                [
+                    "toolbar/" + toolName
+                ]
+            ,   function( tool )
+                {
+                    toolbar[ toolName ] = tool;
+                }
+            ,   function( tool )
+                {   
+                    toolbar[ toolName ].initialize();
+                }
+            );
+        }
     }
 
     function viewportDragStart( event )

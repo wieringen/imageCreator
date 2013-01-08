@@ -7,12 +7,13 @@
  */
 define(
 [
+    // App core modules
+    //
     "utils"
 ],
 function( utils )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
             name     : "selection"
         ,   settings : 
@@ -157,25 +158,6 @@ function( utils )
             $selection.toggle( layer.visible );
         }
     }
-/*
-svgedit.select.Selector.prototype.updateGripCursors = function(angle) {
-    var dir_arr = [];
-    var steps = Math.round(angle / 45);
-    if(steps < 0) steps += 8;
-    for (var dir in selectorManager_.selectorGrips) {
-        dir_arr.push(dir);
-    }
-    while(steps > 0) {
-        dir_arr.push(dir_arr.shift());
-        steps--;
-    }
-    var i = 0;
-    for (var dir in selectorManager_.selectorGrips) {
-        selectorManager_.selectorGrips[dir].setAttribute('style', ('cursor:' + dir_arr[i] + '-resize'));
-        i++;
-    };
-};*/
-
 
     function selectionResize( event )
     {
@@ -201,7 +183,9 @@ svgedit.select.Selector.prototype.updateGripCursors = function(angle) {
         {
             delta.x += event.clientX - mouse.x;
             delta.y += event.clientY - mouse.y;
+/*
 
+STILL UNDER CONSTRUCTION THIS PART
             if( grip.name === "N" )
             {
                 layerCurrent.sizeCurrent.height = layerSize.height - delta.y;
@@ -267,18 +251,18 @@ svgedit.select.Selector.prototype.updateGripCursors = function(angle) {
             layerCurrent.positionRotated.x = layerCurrent.position.x - layerCurrent.offset.x;
             layerCurrent.positionRotated.y = layerCurrent.position.y - layerCurrent.offset.y;
 
-if( layerCurrent.type === "text")
-{
-            layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, 1, layerCurrent.position, layerCurrent.sizeCurrent );
-}else{
-            layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, layerCurrent.scale, layerCurrent.position, layerCurrent.sizeReal );
-}
+            if( layerCurrent.type === "text")
+            {
+                        layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, 1, layerCurrent.position, layerCurrent.sizeCurrent );
+            }else{
+                        layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, layerCurrent.scale, layerCurrent.position, layerCurrent.sizeReal );
+            }
 
             mouse.x = event.clientX;
             mouse.y = event.clientY;
 
             $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
-
+*/
             //$selection.trigger( "onResize", [ rotation ] );
         });
 

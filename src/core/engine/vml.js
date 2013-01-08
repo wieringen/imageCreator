@@ -7,16 +7,19 @@
  * @author mbaijs
  */
 define(
-[],
-function()
+[
+    // App core modules
+    //
+    "config"
+,   "toolbar/layers"
+],
+function( config, layers )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
-            name        : "vml"
-        ,   settings    : 
-            {
-            }
+            name     : "vml"
+        ,   options  : {}
+        ,   snippets : {}
         }
 
     ,   $imageCreator
@@ -78,7 +81,7 @@ function()
 
     function vmlBuildLayers()
     {
-        var layersObject = theApp.toolbar.layers && theApp.toolbar.layers.getAllLayers() || {};
+        var layersObject = layers && layers.getAllLayers() || {};
 
         $.each( layersObject.layers || [], vmlLayerCheck );
     }
@@ -144,7 +147,7 @@ function()
     {
         // Set type specific attributes.
         // 
-       if( "text" === layer.type )
+        if( "text" === layer.type )
         {
             htmlParagraphCurrent = $( vmlLayerCurrent ).find( "p" )[0];
             htmlParagraphCurrent.innerHTML        = layer.text;
@@ -157,7 +160,7 @@ function()
             vmlLayerCurrent.style.setAttribute( 'height', layer.sizeCurrent.height + "px" );
         }
  
-        // Only use the icky filter matrix if the browser is pre ie9.
+        // Only use the icky ms proprietary matrix filter if the browser is pre ie9.
         //
         if( ! document.addEventListener )
         {

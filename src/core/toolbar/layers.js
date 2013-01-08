@@ -14,23 +14,19 @@ define(
 
     // App core modules
     //
+,   "config"
 
     // jQuery plugins
     //
 ,   "plugins/jquery.tabular"
 ],
-function( moduleHTML )
+function( moduleHTML, config )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
             name     : "layers"
-        ,   target   : ".toolbarLayers"
         ,   enabled  : false
-        ,   settings : 
-            {
-                constrainLayers : true
-            }
+        ,   options  : {}
         ,   snippets : {}
         }
 
@@ -44,15 +40,19 @@ function( moduleHTML )
     ,   $currentLayer = false
     ;
 
-    module.initialize = function( options )
-    {        
+    module.initialize = function()
+    {
+        // Easy reference config options.
+        //
+        module.options = config.options.toolbar.layers;
+
         // Append module HTML.
         //
-        $( module.target ).replaceWith( moduleHTML );
+        $( module.options.target ).replaceWith( moduleHTML );
 
         // Get basic app DOM elements.
         //       
-        $imageCreator      = $( ".imageCreator" );
+        $imageCreator = $( ".imageCreator" );
 
         // Get module DOM elements.
         //
@@ -76,19 +76,19 @@ function( moduleHTML )
         module.snippets.$objectLayerSnippet = $module.find( ".objectLayer" ).remove();
         module.snippets.$engineSnippet      = $module.find( ".selectRenderEngineItem" ).remove();
 
-        // Set options.
+        // Set inputs to match module options.
         //
-        $inputConstrainLayers.attr( "checked", module.settings.constrainLayers );
-        $.each( theApp.settings.engine, function( index, engine )
+        $inputConstrainLayers.attr( "checked", module.options.constrainLayers );
+        $.each( config.options.engines, function( engineName, engine )
         {
             if( engine.support() )
             {
                 var $engineClone = module.snippets.$engineSnippet.clone();
                 
-                $engineClone.attr( "value", engine.name );
-                $engineClone.text( engine.name );
-                $engineClone.attr( "selected", engine.name === theApp.engine.name );
-                $engineClone.data( "engine", engine );
+                $engineClone.attr( "value", engineName );
+                $engineClone.text( engineName );
+                $engineClone.attr( "selected", engineName === config.engine.name );
+                $engineClone.data( "engine", engineName );
 
                 $selectRenderEngine.append( $engineClone );
             }
@@ -253,7 +253,16 @@ function( moduleHTML )
 
     function optionConstrainLayersToggle( event )
     {
-         module.settings.constrainLayers = $inputConstrainLayers.attr( "checked" );
+        config.setOptions(
+        { 
+            toolbar : 
+            {
+                layers : 
+                {
+                    constrainLayers : $inputConstrainLayers.is( ":checked" )
+                }
+            }
+        });
     }
 
     return module;

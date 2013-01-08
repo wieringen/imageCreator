@@ -50,10 +50,10 @@ module.exports = function(grunt)
                     ]
                 ,   paths : 
                     {
-                        "lazyRequire" : "../lib/require/lazyRequire"
-                    ,   "plugins"     : "../lib"
-                    ,   "templates"   : "../templates"
-                    ,   "text"        : "../lib/require/text"
+                        "lazyRequire"          : "../lib/require/lazyRequire"
+                    ,   "plugins"              : "../lib"
+                    ,   "templates"            : "../templates"
+                    ,   "text"                 : "../lib/require/text"
                     }
 
                 ,   name    : "main"

@@ -8,20 +8,18 @@
  */
 define(
 [
-
-    // App core modules.
+    // App core modules
     //
-   "utils"
+    "config"
+,   "toolbar/layers"
 ],
-function( utils )
+function( config, layers )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
-            name        : "canvas"
-        ,   settings    : 
-            {
-            }
+            name     : "canvas"
+        ,   options  : {}
+        ,   snippets : {}
         }
 
     ,   $imageCreator
@@ -43,8 +41,8 @@ function( utils )
         
         // Set the viewport's dimensions.
         //
-        canvasWidth  = theApp.settings.viewportWidth;
-        canvasHeight = theApp.settings.viewportHeight;
+        canvasWidth  = config.options.viewportWidth;
+        canvasHeight = config.options.viewportHeight;
 
         $ecardViewport.css( { width : canvasWidth, height : canvasHeight } );
 
@@ -75,7 +73,7 @@ function( utils )
 
     function canvasBuildLayers()
     {
-        var layersObject = theApp.toolbar.layers && theApp.toolbar.layers.getAllLayers() || {}
+        var layersObject = layers && layers.getAllLayers() || {}
         ,   layerCurrent = false
         ;
 
@@ -129,7 +127,7 @@ function( utils )
         
         context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
         context.strokeStyle = "#666";
-        context.lineWidth = 2 / layer.scale;
+        context.lineWidth   = 2 / layer.scale;
 
         context.strokeRect( 0, 0, ( layer.sizeReal ? layer.sizeReal.width : layer.sizeCurrent.width ), ( layer.sizeReal ? layer.sizeReal.height : layer.sizeCurrent.height ) ); 
         

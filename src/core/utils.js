@@ -10,13 +10,10 @@ define(
 [],
 function()
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
-            name     : "utils"
-        ,   settings : 
-            {
-            }
+            name    : "utils"
+        ,   options : {}
         }
     ;
 

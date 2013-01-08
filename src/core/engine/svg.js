@@ -7,16 +7,19 @@
  * @author mbaijs
  */
 define(
-[],
-function()
+[
+    // App core modules
+    //
+    "config"
+,   "toolbar/layers"
+],
+function( config, layers )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
-            name        : "svg"
-        ,   settings    : 
-            {
-            }
+            name     : "svg"
+        ,   options  : {}
+        ,   snippets : {}
         }
 
     ,   $imageCreator
@@ -42,8 +45,8 @@ function()
 
         // Set the viewport's dimensions.
         //
-        canvasWidth  = theApp.settings.viewportWidth;
-        canvasHeight = theApp.settings.viewportHeight;
+        canvasWidth  = config.options.viewportWidth;
+        canvasHeight = config.options.viewportHeight;
 
         $ecardViewport.css( { width : canvasWidth, height : canvasHeight } );
 
@@ -93,7 +96,7 @@ function()
 
     function svgBuildLayers()
     {
-        var layersObject = theApp.toolbar.layers && theApp.toolbar.layers.getAllLayers() || {};
+        var layersObject = layers && layers.getAllLayers() || {};
 
         $.each( layersObject.layers || [], svgLayerCheck );
     }
@@ -143,7 +146,7 @@ function()
 
         // Set ID.
         //
-        svgLayerCurrent.setAttribute( "id", layer.id + "svg" );
+        svgLayerCurrent.setAttribute( "id", layer.id + module.name );
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //   
@@ -160,7 +163,8 @@ function()
             htmlParagraphCurrent = $( svgLayerCurrent ).find( "p" );
             htmlParagraphCurrent.html( layer.text );
             htmlParagraphCurrent.css(
-            {   color      : layer.color
+            {   
+                color      : layer.color
             ,   fontSize   : layer.fontSize
             ,   fontFamily : layer.font
             ,   fontWeight : layer.weight ? "bold" : "normal"
@@ -178,7 +182,7 @@ function()
 
     function svgLayerSelect( event, layer )
     {
-        svgLayerCurrent = $( "#" + layer.id + "svg" )[0];
+        svgLayerCurrent = $( "#" + layer.id + module.name )[0];
 
         // If we have a layer change selection properties to match its dimensions.
         //
@@ -213,7 +217,7 @@ function()
 
     function svgLayerVisibility( event, layer )
     {
-        var $svgLayerToToggle = $( "#" + layer.id + "svg" );
+        var $svgLayerToToggle = $( "#" + layer.id + module.name );
 
         $svgLayerToToggle.attr( "visibility", layer.visible ? "visible" : "hidden" );
 
@@ -227,7 +231,7 @@ function()
 
     function svgLayerRemove( event, layer )
     {
-        var $svgLayerToRemove = $( "#" + layer.id + "svg" );
+        var $svgLayerToRemove = $( "#" + layer.id + module.name );
 
         // Remove layer from DOM.
         //

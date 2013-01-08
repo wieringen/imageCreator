@@ -3,14 +3,12 @@ body						{ background: #bfbfbf repeat 0 0; font: 11px Arial, Helvetica, sans-se
 a 							{ text-decoration: none; color: #CC0000; }
 a:hover 					{ text-decoration: underline; }
 p { color:#EEEEEE; margin: 0 0 10px; }
-form { padding: 0; margin: 0; }
+
 h1 { font-size:19px; color: #fff; line-height: 20px; }
 h3 { color:#000; text-transform: uppercase; font-size:10px; font-weight: normal; margin: 0 0 10px; text-align: left; }
+
 .noSelect { user-select: none; -o-user-select: none; -moz-user-select: none; -khtml-user-select: none; -webkit-user-select: none; }
-.imageCreator { width: 760px; }
-.ecardToolbarLeft { float: left; }
-.ecardToolbarRight { width: 215px; float: right; }
-.ecardToolbarBottom { clear: left; }
+.imageCreator form { padding: 0; margin: 0; }
 .imageCreator .ecardViewport{ box-shadow: 2px 2px 2px #adadad; background-color: #fff; margin: 0 0 20px 10px; border: 2px solid #999; overflow: hidden; position: relative; float: left; }
 .imageCreator .ecardViewport p { margin: 0; padding: 0 5px; line-height: 120%; }
 .imageCreator .ecardCanvas { width: 100%; height: 100%; }

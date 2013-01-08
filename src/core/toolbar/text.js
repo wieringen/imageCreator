@@ -14,6 +14,7 @@ define(
 
     // App core modules.
     //
+,   "config"
 ,   "utils"
 
     // jQuery plugins.
@@ -23,19 +24,14 @@ define(
 ,   "plugins/jquery.circleSlider"
 ,   "plugins/jquery.colorPicker"
 ],
-function( moduleHTML, utils )
+function( moduleHTML, config, utils )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
             name     : "text"
-        ,   target   : ".toolbarText"
         ,   enabled  : true
-        ,   settings : 
-            {
-                textSizeScale  : [ 10, 100 ]
-            ,   font           : "Arial"               
-            }
+        ,   options  : {}
+        ,   snippets : {}
         }
 
     ,   $imageCreator
@@ -91,11 +87,15 @@ function( moduleHTML, utils )
     ,   layerCurrent = false
     ;
 
-    module.initialize = function( options )
+    module.initialize = function()
     {
+        // Easy reference config options.
+        //
+        module.options = config.options.toolbar.text;
+
         // Append module HTML.
         //
-        $( module.target ).replaceWith( moduleHTML );
+        $( module.options.target ).replaceWith( moduleHTML );
 
         // Get basic app DOM elements.
         //
@@ -126,7 +126,7 @@ function( moduleHTML, utils )
         $textSize.slider( 
         { 
             "start" : 14
-        ,   "scale" : module.settings.textSizeScale
+        ,   "scale" : module.options.textSizeScale
         ,   "unit"  : "px"
         });
         $textRotate.circleSlider();
@@ -220,7 +220,7 @@ function( moduleHTML, utils )
         //       
         layerCurrent.id        = "text" + new Date().getTime().toString();
         layerCurrent.layerName = layerCurrent.text;
-        layerCurrent.font      = module.settings.font;
+        layerCurrent.font      = module.options.font;
 
         layerCurrent.sizeCurrent.width  = 200;
         layerCurrent.sizeCurrent.height = 50;
@@ -254,7 +254,7 @@ function( moduleHTML, utils )
             
             // Ieeuw there is no way to calculate the height so i need to get it from the dom :(
             //
-            var $textLayer = $( "#" + layerCurrent.id + theApp.engine.name );
+            var $textLayer = $( "#" + layerCurrent.id + config.engine.name );
 
             if( $textLayer[0].nodeName !== "P" )
             {
@@ -362,14 +362,14 @@ function( moduleHTML, utils )
 
     function textConstrain()
     {
-        if( theApp.toolbar.layers && ! theApp.toolbar.layers.settings.constrainLayers )
+        if( config.options.toolbar.layers && ! config.options.toolbar.layers.constrainLayers )
         {
             return false;
         }
         
         var ratio = { 
-            width  : theApp.settings.viewportWidth - layerCurrent.sizeRotated.width
-        ,   height : theApp.settings.viewportHeight - layerCurrent.sizeRotated.height
+            width  : config.options.viewportWidth - layerCurrent.sizeRotated.width
+        ,   height : config.options.viewportHeight - layerCurrent.sizeRotated.height
         };
 
         if(layerCurrent.positionRotated.x <= 0 + ( ratio.width < 0 ? ratio.width : 0) )

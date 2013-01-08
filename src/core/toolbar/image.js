@@ -14,6 +14,7 @@ define(
 
     // App core modules.
     //
+,   "config"
 ,   "utils"
 
     // jQuery plugins.
@@ -23,19 +24,14 @@ define(
 ,   "plugins/jquery.circleSlider"
 ,   "plugins/jquery.dropArea"    
 ],
-function( moduleHTML, utils )
+function( moduleHTML, config, utils )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
             name     : "image"
-        ,   target   : ".toolbarImage"
         ,   enabled  : true
-        ,   settings : 
-            {
-                imageDownScale : 3
-            ,   imageZoomScale : [ 30, 300 ]
-            }
+        ,   options  : {}
+        ,   snippets : {}
         }
 
     ,   $imageCreator
@@ -86,9 +82,13 @@ function( moduleHTML, utils )
 
     module.initialize = function( options )
     {
+        // Easy reference config options.
+        //
+        module.options = config.options.toolbar.image;
+
         // Append module HTML.
         //
-        $( module.target ).replaceWith( moduleHTML );
+        $( module.options.target ).replaceWith( moduleHTML );
 
         // Get basic app DOM elements.
         //
@@ -114,7 +114,7 @@ function( moduleHTML, utils )
         $imageZoom.slider( 
         { 
             "start" : 100
-        ,   "scale" : module.settings.imageZoomScale
+        ,   "scale" : module.options.imageZoomScale
         ,   "unit"  : "%"
         });
         $imageRotate.circleSlider();
@@ -163,7 +163,7 @@ function( moduleHTML, utils )
             // Set the UI to match the selected layers properties.
             //
             $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
-            $imageZoom.trigger( "setPosition", [ layer ? Math.round( layerCurrent.sizeCurrent.width * module.settings.imageZoomScale[ 1 ] / layerCurrent.sizeReal.width ) : 0 ] );        
+            $imageZoom.trigger( "setPosition", [ layer ? Math.round( layerCurrent.sizeCurrent.width * module.options.imageZoomScale[ 1 ] / layerCurrent.sizeReal.width ) : 0 ] );        
         }
     }
 
@@ -189,10 +189,9 @@ function( moduleHTML, utils )
 
     function imageUpload()
     {
-        // Temp
+        // Temp!!! Just used for debugging puposes.
         //
         $( ".formImageUpload" ).submit();
-
         $( "#iframeImageUpload" ).unbind( "load" ).load( function( event )
         {
             var json = $.parseJSON( $( this ).contents().text() );
@@ -248,12 +247,12 @@ function( moduleHTML, utils )
 
         // Scale the unrotated size of the image also downscale it a bit.
         //
-        layerCurrent.sizeCurrent.width  = Math.round( this.width / module.settings.imageDownScale );
-        layerCurrent.sizeCurrent.height = Math.round( this.height / module.settings.imageDownScale );
+        layerCurrent.sizeCurrent.width  = Math.round( this.width / module.options.imageDownScale );
+        layerCurrent.sizeCurrent.height = Math.round( this.height / module.options.imageDownScale );
 
         // Adjust the scale to reflect the initial downscale.
         //
-        layerCurrent.scale = 1 / module.settings.imageDownScale;
+        layerCurrent.scale = 1 / module.options.imageDownScale;
 
         // In this stage no manipulation has happend so rotated size is the same as the unrotated size.
         //       
@@ -263,8 +262,8 @@ function( moduleHTML, utils )
         //   
         var position = 
         {
-            x : ( theApp.settings.viewportWidth / 2 ) - ( layerCurrent.sizeCurrent.width / 2 )
-        ,   y : ( theApp.settings.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2)
+            x : ( config.options.viewportWidth / 2 ) - ( layerCurrent.sizeCurrent.width / 2 )
+        ,   y : ( config.options.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2)
         };
 
         imagePosition( false, position, true );
@@ -304,8 +303,7 @@ function( moduleHTML, utils )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-
-           layerCurrent.scale = ( sliderScale / module.settings.imageDownScale ) / 100;
+           layerCurrent.scale = ( sliderScale / module.options.imageDownScale ) / 100;
 
             var sizeNew = 
                 {
@@ -354,14 +352,14 @@ function( moduleHTML, utils )
 
     function imageConstrain()
     {
-        if( theApp.toolbar.layers && ! theApp.toolbar.layers.settings.constrainLayers )
+        if( config.options.toolbar.layers && ! config.options.toolbar.layers.constrainLayers )
         {
             return false;
         }
 
         var ratio = { 
-            width  : theApp.settings.viewportWidth - layerCurrent.sizeRotated.width
-        ,   height : theApp.settings.viewportHeight - layerCurrent.sizeRotated.height
+            width  : config.options.viewportWidth - layerCurrent.sizeRotated.width
+        ,   height : config.options.viewportHeight - layerCurrent.sizeRotated.height
         };
 
         if(layerCurrent.positionRotated.x <= 0 + ( ratio.width < 0 ? ratio.width : 0) )

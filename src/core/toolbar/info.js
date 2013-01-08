@@ -2,7 +2,7 @@
  * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
  *
  * @namespace
- * @name utils
+ * @name info
  * @version 1.0
  * @author mbaijs
  */
@@ -12,21 +12,17 @@ define(
     //
     "text!templates/info.html"
 
-    // App core modules.
+    // App core modules
     //
-,   "utils"
+,   "config"
 ],
-function( moduleHTML, utils )
+function( moduleHTML, config )
 {
-    var theApp = window[ "imageCreator" ]
-    ,   module =
+    var module =
         {
-            name     : "info"
-        ,   target   : ".toolbarInfo"           
+            name     : "info"         
         ,   enabled  : true
-        ,   settings : 
-            {
-            }
+        ,   options  : {}
         }
 
     ,   $imageCreator
@@ -43,11 +39,15 @@ function( moduleHTML, utils )
     , 	layerCurrent = false
     ;
 
-    module.initialize = function( options )
+    module.initialize = function()
     {
+        // Easy reference config options.
+        //
+        module.options = config.options.toolbar.info;
+
         // Append module HTML.
         //
-        $( module.target ).replaceWith( moduleHTML );
+        $( module.options.target ).replaceWith( moduleHTML );
 
         // Get basic app DOM elements.
         //

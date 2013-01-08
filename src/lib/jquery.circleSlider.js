@@ -98,7 +98,8 @@ function()
 
             this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
             this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );    
-            this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );       
+            this.$thumb.css( "transform", "rotate(" + degrees + "deg)" ); 
+            this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );      
         },
 
         sanitizeRadians: function( radians )
@@ -119,12 +120,12 @@ function()
             ,   cos     = Math.cos( radians )
             ,   sin     = Math.sin( radians )
             ;
- 
             this.$degrees.html( degrees + "&deg;" );
             this.$thumb.css( "top",  Math.round( -cos * 34 +42 ) );
             this.$thumb.css( "left", Math.round(  sin * 34 +42 ) );
             this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );
-
+            this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );
+            
             var rotation = {
                     degrees : degrees
                 ,   radians : radians
