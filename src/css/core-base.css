@@ -1,110 +1,110 @@
 .noSelect { 
-	user-select: none; 
-	-o-user-select: none; 
-	-moz-user-select: none; 
-	-khtml-user-select: none; 
-	-webkit-user-select: none; 
+    user-select: none; 
+    -o-user-select: none; 
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    -webkit-user-select: none; 
 }
 
 .imageCreatorViewport { 
-	box-shadow: 2px 2px 2px #adadad; 
-	background-color: #fff; 
-	margin: 0 0 20px 10px; 
-	border: 2px solid #999; 
-	overflow: hidden; 
-	position: relative; 
+    box-shadow: 2px 2px 2px #adadad; 
+    background-color: #fff; 
+    margin: 0 0 20px 10px; 
+    border: 2px solid #999; 
+    overflow: hidden; 
+    position: relative; 
 }
 
 .imageCreatorViewport p { 
-	margin: 0; 
-	padding: 0 5px; 
-	line-height: 120%; 
+    margin: 0; 
+    padding: 0 5px; 
+    line-height: 120%; 
 }
 
 .imageCreatorViewport .imageCreatorCanvas {
-	width: 100%; 
-	height: 100%; 
+    width: 100%; 
+    height: 100%; 
 }
 
 .imageCreatorViewport .dropArea {
-	width: 90%;
-	height: 90%;
-	position: absolute;
-	left: 5%;
-	top: 5%;
-	border: 2px dashed #999;
-	font-size: 25px;
-	text-align: center;
-	line-height: 500%;
-	color: #999;
-	background-color: #ccc;
-	opacity: 0.8;
-	display: none;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    left: 5%;
+    top: 5%;
+    border: 2px dashed #999;
+    font-size: 25px;
+    text-align: center;
+    line-height: 500%;
+    color: #999;
+    background-color: #ccc;
+    opacity: 0.8;
+    display: none;
 }
 .imageCreatorSelection
 {
-	border: 1px #ccc solid;
-	position: absolute;
-	z-index: 999;
- 	display: none;
+    border: 1px #ccc solid;
+    position: absolute;
+    z-index: 999;
+    display: none;
 }
 .imageCreatorSelection .gripResize {
-	width: 8px;
-	height: 8px;
-	position: absolute;
-	background-color: #fff;
-	border: 1px #666 solid;
-	overflow: hidden;
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    background-color: #fff;
+    border: 1px #666 solid;
+    overflow: hidden;
 }
 .imageCreatorSelection .gripN,
 .imageCreatorSelection .gripNE,
 .imageCreatorSelection .gripNW {
-	margin-top: -30px;
+    margin-top: -30px;
 }
 .imageCreatorSelection .gripN,
 .imageCreatorSelection .gripS{
-	margin-left: -15px;	
+    margin-left: -15px; 
 }
 .imageCreatorSelection .gripW,
 .imageCreatorSelection .gripE{
-	margin-top: -15px;	
+    margin-top: -15px;  
 }
 .imageCreatorSelection .gripW,
 .imageCreatorSelection .gripSW,
 .imageCreatorSelection .gripNW {
-	margin-left: -30px;
+    margin-left: -30px;
 }
 .imageCreatorSelection .gripN  .gripResize,
 .imageCreatorSelection .gripNE .gripResize,
 .imageCreatorSelection .gripNW .gripResize{
-	bottom: -5px;
+    bottom: -5px;
 }
 .imageCreatorSelection .gripS  .gripResize,
 .imageCreatorSelection .gripSE .gripResize,
 .imageCreatorSelection .gripSW .gripResize{
-	top: -5px;
+    top: -5px;
 }
 .imageCreatorSelection .gripN .gripResize,
 .imageCreatorSelection .gripS .gripResize{
-	left: 1px;
+    left: 1px;
 }
 .imageCreatorSelection .gripW .gripResize,
 .imageCreatorSelection .gripE .gripResize{
-	top: 10px;	
+    top: 10px;  
 }
 .imageCreatorSelection .gripW .gripResize,
 .imageCreatorSelection .gripSW .gripResize,
 .imageCreatorSelection .gripNW .gripResize{
-	right: -5px;
+    right: -5px;
 }
 .imageCreatorSelection .gripNE .gripResize,
 .imageCreatorSelection .gripE  .gripResize,
 .imageCreatorSelection .gripSE .gripResize{
-	left: -5px;
+    left: -5px;
 }
 .imageCreatorSelection .gripRotate {
-	width: 30px;
-	height: 30px;
-	position: absolute;
-	cursor: url('../images/cursor-rotate.cur'), auto;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    cursor: url('../images/cursor-rotate.cur'), auto;
 }

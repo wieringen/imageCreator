@@ -1,73 +1,73 @@
 /*********************** TOOL : LAYERS ***********************/
 
 .imageCreatorToolLayers .layerContainer {
-	list-style:		 	none;
-	padding: 			0;
-	border:  			0;
-	margin:				0 0 10px;
-	border-top:         1px solid #909090;
+    list-style:         none;
+    padding:            0;
+    border:             0;
+    margin:             0 0 10px;
+    border-top:         1px solid #909090;
 }
 .imageCreatorToolLayers .objectLayer {
-	height: 			28px;
-	border-bottom: 		1px solid #909090;
-	cursor: 			pointer;
-	position: 			relative;
+    height:             28px;
+    border-bottom:      1px solid #909090;
+    cursor:             pointer;
+    position:           relative;
 }
 .imageCreatorToolLayers .objectLayer.active {
-	background-color: 	#b5d5ff;
+    background-color:   #b5d5ff;
 }
 .imageCreatorToolLayers .objectToggle {
-	height: 			16px;
-	width:  			16px;
-	text-indent: 		-9999em;
-	overflow: 			hidden;
-	display: 			block;
-	margin: 			5px 3px 0;
-	float: 				left;
-	border-top: 		1px solid #909090;
-	border-left: 		1px solid #909090;	
-	border-bottom: 		1px solid #e4e4e4;
-	border-right: 		1px solid #e4e4e4;
-	background: 		url("../images/layers-eye.png") no-repeat 50% 50%;	
+    height:             16px;
+    width:              16px;
+    text-indent:        -9999em;
+    overflow:           hidden;
+    display:            block;
+    margin:             5px 3px 0;
+    float:              left;
+    border-top:         1px solid #909090;
+    border-left:        1px solid #909090;  
+    border-bottom:      1px solid #e4e4e4;
+    border-right:       1px solid #e4e4e4;
+    background:         url("../images/layers-eye.png") no-repeat 50% 50%;  
 }
 .imageCreatorToolLayers .objectLayer.hide .objectToggle {
-	background: 		transparent none;
+    background:         transparent none;
 }
 .imageCreatorToolLayers .objectThumbContainer {
-	float: 				left;
-	width: 				30px;
-	height: 			20px;
-	border: 			1px solid #000;	
-	margin: 			3px 3px 0;
-	background-color: 	#fff;
-	overflow: 			hidden;
-	position: 			relative;
+    float:              left;
+    width:              30px;
+    height:             20px;
+    border:             1px solid #000; 
+    margin:             3px 3px 0;
+    background-color:   #fff;
+    overflow:           hidden;
+    position:           relative;
 }
 .imageCreatorToolLayers .objectThumbContainer img {
-	height: 			20px;
-	display: 			block;
-	position: 			absolute;
-	top: 				0;
-	left: 				0;
+    height:             20px;
+    display:            block;
+    position:           absolute;
+    top:                0;
+    left:               0;
 }
 .imageCreatorToolLayers .objectLayerName {
-	line-height: 		28px;
-	text-overflow: 		ellipsis;
-	display: 			inline-block;
-	width: 				105px;
-	overflow: 			hidden;
-	white-space: 		nowrap;
+    line-height:        28px;
+    text-overflow:      ellipsis;
+    display:            inline-block;
+    width:              105px;
+    overflow:           hidden;
+    white-space:        nowrap;
 }
 .imageCreatorToolLayers .buttonImageSave {
-	width: 147px;
+    width: 147px;
 }
 .imageCreatorToolLayers .objectRemove {
-	position: absolute;
-	right: 0;
-	top: 3px;
-	display: none;
+    position: absolute;
+    right: 0;
+    top: 3px;
+    display: none;
 }
 
 .imageCreatorToolLayers .objectLayer:hover .objectRemove{
-	display: block;
+    display: block;
 }
