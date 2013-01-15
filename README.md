@@ -46,7 +46,7 @@ The built version of imageCreator will be put in the `dist/` subdirectory, along
 Questions?
 ----------
 
-If you have any questions, please feel free to email [me](mailto:wieringen@gmail.com) .
+If you have any questions, please feel free to email [me](mailto:wieringen@gmail.com).
 
 
 
