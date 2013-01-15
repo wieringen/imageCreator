@@ -37,9 +37,9 @@ function()
 
         init: function()
         {
-            this.$track     = $( this.element ).find( ".track" )
-            this.$thumb     = $( this.element ).find( ".thumb" )
-            this.$indicator = $( this.element ).find( ".indicator" )
+            this.$track     = $( this.element ).find( ".track" );
+            this.$thumb     = $( this.element ).find( ".thumb" );
+            this.$indicator = $( this.element ).find( ".indicator" );
 
             this.setEvents();
 
@@ -140,5 +140,5 @@ function()
                 $.data( this, 'plugin_' + pluginName, new Plugin( this, options ) );
             }
         });
-    }
+    };
 });

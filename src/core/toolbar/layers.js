@@ -30,16 +30,24 @@ function( moduleHTML, config )
         ,   snippets : {}
         }
 
-    ,   $imageCreator 
+    ,   $imageCreatorViewport 
     ,   $module
-    ,   $objectLayers
-    ,   $buttonLayerRemove
+    ,   $moduleTitle
+    ,   $layerContainer
 
     // The curent layer that is being edited.
     //
     ,   $currentLayer = false
     ;
 
+
+    /**
+      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
+      *
+      * @name module#initialize
+      * @function
+      *
+      */
     module.initialize = function()
     {
         // Easy reference config options.
@@ -52,24 +60,36 @@ function( moduleHTML, config )
 
         // Get basic app DOM elements.
         //       
-        $imageCreator = $( ".imageCreator" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
-        $module               = $( ".toolbarLayers" );
-        $objectLayers         = $module.find( ".objectLayers" );
-        $buttonLayerRemove    = $module.find( ".buttonLayerRemove" );
+        $module               = $( ".imageCreatorToolLayers" );
+        $moduleTitle          = $module.find( ".moduleTitle" );
+        $layerContainer       = $module.find( ".layerContainer" );
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
         $inputConstrainLayers = $module.find( ".inputConstrainLayers" );
+        $buttonImageSave      = $( ".buttonImageSave" );
+
+        // Set module title.
+        //
+        $moduleTitle.text( module.options.title );
 
         // Initialize module UI.
         //
-        $module.tabular(
+        if( module.options.showMenu )
         {
-            "menu"  : ".moduleMenu"
-        ,   "tabs"  : "a"
-        ,   "pages" : ".moduleBody" 
-        });
+            $module.tabular(
+            {
+                "menu"  : ".moduleMenu"
+            ,   "tabs"  : "a"
+            ,   "pages" : ".moduleBody" 
+            });
+        }
+        else
+        {
+            $module.find( ".moduleMenu" ).remove();
+        }
 
         // Get snippets.
         //
@@ -96,24 +116,25 @@ function( moduleHTML, config )
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "layerUpdate", layerUpdate );
+        $imageCreatorViewport.bind( "layerUpdate", layerUpdate );
 
         // Set Button events.
         //  
-        $objectLayers.delegate( ".objectLayer", "click", layerSelect );
-        $objectLayers.delegate( ".objectToggle", "click", layerToggle );
-        $buttonLayerRemove.click( layerRemove );
+        $layerContainer.delegate( ".objectLayer",  "click", layerSelect );
+        $layerContainer.delegate( ".objectToggle", "click", layerToggle );
+        $layerContainer.delegate( ".objectRemove", "click", layerRemove );
         $selectRenderEngine.change( optionRenderEngineSelect );
         $inputConstrainLayers.change( optionConstrainLayersToggle );
+        $( "body" ).delegate( ".buttonImageSave", "click", function(){ alert("Saving!!!"); });        
     };
 
     module.getAllLayers = function()
     {
         var layers           = []
-        ,   currentLayerData = $currentLayer && $currentLayer.data( "layer" );
+        ,   currentLayerData = $currentLayer && $currentLayer.data( "layer" )
         ;
 
-        $objectLayers.find( ".objectLayer" ).each( function( index, layer )
+        $layerContainer.find( ".objectLayer" ).each( function( index, layer )
         {
             layers.unshift( $( layer ).data( "layer" ) );
         });
@@ -123,12 +144,12 @@ function( moduleHTML, config )
 
     module.getCurrentLayer = function()
     {
-        return $objectLayers.find( ".active" ).data( "layer" );
+        return $layerContainer.find( ".active" ).data( "layer" );
     };
 
     function layerSelect()
     {
-        var $oldLayer    = $objectLayers.find( ".active" )
+        var $oldLayer    = $layerContainer.find( ".active" )
         ,   $newLayer    = $( this )
         ,   oldLayerData = $oldLayer.data( "layer" )
         ,   newLayerData = $newLayer.data( "layer" )
@@ -151,20 +172,16 @@ function( moduleHTML, config )
 
         newLayerData.selected = true;
 
-        // Activate UI controls
-        //
-        $buttonLayerRemove.removeClass( "disabled" );
-
         // Tell the app what layer is now selected.
         //
-        $imageCreator.trigger( "layerSelect", [ newLayerData ] );
+        $imageCreatorViewport.trigger( "layerSelect", [ newLayerData ] );
 
         return false;
     }
 
     function layerUpdate( event, objectLayer )
     {
-        $currentLayer = $objectLayers.find( "#objectLayer" + objectLayer.id );
+        $currentLayer = $layerContainer.find( "#objectLayer" + objectLayer.id );
         
         var $layerClone = null;
 
@@ -187,8 +204,7 @@ function( moduleHTML, config )
                 $layerClone.find( ".objectLayerName" ).text( objectLayer.text );
                 //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );   
             }
-
-            $objectLayers.prepend( $layerClone );
+            $layerContainer.prepend( $layerClone );
 
             layerSelect.call( $layerClone[0] );
         }
@@ -217,30 +233,31 @@ function( moduleHTML, config )
         
         $layerToToggle.data( "layer", layerToToggleData );
 
-        $imageCreator.trigger( "layerVisibility", [ layerToToggleData ] );
+        $imageCreatorViewport.trigger( "layerVisibility", [ layerToToggleData ] );
 
         return false;
     }
 
     function layerRemove( event )
     {
-        if( $currentLayer )
+        var $layerToRemove    = $( this ).parent()
+        ,   layerToRemoveData = $layerToRemove.data( "layer" )
+        ;
+
+        // Remove layer from layers list.
+        //            
+        $layerToRemove.remove();
+
+        // Tell the app to remove this layer.
+        //
+        $imageCreatorViewport.trigger( "layerRemove", [ layerToRemoveData ] );
+
+        // If this layer is the current selected one. Deselect it.
+        //
+        if( layerToRemoveData.selected )
         {
-            var currentLayerData = $currentLayer.data( "layer" );
-            
-            // Remove layer from layers list and out of module memory.
-            //            
-            $currentLayer.remove();
             $currentLayer = false;
-
-            // Tell the app to remove this layer and unselect it.
-            //
-            $imageCreator.trigger( "layerRemove", [ currentLayerData ] );
-            $imageCreator.trigger( "layerSelect", [ false ] );
-
-            // Disable UI.
-            //
-            $buttonLayerRemove.addClass( "disabled" );
+            $imageCreatorViewport.trigger( "layerSelect", [ false ] );
         }
 
         return false;
@@ -248,7 +265,7 @@ function( moduleHTML, config )
 
     function optionRenderEngineSelect( event )
     {
-        $imageCreator.trigger( "loadEngine", [ $( this ).find( ":selected" ).data( "engine" ) ] );
+        $imageCreatorViewport.trigger( "loadEngine", [ $( this ).find( ":selected" ).data( "engine" ) ] );
     }
 
     function optionConstrainLayersToggle( event )

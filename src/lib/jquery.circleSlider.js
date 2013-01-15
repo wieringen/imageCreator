@@ -31,9 +31,9 @@ function()
 
         init: function()
         {
-            this.$track   = $( this.element ).find( ".track" )
-            this.$thumb   = $( this.element ).find( ".thumb" )
-            this.$degrees = $( this.element ).find( ".degrees" )
+            this.$track   = $( this.element ).find( ".track" );
+            this.$thumb   = $( this.element ).find( ".thumb" );
+            this.$degrees = $( this.element ).find( ".degrees" );
 
             this.setEvents();
         }, 
@@ -51,7 +51,7 @@ function()
 
             $( this.element ).bind( "setPosition", function( event, degrees )
             { 
-                _self.setPosition( event, degrees ) 
+                _self.setPosition( event, degrees );
             });
         },
 
@@ -148,5 +148,5 @@ function()
                 $.data( this, 'plugin_' + pluginName, new Plugin( this, options ) );
             }
         });
-    }
+    };
 });

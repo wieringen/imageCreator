@@ -46,8 +46,8 @@ function()
             this.$hex   = $( this.element ).find( ".hex" );
             this.$color = $( this.element ).find( ".color" );
 
-            this.canvasHeight = this.$track.height()
-            this.canvasWidth  = this.$track.width()
+            this.canvasHeight = this.$track.height();
+            this.canvasWidth  = this.$track.width();
 
             var hasCanvas = !!document.createElement("canvas").getContext;
 
@@ -150,5 +150,5 @@ function()
                 $.data( this, 'plugin_' + pluginName, new Plugin( this, options ) );
             }
         });
-    }
+    };
 });

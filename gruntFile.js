@@ -9,7 +9,10 @@ module.exports = function(grunt)
     //
     ,   clean : 
         {
-            folder: "dist"
+            dist : 
+            {
+                src : [ "dist" ]
+            }
         }
 
     //  Copy the images and the index to the dist location.
@@ -28,6 +31,22 @@ module.exports = function(grunt)
                     ]
                 }
             }
+        }
+
+    //  Validate javascript files with jsHint.
+    //
+    ,   jshint : 
+        {
+            options : 
+            {
+                "laxcomma" : true
+            ,   "laxbreak" : false
+            }
+        ,   all : 
+            [ 
+                "src/lib/*.js" 
+            ,   "src/core/**/*.js"
+            ]
         }
 
     //  Optimize require modules and insert almond.
@@ -50,24 +69,25 @@ module.exports = function(grunt)
                     ]
                 ,   paths : 
                     {
-                        "lazyRequire"          : "../lib/require/lazyRequire"
-                    ,   "plugins"              : "../lib"
-                    ,   "templates"            : "../templates"
-                    ,   "text"                 : "../lib/require/text"
+                        "lazyRequire" : "../lib/require/lazyRequire"
+                    ,   "plugins"     : "../lib"
+                    ,   "templates"   : "../templates"
+                    ,   "text"        : "../lib/require/text"
                     }
+                ,   replaceRequireScript : 
+                    [
+                        {
+                            files      : [ "dist/index.html" ]
+                        ,   module     : "main"
+                        ,   modulePath : "jquery.imageCreator"
+                        }
+                    ]
 
                 ,   name    : "main"
                 ,   baseUrl : "src/core"
                 ,   out     : "dist/jquery.imageCreator.js"
                 ,   wrap    : true
                 ,   almond  : true
-
-                ,   replaceRequireScript : 
-                    [{
-                        files      : [ "dist/index.html" ]
-                    ,   module     : "main"
-                    ,   modulePath : "jquery.imageCreator"
-                    }]
                 }
             }
         }
@@ -82,13 +102,14 @@ module.exports = function(grunt)
                 [
                     "src/css/core-base.css"
                 ,   "src/css/core-buttons.css"
+                ,   "src/css/toolbar-base.css"
                 ,   "src/css/toolbar-image.css"
                 ,   "src/css/toolbar-text.css"
                 ,   "src/css/toolbar-info.css"
                 ,   "src/css/toolbar-layers.css"
                 ]
 
-            ,   dest : "dist/imageCreator.css"
+            ,   dest : "dist/css/imageCreator.css"
             }
         }
 
@@ -97,13 +118,12 @@ module.exports = function(grunt)
     //
     ,   cssmin : 
         {
-            css : 
+            dist : 
             {
-                src  : "dist/imageCreator.css"
-            ,   dest : "dist/imageCreator.css"
+                src  : "dist/css/imageCreator.css"
+            ,   dest : "dist/css/imageCreator.css"
             }
         }
-
 
     //  Replace image file paths in css and correct css path in the index.
     //
@@ -114,7 +134,6 @@ module.exports = function(grunt)
                 files : 
                 {
                     "dist/imageCreator.css" : "dist/imageCreator.css"
-                ,   "dist/index.html"       : "dist/index.html"
                 }
 
             ,   options : 
@@ -125,11 +144,29 @@ module.exports = function(grunt)
                             pattern     : /..\/images\//g
                         ,   replacement : "images/"
                         }
-                    ,   {
-                            pattern     : "css/style.css"
-                        ,   replacement : "imageCreator.css"
-                        }                        
                     ]
+                }
+            }
+        }
+
+    //  Watch for changes in js core and lib files and runs jshint if it finds any.
+    //
+    ,   watch : 
+        {
+            javascript : 
+            {
+                files : 
+                [ 
+                    "src/lib/*.js" 
+                ,   "src/core/**/*.js"
+                ]
+            ,   tasks : 
+                [
+                    "jshint"
+                ]
+            ,   options : 
+                {
+                    interrupt: true
                 }
             }
         }
@@ -139,12 +176,19 @@ module.exports = function(grunt)
     //  Load all the task modules we need.
     //
     grunt.loadNpmTasks( "grunt-requirejs" );
-    grunt.loadNpmTasks( "grunt-css" );
-    grunt.loadNpmTasks( "grunt-clean" );
+    grunt.loadNpmTasks( "grunt-contrib-clean" );
     grunt.loadNpmTasks( "grunt-contrib-copy" );
-    grunt.loadNpmTasks( "grunt-string-replace" );
+    grunt.loadNpmTasks( "grunt-contrib-concat" );
+    grunt.loadNpmTasks( "grunt-contrib-jshint" );
+    grunt.loadNpmTasks( "grunt-contrib-watch" );  
+    grunt.loadNpmTasks( "grunt-css" );
+    //grunt.loadNpmTasks( "grunt-string-replace" ); Damn it no grunt 0.4 support...
 
-    //  Define the build task.
+    //  Define the default build task.
     //
-    grunt.registerTask( "default", "copy concat cssmin requirejs string-replace" );
+    grunt.registerTask( "default", [ "clean:dist", "copy:dist", "jshint", "concat:dist", "cssmin:dist", "requirejs:dist" ] );
+
+    //  Check yourself before you wreck yourself.
+    //
+    grunt.registerTask( "sherlock", [ "watch:javascript" ] );
 };

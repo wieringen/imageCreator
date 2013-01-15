@@ -39,16 +39,16 @@ function( config, lazyRequire, utils, selection )
     var mouse   = {}
     ,   toolbar = {}
 
-    ,   $imageCreator 
-    ,   $ecardViewport
+    ,   $imageCreatorViewport
+    ,   $imageCreatorIntro
     ;
 
     $( document ).ready( function()
     {
         // Get basic app DOM elements.
         //
-        $imageCreator  = $( ".imageCreator"  );
-        $ecardViewport = $( ".ecardViewport" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
+        $imageCreatorIntro    = $( ".imageCreatorIntro" );
 
         // Setup the layer resizer/rotater selection.
         //
@@ -56,13 +56,13 @@ function( config, lazyRequire, utils, selection )
 
         // Set viewport events.
         //
-        $ecardViewport.mousedown( viewportDragStart );
+        $imageCreatorViewport.mousedown( viewportDragStart );
 
         // Create toolbar.
         //
         $.each( config.options.toolbar || [], loadTool );
 
-        $imageCreator.bind( "loadTool", function( event, toolName, toolOptions )
+        $imageCreatorViewport.bind( "loadTool", function( event, toolName, toolOptions )
         { 
             loadTool( toolName, toolOptions );
         });
@@ -74,10 +74,16 @@ function( config, lazyRequire, utils, selection )
             return loadEngine( engineName );
         });
 
-        $imageCreator.bind( "loadEngine", function( event, engineName )
+        $imageCreatorViewport.bind( "loadEngine", function( event, engineName )
         { 
             loadEngine( engineName );
         });
+
+        $imageCreatorViewport.bind( "layerSelect layerVisibility", function( event, layer )
+        {
+            $imageCreatorIntro.toggle( layer === false || ( !layer.visible && layer.selected ) );   
+        });
+
     } );
 
     function loadEngine( engineNane )
@@ -135,13 +141,13 @@ function( config, lazyRequire, utils, selection )
 
         $( "body" ).addClass( "noSelect" );
 
-        $ecardViewport.mousemove( viewportDragMove );
+        $imageCreatorViewport.mousemove( viewportDragMove );
 
         $( document ).mouseup( function( event )
         {
             $( "body" ).removeClass( "noSelect" );
 
-            $ecardViewport.unbind( "mousemove" );
+            $imageCreatorViewport.unbind( "mousemove" );
             $( document ).unbind( "mouseup" );
         });       
     }
@@ -154,7 +160,7 @@ function( config, lazyRequire, utils, selection )
         ,   y : event.clientY - mouse.y
         };
 
-        $imageCreator.trigger( "viewportMove", delta );
+        $imageCreatorViewport.trigger( "viewportMove", delta );
 
         mouse.x = event.clientX;
         mouse.y = event.clientY;

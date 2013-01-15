@@ -1,5 +1,5 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description <p>A collection of reusable utility functions.</p>
  *
  * @namespace imageCreator
  * @name utils
@@ -17,33 +17,86 @@ function()
         }
     ;
 
+
+    /**
+      * @description Function that returns a postive equivelant radian if a negative is given.
+      *
+      * @name module#sanitizeRadians
+      * @function
+      *
+      * @param {Number} radians 
+      *
+      */ 
     module.sanitizeRadians = function( radians )
     {
         var max = 2 * Math.PI;
         return radians < 0 ? max + radians : ( radians > max ? radians - max : radians );
-    }
+    };
 
+
+    /**
+      * @description Function that transforms degrees into radians.
+      *
+      * @name module#toRadians
+      * @function
+      *
+      * @param {Number} degrees 
+      *
+      */ 
     module.toRadians = function( degrees )
     {
         return degrees * ( Math.PI / 180 );
     };
 
+
+    /**
+      * @description Function that transforms radians into degrees.
+      *
+      * @name module#toDegrees
+      * @function
+      *
+      * @param {Number} radians 
+      *
+      */ 
     module.toDegrees = function( radians )
     {
         return radians * 180 / Math.PI;
     };
    
+
+    /**
+      * @description Function that calculates bounding box dimensions from the dimensions supplied.
+      *
+      * @name module#getBoundingBox
+      * @function
+      *
+      * @param {Object} sizeUnrotated 
+      * @param {Object} rotation 
+      *
+      */    
     module.getBoundingBox = function( sizeUnrotated, rotation )
     {
         var sin = Math.abs( rotation.sin )
         ,   cos = Math.abs( rotation.cos )
-
+        ;
+        
         return { 
             width  : Math.round( sizeUnrotated.height * sin + sizeUnrotated.width * cos )
         ,   height : Math.round( sizeUnrotated.height * cos + sizeUnrotated.width * sin )
         };
     };
 
+
+    /**
+      * @description Function that calculates the inside rotated box from the dimensions supplied.
+      *
+      * @name module#getRectSizeInsideBoundingBox
+      * @function
+      *
+      * @param {Object} sizeRotated 
+      * @param {Object} rotation 
+      *
+      */
     module.getRectSizeInsideBoundingBox = function( sizeRotated, rotation )
     {
         var sin = Math.abs( rotation.sin )
@@ -56,6 +109,19 @@ function()
         };
     };
 
+
+    /**
+      * @description Function that transforms layer properties to a projection matrix.
+      *
+      * @name module#getMatrix
+      * @function
+      *
+      * @param {Object} rotation
+      * @param {Number} scale 
+      * @param {Object} position  
+      * @param {Object} sizeReal 
+      *
+      */        
     module.getMatrix = function( rotation, scale, position, sizeReal ) 
     {
         var sin = scale * rotation.sin
@@ -92,6 +158,17 @@ function()
         return module.matrixMultiply( matrixPre, module.matrixMultiply( matrix, matrixPost ) );
     };
 
+
+    /**
+      * @description Function that multiplies matrixes into a single matrix.
+      *
+      * @name module#matrixMultiply
+      * @function
+      *
+      * @param {Object} a
+      * @param {Object} b 
+      *
+      */   
     module.matrixMultiply = function( a, b ) 
     {
         // Cache matrix values.
@@ -121,6 +198,13 @@ function()
         ];
     };
 
+    /**
+      * @description Function that tests the browser for VML support.
+      *
+      * @name module#testForVML
+      * @function
+      *
+      */   
     module.testForVML = function() 
     {
         var div       = document.body.appendChild( document.createElement( "div" ) );
@@ -135,11 +219,25 @@ function()
         return supportsVml;
     };
 
+    /**
+      * @description Function that tests the browser for Canvas support.
+      *
+      * @name module#testForCanvas
+      * @function
+      *
+      */
     module.testForCanvas = function() 
     {
         return !!document.createElement("canvas").getContext;
     };
 
+    /**
+      * @description Function that tests the browser for SVG support.
+      *
+      * @name module#testForSVG
+      * @function
+      *
+      */   
     module.testForSVG = function()
     {   
         var testForSVG           = !!document.createElementNS && !!document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGRect

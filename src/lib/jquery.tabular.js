@@ -87,5 +87,5 @@ function()
                 $.data( this, 'plugin_' + pluginName, new Plugin( this, options ) );
             }
         });
-    }
+    };
 });

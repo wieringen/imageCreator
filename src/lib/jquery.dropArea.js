@@ -37,7 +37,7 @@ function()
             if( ! testFileApi )
             {
                 return false;
-            };
+            }
 
             this.createDropArea();
             this.setEvents();
@@ -47,7 +47,7 @@ function()
         {
             var _self = this;
             
-            this.$dropArea = $( "<div class='dropArea'></div>")
+            this.$dropArea = $( "<div class='dropArea'></div>");
             this.$dropArea.text( "Drop your image here" );
 
             $( _self.element ).append( this.$dropArea );
@@ -132,5 +132,5 @@ function()
                 $.data( this, 'plugin_' + pluginName, new Plugin( this, options ) );
             }
         });
-    }
+    };
 });

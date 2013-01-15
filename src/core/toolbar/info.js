@@ -25,20 +25,29 @@ function( moduleHTML, config )
         ,   options  : {}
         }
 
-    ,   $imageCreator
+    ,   $imageCreatorViewport
     ,   $module
-    , 	$layerName
-    ,	$layerRotationValue
-    ,	$layerPositionXValue 
-    ,	$layerPositionYValue
+    ,   $moduleTitle
+    ,   $layerName
+    ,   $layerRotationValue
+    ,   $layerPositionXValue 
+    ,   $layerPositionYValue
     ,   $layerSizeWidth
     ,   $layerSizeHeight
 
     // The curent layer that is being edited.
     //
-    , 	layerCurrent = false
+    ,   layerCurrent = false
     ;
 
+
+    /**
+      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
+      *
+      * @name module#initialize
+      * @function
+      *
+      */
     module.initialize = function()
     {
         // Easy reference config options.
@@ -51,11 +60,12 @@ function( moduleHTML, config )
 
         // Get basic app DOM elements.
         //
-        $imageCreator = $( ".imageCreator" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
-        $module              = $( ".toolbarInfo" );       
+        $module              = $( ".imageCreatorToolInfo" );
+        $moduleTitle         = $module.find( ".moduleTitle" );
         $layerName           = $module.find( ".objectName" );
         $layerRotationValue  = $module.find( ".objectRotationValue" );
         $layerPositionXValue = $module.find( ".objectPositionXValue" );
@@ -63,27 +73,40 @@ function( moduleHTML, config )
         $layerSizeWidth      = $module.find( ".objectSizeWidth" );
         $layerSizeHeight     = $module.find( ".objectSizeHeight" );
 
+        // Set module title.
+        //
+        $moduleTitle.text( module.options.title );
+
         // Listen to global app events.
         //
-    	$imageCreator.bind( "layerSelect", infoUpdate );
-    	$imageCreator.bind( "layerUpdate", infoUpdate );
+        $imageCreatorViewport.bind( "layerSelect", infoUpdate );
+        $imageCreatorViewport.bind( "layerUpdate", infoUpdate );
     };
 
+    /**
+      * @description Function updates all the info fields with the current selected layer properties.
+      *
+      * @name infoUpdate
+      * @function
+      *
+      */
     function infoUpdate( event, layer )
     {
         $layerName.text( layer.name ? layer.name : "" );
         
+        // If the current selected layer is a text layer use its text value as the value for the info box name field.
+        //
         if( layer.text )
         {
             $layerName.text( layer.text.replace( "<br/>", "" ) );
         } 
 
         $layerRotationValue.text( layer.rotation && layer.rotation.degrees || 0 );
-    	
-        $layerPositionXValue.text( layer.positionRotated && layer.positionRotated.x || 0 );
-    	$layerPositionYValue.text( layer.positionRotated && layer.positionRotated.y || 0 );
         
-        $layerSizeWidth.text( layer.sizeCurrent && layer.sizeCurrent.width || 0);
+        $layerPositionXValue.text( layer.positionRotated && layer.positionRotated.x || 0 );
+        $layerPositionYValue.text( layer.positionRotated && layer.positionRotated.y || 0 );
+        
+        $layerSizeWidth.text( layer.sizeCurrent && layer.sizeCurrent.width || 0 );
         $layerSizeHeight.text( layer.sizeCurrent && layer.sizeCurrent.height || 0 );
     }
 

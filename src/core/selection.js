@@ -74,10 +74,9 @@ function( utils )
             }
         }
 
-    ,   $imageCreator
-    ,   $ecardViewport
-    ,   $ecardCanvas
-    ,   $selection
+    ,   $imageCreatorViewport
+    ,   $imageCreatorCanvas
+    ,   $imageCreatorSelection
 
     ,   mouse = {}
 
@@ -88,23 +87,22 @@ function( utils )
     {
         // Get basic app DOM elements.
         //
-        $imageCreator  = $( ".imageCreator" );
-        $ecardViewport = $( ".ecardViewport" );
-        $selection     = $ecardViewport.find( ".selection" );
+        $imageCreatorViewport  = $( ".imageCreatorViewport" );
+        $imageCreatorSelection = $( ".imageCreatorSelection" );
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "layerUpdate", selectionPosition );
-        $imageCreator.bind( "layerSelect", selectionPosition );
-        $imageCreator.bind( "layerVisibility", selectionVisibility );  
+        $imageCreatorViewport.bind( "layerUpdate", selectionPosition );
+        $imageCreatorViewport.bind( "layerSelect", selectionPosition );
+        $imageCreatorViewport.bind( "layerVisibility", selectionVisibility );  
         
         // Set grip events.
         //
-        $ecardViewport.delegate( ".gripResize", "mousedown", selectionResize );
-        $ecardViewport.delegate( ".gripRotate", "mousedown", selectionRotate );
+        $imageCreatorSelection.delegate( ".gripResize", "mousedown", selectionResize );
+        $imageCreatorSelection.delegate( ".gripRotate", "mousedown", selectionRotate );
 
         selectionCreate();
-    }
+    };
 
     function selectionCreate()
     {
@@ -127,7 +125,7 @@ function( utils )
             
             $gripClone.find( ".gripResize" ).css( "cursor", grip.name.toLowerCase() + "-resize" );
 
-            $selection.append( $gripClone );
+            $imageCreatorSelection.append( $gripClone );
         });
     }
 
@@ -137,7 +135,7 @@ function( utils )
         
         if( layerCurrent && layerCurrent.visible )
         {
-            $selection.css({
+            $imageCreatorSelection.css({
                     "left"    : layer.positionRotated.x  - module.settings.offsetWidth
                 ,   "top"     : layer.positionRotated.y  - module.settings.offsetWidth
                 ,   "width"   : layer.sizeRotated.width  + module.settings.offsetWidth
@@ -147,7 +145,7 @@ function( utils )
         }
         else
         {
-            $selection.hide();
+            $imageCreatorSelection.hide();
         }
     }
 
@@ -155,7 +153,7 @@ function( utils )
     { 
         if( layer.selected )
         {
-            $selection.toggle( layer.visible );
+            $imageCreatorSelection.toggle( layer.visible );
         }
     }
 
@@ -284,8 +282,8 @@ STILL UNDER CONSTRUCTION THIS PART
         ,   layerRotationStart      = layerCurrent.rotation.radians
         ,   gripPositionCenterStart = 
             {
-                x : event.pageX - $selection.offset().left - ( $selection.width()  / 2 )
-            ,   y : event.pageY - $selection.offset().top  - ( $selection.height() / 2 )
+                x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width()  / 2 )
+            ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
             }
         ,   gripOffsetRadians = utils.sanitizeRadians( Math.atan2( gripPositionCenterStart.x, -gripPositionCenterStart.y ) )
         ;
@@ -296,8 +294,8 @@ STILL UNDER CONSTRUCTION THIS PART
         {
             var gripPositionCenter = 
                 {
-                    x : event.pageX - $selection.offset().left - ( $selection.width() / 2 )
-                ,   y : event.pageY - $selection.offset().top  - ( $selection.height() / 2 )
+                    x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width() / 2 )
+                ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
                 }
             ,   radians  = utils.sanitizeRadians( layerRotationStart + utils.sanitizeRadians( Math.atan2( gripPositionCenter.x, -gripPositionCenter.y ) ) - gripOffsetRadians )
             ,   rotation = 
@@ -308,7 +306,7 @@ STILL UNDER CONSTRUCTION THIS PART
                 ,   cos     : Math.cos( radians )
                 };
 
-            $selection.trigger( "onRotate", [ rotation ] );
+            $imageCreatorSelection.trigger( "onRotate", [ rotation ] );
         });
 
         $( document ).mouseup( function( event )

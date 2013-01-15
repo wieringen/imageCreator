@@ -1,14 +1,18 @@
-.imageCreator .textSize .track { 
+/*********************** TOOL : TEXT ***********************/
+
+/* Size */
+.imageCreatorToolText .textSize .track { 
 	background: 	#cdcdcd; 
 	height: 		4px;
 	width: 			140px;
 	margin: 		0 0 5px; 
-	border-radius: 5px;
-	border: 1px solid #aeaeae;
-	border-top: 1px solid #747474;
+	border-radius:  5px;
+	border: 		1px solid #aeaeae;
+	border-top: 	1px solid #747474;
 	position: 		relative; 
+	float:			left;
 }
-.imageCreator .textSize .thumb { 
+.imageCreatorToolText .textSize .thumb { 
 	background: 	transparent url(../images/text-zoom-thumb.png) no-repeat 0 0; 
 	height: 		10px; 
 	width:			10px; 
@@ -17,13 +21,15 @@
 	top:			-4px; 
 	cursor: 		pointer; 
 }
-.imageCreator .textSize .indicator 
+.imageCreatorToolText .textSize .indicator 
 {
 	font-size: 		10px; 
-	float: 			right; 
-	margin:			-3px 0 0;
+	float: 			left; 
+	margin:			-3px 0 0 5px;
 }
-.imageCreator .textColor .track { 
+
+/* Color */
+.imageCreatorToolText .textColor .track { 
 	background: 	transparent url(../images/text-color.png) no-repeat 0 0;
 	height: 		83px; 
 	width: 			83px; 
@@ -31,16 +37,34 @@
 	cursor:			crosshair;
 	float: 			left;
 }
-.imageCreator .moduleDisabled .textColor .track {
-	opacity: 0.5;
+.imageCreator .textColor .hex { 
+	float: 			left;
+	font-size: 		10px;
+	margin: 		0 0 0 5px;
 }
-.imageCreator .textRotate .track { 
+.imageCreatorToolText .textColor .color { 
+	width: 			10px;
+	height: 		10px;
+	float: 			left;
+	border-radius: 	10px;
+	border: 		1px solid #8b8b8b;
+}
+.imageCreatorToolText.moduleDisabled .color,
+.imageCreatorToolText.moduleDisabled .hex {
+	display: 		none;
+}
+.imageCreatorToolText.moduleDisabled .textColor .track {
+	opacity: 		0.5;
+}
+
+/* Rotate */
+.imageCreatorToolText .textRotate .track { 
 	background: 	transparent url(../images/text-rotate-track.png) no-repeat 0 0; 
 	height: 		83px; 
 	width: 			83px; 
 	position: 		relative; 
 }
-.imageCreator .textRotate .thumb { 
+.imageCreatorToolText .textRotate .thumb { 
 	background: 	transparent url(../images/text-zoom-thumb.png) no-repeat 0 0; 
 	height: 		10px; 
 	width: 			10px; 
@@ -50,7 +74,7 @@
 	left: 			42px; 
 	cursor: 		pointer; 
 }
-.imageCreator .textRotate .degrees{ 
+.imageCreatorToolText .textRotate .degrees{ 
 	font-size: 		10px; 
 	position:		absolute;
 	left: 			50%; 
@@ -60,41 +84,33 @@
 	text-align: 	center; 
 	margin:			-7px 0 0 -10px;
 }
-.imageCreator .textColor .hex { 
-	float: left;
-	font-size: 10px;
-	margin: 0 0 0 5px;
+
+/* Font family */
+.imageCreatorToolText .selectTextFont {
+	width: 			65%;
+	float: 			left;
+	height: 		22px;
+	line-height: 	22px;
+	margin: 		0 5% 0 0;
 }
-.imageCreator .textColor .color { 
-	width: 10px;
-	height: 10px;
-	float: left;
-	border-radius: 10px;
-	border: 1px solid #8b8b8b;
+
+/* Font weight */
+.imageCreatorToolText .buttonTextWeight {
+	float: 			left;
+	font-weight: 	bold;
+	margin: 		0 5% 0 0;
 }
-.imageCreator .moduleDisabled .color,
-.imageCreator .moduleDisabled .hex {
-	display: none;
+
+/* Font style */
+.imageCreatorToolText .buttonTextStyle {
+	float: 			left;
+	margin:		 	0;
+	font-style: 	italic;
 }
-.imageCreator .selectTextFont {
-	width: 65%;
-	float: left;
-	height: 22px;
-	line-height: 22px;
-	margin: 0 5% 0 0;
-}
-.imageCreator .buttonTextWeight {
-	float: left;
-	font-weight: bold;
-	margin: 0 5% 0 0;
-}
-.imageCreator .buttonTextStyle {
-	float: left;
-	margin: 0;
-	font-style: italic;
-}
-.imageCreator .areaTextEdit {
-	min-height: 128px;
-	width: 167px;
-	margin: 0;
+
+/* Text */
+.imageCreatorToolText .areaTextEdit {
+	min-height: 	128px;
+	width: 			167px;
+	margin: 		0;
 }

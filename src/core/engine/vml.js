@@ -22,9 +22,8 @@ function( config, layers )
         ,   snippets : {}
         }
 
-    ,   $imageCreator
-    ,   $ecardViewport
-    ,   $ecardCanvas
+    ,   $imageCreatorViewport
+    ,   $imageCreatorCanvas
 
     ,   canvasWidth
     ,   canvasHeight
@@ -38,16 +37,15 @@ function( config, layers )
     {
         // Get basic app DOM elements.
         //
-        $imageCreator  = $( ".imageCreator" );
-        $ecardViewport = $( ".ecardViewport" );
-        $ecardCanvas   = $( ".ecardCanvas" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
+        $imageCreatorCanvas   = $( ".imageCreatorCanvas" );
 
         // Set the viewport's dimensions.
         //
         canvasWidth  = theApp.settings.viewportWidth;
         canvasHeight = theApp.settings.viewportHeight;
 
-        $ecardCanvas.css( { width : canvasWidth, height : canvasHeight } );
+        $imageCreatorCanvas.css( { width : canvasWidth, height : canvasHeight } );
 
         // Initialize VML.
         //
@@ -61,18 +59,18 @@ function( config, layers )
         // Create a selection rectangle to put around selected layers.
         //
         var vmlSelect = $( "<rvml:rect id='vmlSelect' strokecolor='#666' strokeweight='1px'><rvml:stroke dashstyle='dash'></rvml:stroke></rvml:rect>" )[0];
-        $ecardCanvas.html( vmlSelect );
+        $imageCreatorCanvas.html( vmlSelect );
 
         // Remove other engines that may be listening.
         //
-        $imageCreator.unbind( ".engine" );
+        $imageCreatorViewport.unbind( ".engine" );
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "layerUpdate.engine", vmlLayerCheck );
-        $imageCreator.bind( "layerSelect.engine", vmlLayerSelect );
-        $imageCreator.bind( "layerVisibility.engine", vmlLayerVisibility );
-        $imageCreator.bind( "layerRemove.engine", vmlLayerRemove );
+        $imageCreatorViewport.bind( "layerUpdate.engine", vmlLayerCheck );
+        $imageCreatorViewport.bind( "layerSelect.engine", vmlLayerSelect );
+        $imageCreatorViewport.bind( "layerVisibility.engine", vmlLayerVisibility );
+        $imageCreatorViewport.bind( "layerRemove.engine", vmlLayerRemove );
 
         // Do we have any layers allready?
         //
@@ -139,8 +137,8 @@ function( config, layers )
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //   
-        $ecardCanvas.append( vmlLayerCurrent );
-        $ecardCanvas.append( vmlSelect );      
+        $imageCreatorCanvas.append( vmlLayerCurrent );
+        $imageCreatorCanvas.append( vmlSelect );      
     }
 
     function vmlLayerUpdate( event, layer )
@@ -262,7 +260,7 @@ function( config, layers )
         return {
             y : ( size.height - size.height * cos + size.width  * sin ) / 2
         ,   x : ( size.width  - size.width  * cos + size.height * sin ) / 2
-        }
+        };
     }
 
     return module;

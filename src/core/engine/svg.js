@@ -22,9 +22,8 @@ function( config, layers )
         ,   snippets : {}
         }
 
-    ,   $imageCreator
-    ,   $ecardViewport
-    ,   $ecardCanvas 
+    ,   $imageCreatorViewport
+    ,   $imageCreatorCanvas 
     ,   svgContainer
 
     ,   canvasWidth
@@ -39,16 +38,15 @@ function( config, layers )
     {
         // Get basic app DOM elements.
         //
-        $imageCreator  = $( ".imageCreator" );
-        $ecardViewport = $( ".ecardViewport" );
-        $ecardCanvas   = $( ".ecardCanvas" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
+        $imageCreatorCanvas   = $( ".imageCreatorCanvas" );
 
         // Set the viewport's dimensions.
         //
         canvasWidth  = config.options.viewportWidth;
         canvasHeight = config.options.viewportHeight;
 
-        $ecardViewport.css( { width : canvasWidth, height : canvasHeight } );
+        $imageCreatorViewport.css( { width : canvasWidth, height : canvasHeight } );
 
         // Create and add SVG container.
         //
@@ -58,7 +56,7 @@ function( config, layers )
         
         $( svgContainer ).css( { width : canvasWidth, height : canvasHeight } );
 
-        $ecardCanvas.html( svgContainer );
+        $imageCreatorCanvas.html( svgContainer );
 
         // Create a selection rectangle to put around selected layers.
         //
@@ -80,14 +78,14 @@ function( config, layers )
 
         // Remove other engines that may be listening.
         //
-        $imageCreator.unbind( ".engine" );
+        $imageCreatorViewport.unbind( ".engine" );
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "layerUpdate.engine" , svgLayerCheck );
-        $imageCreator.bind( "layerSelect.engine", svgLayerSelect );
-        $imageCreator.bind( "layerVisibility.engine", svgLayerVisibility );
-        $imageCreator.bind( "layerRemove.engine", svgLayerRemove );
+        $imageCreatorViewport.bind( "layerUpdate.engine" , svgLayerCheck );
+        $imageCreatorViewport.bind( "layerSelect.engine", svgLayerSelect );
+        $imageCreatorViewport.bind( "layerVisibility.engine", svgLayerVisibility );
+        $imageCreatorViewport.bind( "layerRemove.engine", svgLayerRemove );
 
         // Do we have any layers allready?
         //

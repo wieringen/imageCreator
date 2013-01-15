@@ -34,10 +34,10 @@ function( moduleHTML, config, utils )
         ,   snippets : {}
         }
 
-    ,   $imageCreator
-    ,   $ecardViewport
+    ,   $imageCreatorViewport
     ,   $module
-    ,   $selection   
+    ,   $moduleTitle
+    ,   $imageCreatorSelection   
     ,   $imageZoom
     ,   $imageRotate
     ,   $buttonImageAdd
@@ -51,6 +51,8 @@ function( moduleHTML, config, utils )
         ,   type            : "image"
         ,   visible         : true
 
+        // Image layer specific properties.
+        //
         ,   image           : null
         ,   sizeReal        : { "width": 0, "height": 0 }
         
@@ -80,6 +82,14 @@ function( moduleHTML, config, utils )
     ,   layerCurrent = false   
     ;
 
+
+    /**
+      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
+      *
+      * @name module#initialize
+      * @function
+      *
+      */
     module.initialize = function( options )
     {
         // Easy reference config options.
@@ -92,16 +102,20 @@ function( moduleHTML, config, utils )
 
         // Get basic app DOM elements.
         //
-        $imageCreator  = $( ".imageCreator" );
-        $ecardViewport = $( ".ecardViewport" );
-        $selection     = $ecardViewport.find( ".selection" );
+        $imageCreatorViewport  = $( ".imageCreatorViewport" );
+        $imageCreatorSelection = $( ".imageCreatorSelection" );
 
         // Get module DOM elements.
         //
-        $module         = $( ".toolbarImage" );
+        $module         = $( ".imageCreatorToolImage" );
+        $moduleTitle    = $module.find( ".moduleTitle" );
         $imageZoom      = $module.find( ".imageZoom" );
         $imageRotate    = $module.find( ".imageRotate" );        
         $buttonImageAdd = $module.find( ".buttonImageAdd" ); 
+
+        // Set module title.
+        //
+        $moduleTitle.text( module.options.title );
 
         // Initialize module UI.
         //
@@ -118,19 +132,19 @@ function( moduleHTML, config, utils )
         ,   "unit"  : "%"
         });
         $imageRotate.circleSlider();
-        $ecardViewport.dropArea();
+        $imageCreatorViewport.dropArea();
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "viewportMove", imagePosition );
-        $imageCreator.bind( "layerSelect", imageSelect );
-        $imageCreator.bind( "layerVisibility", imageSelect );
-        $ecardViewport.bind( "fileUpload", imageAdd );
+        $imageCreatorViewport.bind( "viewportMove", imagePosition );
+        $imageCreatorViewport.bind( "layerSelect", imageSelect );
+        $imageCreatorViewport.bind( "layerVisibility", imageSelect );
+        $imageCreatorViewport.bind( "fileUpload", imageAdd );
 
         // Listen to selection events.
         //        
-        $selection.bind( "onRotate", imageRotate );
-        $selection.bind( "onResize", imageResize );
+        $imageCreatorSelection.bind( "onRotate", imageRotate );
+        $imageCreatorSelection.bind( "onResize", imageResize );
 
         // Listen to UI module events.
         //    
@@ -183,7 +197,7 @@ function( moduleHTML, config, utils )
 
             imagePosition( false, { x : -delta.x, y: -delta.y }, true );
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -211,7 +225,7 @@ function( moduleHTML, config, utils )
         if( ! url )
         {
             var  dummy = [ "images/girl.jpg", "images/girl2.jpg" ];
-            url = dummy[Math.floor(Math.random()*dummy.length)]     
+            url = dummy[Math.floor(Math.random()*dummy.length)];    
         }
 
         // Clone and set layer defaults.
@@ -270,7 +284,7 @@ function( moduleHTML, config, utils )
 
         // Tell the app we have a new layer.
         //
-        $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+        $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
     }
 
     function imageLoadError()
@@ -295,7 +309,7 @@ function( moduleHTML, config, utils )
 
             // Tell the app there a change in the current layer's rotation.
             //
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -320,9 +334,9 @@ function( moduleHTML, config, utils )
             layerCurrent.sizeCurrent = sizeNew;
             layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
 
-            imagePosition( false, newPosition, true )
+            imagePosition( false, newPosition, true );
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -345,7 +359,7 @@ function( moduleHTML, config, utils )
 
             if( ! internal )
             {
-                $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+                $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
             }
         }
     }

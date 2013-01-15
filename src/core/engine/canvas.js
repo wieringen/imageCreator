@@ -22,8 +22,7 @@ function( config, layers )
         ,   snippets : {}
         }
 
-    ,   $imageCreator
-    ,   $ecardViewport
+    ,   $imageCreatorViewport
     ,   $canvas
     ,   $context
 
@@ -35,36 +34,35 @@ function( config, layers )
     {
         // Get basic app DOM elements.
         //        
-        $imageCreator  = $( ".imageCreator" );
-        $ecardViewport = $( ".ecardViewport" );
-        $ecardCanvas   = $( ".ecardCanvas" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
+        $imageCreatorCanvas   = $( ".imageCreatorCanvas" );
         
         // Set the viewport's dimensions.
         //
         canvasWidth  = config.options.viewportWidth;
         canvasHeight = config.options.viewportHeight;
 
-        $ecardViewport.css( { width : canvasWidth, height : canvasHeight } );
+        $imageCreatorViewport.css( { width : canvasWidth, height : canvasHeight } );
 
         // Create and add Canvas.
         //
         $canvas = $( "<canvas></canvas>" );
         $canvas.attr( "width", canvasWidth );
         $canvas.attr( "height", canvasHeight );    
-        $ecardCanvas.html( $canvas );
+        $imageCreatorCanvas.html( $canvas );
 
         context = $canvas[0].getContext( "2d" );
 
         // Remove other engines that may be listening.
         //
-        $imageCreator.unbind( ".engine" );
+        $imageCreatorViewport.unbind( ".engine" );
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "layerUpdate.engine", canvasBuildLayers );
-        $imageCreator.bind( "layerSelect.engine", canvasBuildLayers );
-        $imageCreator.bind( "layerVisibility.engine", canvasBuildLayers );
-        $imageCreator.bind( "layerRemove.engine", canvasBuildLayers );
+        $imageCreatorViewport.bind( "layerUpdate.engine", canvasBuildLayers );
+        $imageCreatorViewport.bind( "layerSelect.engine", canvasBuildLayers );
+        $imageCreatorViewport.bind( "layerVisibility.engine", canvasBuildLayers );
+        $imageCreatorViewport.bind( "layerRemove.engine", canvasBuildLayers );
 
         // Do we have any layers allready?
         //

@@ -34,10 +34,10 @@ function( moduleHTML, config, utils )
         ,   snippets : {}
         }
 
-    ,   $imageCreator
-    ,   $ecardViewport
+    ,   $imageCreatorViewport
     ,   $module
-    ,   $selection  
+    ,   $moduleTitle
+    ,   $imageCreatorSelection  
     ,   $textSize
     ,   $textRotate
     ,   $buttonTextAdd
@@ -54,6 +54,8 @@ function( moduleHTML, config, utils )
         ,   type            : "text"
         ,   visible         : true
 
+        // text layer specific properties.
+        //
         ,   text            : "Your text here..."
         ,   color           : "#000000"
         ,   fontSize        : 14
@@ -87,6 +89,14 @@ function( moduleHTML, config, utils )
     ,   layerCurrent = false
     ;
 
+
+    /**
+      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
+      *
+      * @name module#initialize
+      * @function
+      *
+      */
     module.initialize = function()
     {
         // Easy reference config options.
@@ -99,21 +109,25 @@ function( moduleHTML, config, utils )
 
         // Get basic app DOM elements.
         //
-        $imageCreator  = $( ".imageCreator" );
-        $ecardViewport = $( ".ecardViewport" );
-        $selection     = $ecardViewport.find( ".selection" );
+        $imageCreatorViewport  = $( ".imageCreatorViewport" );
+        $imageCreatorSelection = $( ".imageCreatorSelection" );
 
         // Get module DOM elements.
         //        
-        $module           = $( ".toolbarText" );
+        $module           = $( ".imageCreatorToolText" );
+        $moduleTitle      = $module.find( ".moduleTitle" );
         $textSize         = $module.find( ".textSize" );
         $textColor        = $module.find( ".textColor" );
         $textRotate       = $module.find( ".textRotate" );
-        $buttonTextAdd    = $module.find( ".buttonTextAdd" );
+        $buttonTextAdd    = $( ".imageCreatorTextAdd" );
         $buttonTextWeight = $module.find( ".buttonTextWeight" );
         $buttonTextStyle  = $module.find( ".buttonTextStyle" ); 
         $areaTextEdit     = $module.find( ".areaTextEdit" );
         $selectTextFont   = $module.find( ".selectTextFont" ); 
+
+        // Set module title.
+        //
+        $moduleTitle.text( module.options.title );
 
         // Initialize module UI.
         //
@@ -134,15 +148,15 @@ function( moduleHTML, config, utils )
 
         // Listen to global app events.
         //
-        $imageCreator.bind( "viewportMove", textPosition );
-        $imageCreator.bind( "layerSelect", textSelect );
-        $imageCreator.bind( "layerVisibility", textSelect );
-        $imageCreator.bind( "layerResize", textResize );
+        $imageCreatorViewport.bind( "viewportMove", textPosition );
+        $imageCreatorViewport.bind( "layerSelect", textSelect );
+        $imageCreatorViewport.bind( "layerVisibility", textSelect );
+        $imageCreatorViewport.bind( "layerResize", textResize );
 
         // Listen to selection events.
         //        
-        $selection.bind( "onRotate", textRotate );
-        $selection.bind( "onResize", textResize );
+        $imageCreatorSelection.bind( "onRotate", textRotate );
+        $imageCreatorSelection.bind( "onResize", textResize );
 
         // Listen to UI module events.
         //           
@@ -159,6 +173,13 @@ function( moduleHTML, config, utils )
         $selectTextFont.change( textFont );
     };
 
+    /**
+      * @description Function that select a certain text layer and sets or disables the modules UI.
+      *
+      * @name textSelect
+      * @function
+      *
+      */
     function textSelect( event, layer )
     {
         // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
@@ -188,6 +209,13 @@ function( moduleHTML, config, utils )
         }
     }
 
+    /**
+      * @description Function that is called when selection resize events are triggerd.
+      *
+      * @name textResize
+      * @function
+      *
+      */
     function textResize( event, delta, direction )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
@@ -202,10 +230,17 @@ function( moduleHTML, config, utils )
 
             textPosition( false, { x : ( direction.compensate[0] ? delta.x : 0 ), y: ( direction.compensate[1] ? delta.y : 0 ) }, true );
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
+    /**
+      * @description Function that creates a new text layer with default properties.
+      *
+      * @name textAdd
+      * @function
+      *
+      */
     function textAdd( event )
     {
         // Since we are adding a new text we can enable the module savely.
@@ -222,18 +257,33 @@ function( moduleHTML, config, utils )
         layerCurrent.layerName = layerCurrent.text;
         layerCurrent.font      = module.options.font;
 
-        layerCurrent.sizeCurrent.width  = 200;
-        layerCurrent.sizeCurrent.height = 50;
+        layerCurrent.sizeCurrent.width  = module.options.textWidth;
+        layerCurrent.sizeCurrent.height = module.options.textHeight;
 
         layerCurrent.sizeRotated = layerCurrent.sizeCurrent;
 
-        textPosition( false, { y : 200, x : 50 }, true )
+        // Set the layer's position to the center of the viewport. 
+        //   
+        var position = 
+        {
+            x : ( config.options.viewportWidth / 2 ) - ( layerCurrent.sizeCurrent.width / 2 )
+        ,   y : ( config.options.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2)
+        };
 
-        $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+        textPosition( false, position, true );
+
+        $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
 
         return false;
     }
 
+    /**
+      * @description Function that sets the text of a text layer.
+      *
+      * @name textEdit
+      * @function
+      *
+      */
     function textEdit( event )
     {       
         if( module.enabled && layerCurrent && layerCurrent.visible )
@@ -244,13 +294,20 @@ function( moduleHTML, config, utils )
         }
     }
 
+    /**
+      * @description Function that sets the font size and height of a layer.
+      *
+      * @name textSize
+      * @function
+      *
+      */
     function textSize( event, fontSize )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             layerCurrent.fontSize = fontSize;
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
             
             // Ieeuw there is no way to calculate the height so i need to get it from the dom :(
             //
@@ -270,30 +327,51 @@ function( moduleHTML, config, utils )
 
             layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, 1, layerCurrent.position, layerCurrent.sizeCurrent );
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
+    /**
+      * @description Function that sets a text layer's font.
+      *
+      * @name textFont
+      * @function
+      *
+      */
     function textFont( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             layerCurrent.font = $( this ).val();
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
+    /**
+      * @description Function that sets a text layer's font color.
+      *
+      * @name textColor
+      * @function
+      *
+      */
     function textColor( event, hexColor )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             layerCurrent.color = hexColor;
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
+    /**
+      * @description Function that toggle a text layer's font weight.
+      *
+      * @name textWeight
+      * @function
+      *
+      */
     function textWeight( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
@@ -302,10 +380,17 @@ function( moduleHTML, config, utils )
 
             $buttonTextWeight.toggleClass( "active", layerCurrent.weight ); 
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
+    /**
+      * @description Function that toggle a text layer's font style.
+      *
+      * @name textStyle
+      * @function
+      *
+      */
     function textStyle( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
@@ -314,10 +399,17 @@ function( moduleHTML, config, utils )
 
             $buttonTextStyle.toggleClass( "active", layerCurrent.style ); 
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] ); 
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
+    /**
+      * @description Function that rotates a text to certain number of degrees.
+      *
+      * @name textRotate
+      * @function
+      *
+      */   
     function textRotate( event, rotation )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
@@ -332,10 +424,17 @@ function( moduleHTML, config, utils )
 
             textPosition( false, { x: 0, y: 0 }, true );
 
-            $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
         }
     }
 
+    /**
+      * @description Function that sets a text layers position.
+      *
+      * @name textPosition
+      * @function
+      *
+      */   
     function textPosition( event, delta, internal )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
@@ -355,11 +454,18 @@ function( moduleHTML, config, utils )
 
             if( ! internal )
             {
-                $imageCreator.trigger( "layerUpdate", [ layerCurrent ] );
+                $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
             }
         }
     }
 
+    /**
+      * @description Function that constrains a text layer to the viewport edges.
+      *
+      * @name textConstrain
+      * @function
+      *
+      */   
     function textConstrain()
     {
         if( config.options.toolbar.layers && ! config.options.toolbar.layers.constrainLayers )
