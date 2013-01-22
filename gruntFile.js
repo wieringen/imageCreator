@@ -15,6 +15,21 @@ module.exports = function(grunt)
             }
         }
 
+    //  Create Documentation.
+    //
+    ,   jsdoc : 
+        {
+            dist : 
+            {
+                src : 
+                [
+                    "src/core/**/*.js"
+                ,   "src/lib/*.js"
+                ]
+            ,   dest : "doc"
+            }
+        }
+
     //  Copy the images and the index to the dist location.
     //
     ,   copy : 
@@ -22,14 +37,11 @@ module.exports = function(grunt)
             dist : 
             {
                 files : 
-                {
-                    "dist/" : 
-                    [ 
-                        "src/images/*"
-                    ,   "src/temp/*"
-                    ,   "src/index.html"
-                    ]
-                }
+                [
+                    { expand: true, cwd: "src", src: "images/*",   dest: "dist/" }
+                ,   { expand: true, cwd: "src", src: "temp/*",     dest: "dist/" }
+                ,   { expand: true, cwd: "src", src: "index.html", dest: "dist/" }
+                ]
             }
         }
 
@@ -148,7 +160,7 @@ module.exports = function(grunt)
                 }
             }
         }
-
+    
     //  Watch for changes in js core and lib files and runs jshint if it finds any.
     //
     ,   watch : 
@@ -175,13 +187,14 @@ module.exports = function(grunt)
 
     //  Load all the task modules we need.
     //
-    grunt.loadNpmTasks( "grunt-requirejs" );
     grunt.loadNpmTasks( "grunt-contrib-clean" );
+    grunt.loadNpmTasks( "grunt-contrib-jsdoc" );
     grunt.loadNpmTasks( "grunt-contrib-copy" );
+    grunt.loadNpmTasks( "grunt-contrib-jshint" );    
+    grunt.loadNpmTasks( "grunt-requirejs" );
     grunt.loadNpmTasks( "grunt-contrib-concat" );
-    grunt.loadNpmTasks( "grunt-contrib-jshint" );
+    grunt.loadNpmTasks( "grunt-css" );    
     grunt.loadNpmTasks( "grunt-contrib-watch" );  
-    grunt.loadNpmTasks( "grunt-css" );
     //grunt.loadNpmTasks( "grunt-string-replace" ); Damn it no grunt 0.4 support...
 
     //  Define the default build task.

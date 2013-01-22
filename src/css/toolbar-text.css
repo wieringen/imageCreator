@@ -37,7 +37,7 @@
     cursor:         crosshair;
     float:          left;
 }
-.imageCreator .textColor .hex { 
+.imageCreatorToolText .textColor .hex { 
     float:          left;
     font-size:      10px;
     margin:         0 0 0 5px;
@@ -113,4 +113,9 @@
     min-height:     128px;
     width:          167px;
     margin:         0;
+}
+
+.imageCreatorToolText .buttonTextAdd {
+    margin:         0;
+    display:        block;
 }

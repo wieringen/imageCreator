@@ -51,13 +51,13 @@ include("resize-class.php");
 // *** 1) Initialize / load image
 $resizeObj = new resize($uploadsDirectory.$now.'-'.$_FILES[$fieldname]['name']);
 // *** 2) Resize image (options: exact, portrait, landscape, auto, crop)
-$resizeObj -> resizeImage(320, 240, 'crop');
+$resizeObj -> resizeImage(320);
 // *** 3) Save image
 $resizeObj -> saveImage($uploadsDirectory.$now.'-'.$_FILES[$fieldname]['name'], 100);
 
 // If you got this far, everything has worked and the file has been successfully saved.
 header('content-type: text/html');
-echo json_encode( array( "message" => "Image uploaded succesfully.", "src" => "temp/uploads/" .$now.'-'.$_FILES[$fieldname]['name'] ) );
+echo json_encode( array( "message" => "Image uploaded succesfully.", "src" => "release/temp/uploads/" .$now.'-'.$_FILES[$fieldname]['name'] ) );
 
 // make an error handler which will be used if the upload fails
 function error( $error )

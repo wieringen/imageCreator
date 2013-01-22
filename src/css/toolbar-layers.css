@@ -71,3 +71,7 @@
 .imageCreatorToolLayers .objectLayer:hover .objectRemove{
     display: block;
 }
+
+.imageCreatorToolLayers .emptyMessage {
+    font-size: 12px;
+}

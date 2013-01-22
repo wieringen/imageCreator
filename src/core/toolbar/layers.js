@@ -34,6 +34,10 @@ function( moduleHTML, config )
     ,   $module
     ,   $moduleTitle
     ,   $layerContainer
+    ,   $selectRenderEngine
+    ,   $inputConstrainLayers
+    ,   $buttonImageSave
+    ,   $emptyMessage
 
     // The curent layer that is being edited.
     //
@@ -70,6 +74,7 @@ function( moduleHTML, config )
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
         $inputConstrainLayers = $module.find( ".inputConstrainLayers" );
         $buttonImageSave      = $( ".buttonImageSave" );
+        $emptyMessage         = $module.find( ".emptyMessage" );
 
         // Set module title.
         //
@@ -83,7 +88,7 @@ function( moduleHTML, config )
             {
                 "menu"  : ".moduleMenu"
             ,   "tabs"  : "a"
-            ,   "pages" : ".moduleBody" 
+            ,   "pages" : ".moduleTab" 
             });
         }
         else
@@ -189,6 +194,8 @@ function( moduleHTML, config )
         //
         if( 0 === $currentLayer.length )
         {
+            $emptyMessage.hide();
+
             $layerClone = module.snippets.$objectLayerSnippet.clone();
             $layerClone.attr( "id", "objectLayer" + objectLayer.id );
             $layerClone.data( "layer", objectLayer );
@@ -258,6 +265,13 @@ function( moduleHTML, config )
         {
             $currentLayer = false;
             $imageCreatorViewport.trigger( "layerSelect", [ false ] );
+        }
+
+        // Show empty message if we have no more layers.
+        //
+        if( 0 === $layerContainer.find( ".objectLayer" ).length )
+        {
+            $emptyMessage.show();
         }
 
         return false;

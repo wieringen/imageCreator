@@ -1,5 +1,5 @@
 /**
- * @description 
+ * @description The main module.
  *
  * @namespace imageCreator
  * @name controller

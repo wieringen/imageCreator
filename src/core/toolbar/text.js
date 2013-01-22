@@ -119,7 +119,7 @@ function( moduleHTML, config, utils )
         $textSize         = $module.find( ".textSize" );
         $textColor        = $module.find( ".textColor" );
         $textRotate       = $module.find( ".textRotate" );
-        $buttonTextAdd    = $( ".imageCreatorTextAdd" );
+        $buttonTextAdd    = $module.find( ".buttonTextAdd" );
         $buttonTextWeight = $module.find( ".buttonTextWeight" );
         $buttonTextStyle  = $module.find( ".buttonTextStyle" ); 
         $areaTextEdit     = $module.find( ".areaTextEdit" );
@@ -135,7 +135,7 @@ function( moduleHTML, config, utils )
         {
             "menu"  : ".moduleMenu"
         ,   "tabs"  : "a"
-        ,   "pages" : ".moduleBody"
+        ,   "pages" : ".moduleTab"
         }); 
         $textSize.slider( 
         { 

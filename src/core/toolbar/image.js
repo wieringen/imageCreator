@@ -1,10 +1,10 @@
-/**
- * @description <p></p>
+/** 
+ * Image tool Class
+ * 
+ * @name Image
+ * @class Image
+ * @constructor
  *
- * @namespace imageCreator.toolbar
- * @name image
- * @version 1.0
- * @author mbaijs
  */
 define(
 [
@@ -40,6 +40,7 @@ function( moduleHTML, config, utils )
     ,   $imageCreatorSelection   
     ,   $imageZoom
     ,   $imageRotate
+    ,   $buttonImageUpload
     ,   $buttonImageAdd
 
     // The default properties of a image layer.
@@ -84,9 +85,9 @@ function( moduleHTML, config, utils )
 
 
     /**
-      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
+      * Function that initializes the module. It will append the modules html, set the title and initializes its UI.
       *
-      * @name module#initialize
+      * @name Image#initialize
       * @function
       *
       */
@@ -107,11 +108,12 @@ function( moduleHTML, config, utils )
 
         // Get module DOM elements.
         //
-        $module         = $( ".imageCreatorToolImage" );
-        $moduleTitle    = $module.find( ".moduleTitle" );
-        $imageZoom      = $module.find( ".imageZoom" );
-        $imageRotate    = $module.find( ".imageRotate" );        
-        $buttonImageAdd = $module.find( ".buttonImageAdd" ); 
+        $module            = $( ".imageCreatorToolImage" );
+        $moduleTitle       = $module.find( ".moduleTitle" );
+        $imageZoom         = $module.find( ".imageZoom" );
+        $imageRotate       = $module.find( ".imageRotate" ); 
+        $buttonImageUpload = $module.find( ".buttonImageUpload" ); 
+        $buttonImageAdd    = $module.find( ".buttonImageAdd" ); 
 
         // Set module title.
         //
@@ -121,9 +123,13 @@ function( moduleHTML, config, utils )
         //
         $module.tabular(
         {
-            "menu"  : ".moduleMenu"
-        ,   "tabs"  : "a"
-        ,   "pages" : ".moduleBody"
+            "menu"     : ".moduleMenu"
+        ,   "tabs"     : "a"
+        ,   "pages"    : ".moduleTab"
+        ,   "callback" : function()
+            {
+                $buttonImageAdd.show();
+            }
         });
         $imageZoom.slider( 
         { 
@@ -153,7 +159,14 @@ function( moduleHTML, config, utils )
  
         // Set Button events.
         //       
-        $buttonImageAdd.click( imageUpload );        
+        $buttonImageUpload.click( imageUpload );  
+        $buttonImageAdd.click( function()
+        {
+            $module.trigger( "setTab", [ 1 ] );
+            $buttonImageAdd.hide();
+
+            return false;
+        });      
     };
 
     function imageSelect( event, layer )
@@ -176,6 +189,7 @@ function( moduleHTML, config, utils )
             
             // Set the UI to match the selected layers properties.
             //
+            $module.trigger( "setTab", [ 0 ] );
             $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
             $imageZoom.trigger( "setPosition", [ layer ? Math.round( layerCurrent.sizeCurrent.width * module.options.imageZoomScale[ 1 ] / layerCurrent.sizeReal.width ) : 0 ] );        
         }

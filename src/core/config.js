@@ -17,7 +17,7 @@ function( utils )
     {
         options : 
         {
-            viewportWidth  : 520
+            viewportWidth  : 490
         ,   viewportHeight : 360
         
         ,   engines :  
