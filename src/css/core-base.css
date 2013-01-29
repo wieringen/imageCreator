@@ -104,6 +104,6 @@
 .imageCreatorSelection .gripRotate {
     width: 30px;
     height: 30px;
-    position: absolute;
+    position:  absolute;
     cursor: url('../images/cursor-rotate.cur'), auto;
 }
