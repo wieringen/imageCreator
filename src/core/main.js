@@ -24,6 +24,8 @@ requirejs.config(
         //
     ,   "lazyRequire" : "../lib/require/lazyRequire"
     ,   "text"        : "../lib/require/text"
+
+    ,   "hammer"      : "../lib/hammer"
     }
 });
 
@@ -33,10 +35,15 @@ require(
 ,   "lazyRequire"
 ,   "utils"
 ,   "selection"
+,   "hammer"
 ],
 function( config, lazyRequire, utils, selection )
 {   
     var mouse   = {}
+    ,   pinch   =   { 
+                        scale  : 1
+                    ,   rotate : 0
+                    }
     ,   toolbar = {}
 
     ,   $imageCreatorViewport
@@ -56,7 +63,17 @@ function( config, lazyRequire, utils, selection )
 
         // Set viewport events.
         //
-        $imageCreatorViewport.mousedown( viewportDragStart );
+        $imageCreatorViewport.hammer({
+            prevent_default   : true
+        ,   scale_treshold    : 0
+        ,   drag_min_distance : 0
+        });
+        $imageCreatorViewport.bind( "dragstart", viewportDragStart );
+        $imageCreatorViewport.bind( "drag", viewportDrag );
+        $imageCreatorViewport.bind( "dragend", viewportDragEnd );
+        $imageCreatorViewport.bind( "transformstart", viewportPinchStart );
+        $imageCreatorViewport.bind( "transform", viewportPinch );
+        $imageCreatorViewport.bind( "transformend", viewportPinchEnd );
 
         // Create toolbar.
         //
@@ -136,36 +153,66 @@ function( config, lazyRequire, utils, selection )
 
     function viewportDragStart( event )
     {
-        mouse.x = event.clientX;
-        mouse.y = event.clientY;
+        event.preventDefault();
+
+        var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent;
+        mouse.x = target.clientX;
+        mouse.y = target.clientY; 
 
         $( "body" ).addClass( "noSelect" );
-
-        $imageCreatorViewport.mousemove( viewportDragMove );
-
-        $( document ).mouseup( function( event )
-        {
-            $( "body" ).removeClass( "noSelect" );
-
-            $imageCreatorViewport.unbind( "mousemove" );
-            $( document ).unbind( "mouseup" );
-        });       
     }
 
-    function viewportDragMove( event )
+    function viewportDrag( event )
     {
-        var delta = 
+        event.preventDefault();
+
+        var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent
+        ,   delta  = 
         {
-            x : event.clientX - mouse.x
-        ,   y : event.clientY - mouse.y
+            x : target.clientX - mouse.x
+        ,   y : target.clientY - mouse.y
         };
 
         $imageCreatorViewport.trigger( "viewportMove", delta );
 
-        mouse.x = event.clientX;
-        mouse.y = event.clientY;
+        mouse.x = target.clientX;
+        mouse.y = target.clientY;
+    }
 
-        return false;      
+    function viewportDragEnd( event )
+    {
+        event.preventDefault();
+
+        $( "body" ).removeClass( "noSelect" );
+    }
+
+    function viewportPinchStart( event )
+    {
+        event.preventDefault();
+
+        pinch.scale  = event.scale;
+        pinch.rotate = event.rotation; 
+    }
+
+    function viewportPinch( event )
+    {
+        event.preventDefault();
+
+        var delta = 
+        {
+            scale  : event.scale    - pinch.scale
+        ,   rotate : event.rotation - pinch.rotate
+        }
+
+        $imageCreatorViewport.trigger( "viewportPinch", [ delta ] );
+
+        pinch.scale  = event.scale;
+        pinch.rotate = event.rotation;
+    }
+
+    function viewportPinchEnd( event )
+    {
+
     }
 
 } );

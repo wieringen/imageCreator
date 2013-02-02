@@ -56,7 +56,11 @@ function( moduleHTML, config, utils )
 
         // text layer specific properties.
         //
-        ,   text            : "Your text here..."
+        ,   text            : "Lorem ipsum dolor sit amet. \nConsectetur adipiscing elit. Proin malesuada. \nLigula in blandit rutrum, libero ipsum luctus augue, diam sagittis dui. \nVivamus fermentum urna sit amet libero volutpat ac consectetur purus placerat."
+        ,   textLines       : []
+        ,   textLongestLine : ""
+
+
         ,   color           : "#000000"
         ,   fontSize        : 14
         ,   font            : "Arial"
@@ -149,6 +153,7 @@ function( moduleHTML, config, utils )
         // Listen to global app events.
         //
         $imageCreatorViewport.bind( "viewportMove", textPosition );
+        $imageCreatorViewport.bind( "viewportPinch", textPinch );
         $imageCreatorViewport.bind( "layerSelect", textSelect );
         $imageCreatorViewport.bind( "layerVisibility", textSelect );
         $imageCreatorViewport.bind( "layerResize", textResize );
@@ -253,25 +258,27 @@ function( moduleHTML, config, utils )
 
         // Set layer options.
         //       
-        layerCurrent.id        = "text" + new Date().getTime().toString();
-        layerCurrent.layerName = layerCurrent.text;
-        layerCurrent.font      = module.options.font;
-
-        layerCurrent.sizeCurrent.width  = module.options.textWidth;
-        layerCurrent.sizeCurrent.height = module.options.textHeight;
+        layerCurrent.id          = "text" + new Date().getTime().toString();
+        layerCurrent.layerName   = layerCurrent.text
+        layerCurrent.font        = module.options.font;
 
         layerCurrent.sizeRotated = layerCurrent.sizeCurrent;
+
+        layerCurrent.text        = layerCurrent.text.slice( 0, utils.getRandomInt( 0, layerCurrent.text.length ) );
+
+        textGetLines();
+        textSize( false, layerCurrent.fontSize );
 
         // Set the layer's position to the center of the viewport. 
         //   
         var position = 
         {
-            x : ( config.options.viewportWidth / 2 ) - ( layerCurrent.sizeCurrent.width / 2 )
-        ,   y : ( config.options.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2)
+            x : utils.getRandomInt( 0, config.options.viewportWidth - layerCurrent.sizeCurrent.width)
+        ,   y : utils.getRandomInt( 0, config.options.viewportHeight - layerCurrent.sizeCurrent.height)
         };
 
         textPosition( false, position, true );
-
+   
         $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
 
         return false;
@@ -288,10 +295,49 @@ function( moduleHTML, config, utils )
     {       
         if( module.enabled && layerCurrent && layerCurrent.visible )
         { 
-            layerCurrent.text = this.value.replace(/\n/g, "<br/>");
+            layerCurrent.text = this.value;
+
+            textGetLines();
 
             textSize( false, layerCurrent.fontSize );
         }
+    }
+
+    function textGetLines()
+    {
+        layerCurrent.textLines = layerCurrent.text.split(/\r?\n/);
+        layerCurrent.textLongestLine = "";
+
+        $.each( layerCurrent.textLines, function( index, line )
+        {
+            if( line.length > layerCurrent.textLongestLine.length )
+            {
+                layerCurrent.textLongestLine = line;
+            }
+        });
+    }
+
+    function textMeasureWidth( textLine ) 
+    {
+        var lDiv = document.createElement('lDiv');
+
+        document.body.appendChild(lDiv);
+
+        lDiv.style.fontSize   = layerCurrent.fontSize + "px";
+        lDiv.style.fontFamily = layerCurrent.font;
+        lDiv.style.fontWeight = layerCurrent.weight ? "bold" : "normal";
+        lDiv.style.position   = "absolute";
+        //lDiv.style.visibility = "hidden";
+        lDiv.style.left = "0px";
+        lDiv.style.top = "0px";
+        lDiv.innerHTML        = textLine;
+
+        var lResultwidth = lDiv.clientWidth + 10;
+
+        document.body.removeChild(lDiv);
+        lDiv = null;
+
+        return lResultwidth;
     }
 
     /**
@@ -301,33 +347,33 @@ function( moduleHTML, config, utils )
       * @function
       *
       */
-    function textSize( event, fontSize )
+    function textSize( event, fontSize, internal )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.fontSize = fontSize;
+            layerCurrent.fontSize = fontSize || layerCurrent.fontSize;
 
-            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] );
-            
-            // Ieeuw there is no way to calculate the height so i need to get it from the dom :(
-            //
-            var $textLayer = $( "#" + layerCurrent.id + config.engine.name );
+            var sizeNew = 
+                {
+                    width  : textMeasureWidth( layerCurrent.textLongestLine )
+                ,   height : Math.round( layerCurrent.textLines.length * ( layerCurrent.fontSize * module.options.textLineHeight ))
+                }
+            ,   newPosition =
+                {
+                    x : ( layerCurrent.sizeCurrent.width - sizeNew.width ) / 2
+                ,   y : ( layerCurrent.sizeCurrent.height - sizeNew.height ) / 2
+                }
+            ;
 
-            if( $textLayer[0].nodeName !== "P" )
-            {
-                $textLayer = $textLayer.find( "p" );  
-            }
-
-            layerCurrent.sizeCurrent.height = $textLayer.height();
-            
+            layerCurrent.sizeCurrent = sizeNew;
             layerCurrent.sizeRotated = utils.getBoundingBox( layerCurrent.sizeCurrent, layerCurrent.rotation );
-            
-            layerCurrent.position.x = Math.round( layerCurrent.positionRotated.x + ( layerCurrent.sizeRotated.width  - layerCurrent.sizeCurrent.width ) / 2  );
-            layerCurrent.position.y = Math.round( layerCurrent.positionRotated.y + ( layerCurrent.sizeRotated.height - layerCurrent.sizeCurrent.height ) / 2 );
 
-            layerCurrent.matrix = utils.getMatrix( layerCurrent.rotation, 1, layerCurrent.position, layerCurrent.sizeCurrent );
+            textPosition( false, newPosition, true );
 
-            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
+            if( ! internal )
+            {
+                $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
+            }
         }
     }
 
@@ -343,6 +389,7 @@ function( moduleHTML, config, utils )
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             layerCurrent.font = $( this ).val();
+            textSize( false, false, true );
 
             $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
@@ -378,6 +425,8 @@ function( moduleHTML, config, utils )
         {
             layerCurrent.weight = ! layerCurrent.weight;
 
+            textSize( false, false, true );
+
             $buttonTextWeight.toggleClass( "active", layerCurrent.weight ); 
 
             $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
@@ -403,6 +452,24 @@ function( moduleHTML, config, utils )
         }
     }
 
+    function textPinch( event, delta )
+    {
+        if( module.enabled && layerCurrent && layerCurrent.visible )
+        {
+            var radians       = utils.sanitizeRadians( layerCurrent.rotation.radians + utils.toRadians( delta.rotate ) )
+            ,   deltaRotation = 
+                {
+                    radians : radians
+                ,   degrees : Math.round( utils.toDegrees( radians ) )
+                ,   sin     : Math.sin( radians )
+                ,   cos     : Math.cos( radians )
+                }
+            ;
+
+            textRotate( event, deltaRotation, true );
+        }
+    }
+
     /**
       * @description Function that rotates a text to certain number of degrees.
       *
@@ -410,11 +477,11 @@ function( moduleHTML, config, utils )
       * @function
       *
       */   
-    function textRotate( event, rotation )
+    function textRotate( event, rotation, setUI )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            if( "onRotate" === event.type )
+            if( "onRotate" === event.type || setUI )
             {
                 $textRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
             }            

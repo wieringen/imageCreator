@@ -46,15 +46,17 @@
     border:         1px solid #aeaeae;
     border-top:     1px solid #747474;
     position:       relative; 
+    -webkit-user-select: none;
 }
 .imageCreatorToolImage .imageZoom .thumb { 
-    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 0 0; 
-    height:         10px; 
-    width:          10px; 
+    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 50% 50%; 
+    height:         40px; 
+    width:          40px; 
     position:       absolute; 
     left:           0; 
     top:            -4px; 
-    cursor:         pointer; 
+    cursor:         pointer;
+    margin:         -15px 0 0 -15px; 
 }
 .imageCreatorToolImage .imageZoom .indicator {
     font-size:      10px; 
@@ -67,14 +69,15 @@
     background:     transparent url(../images/image-rotate-track.png) no-repeat 0 0; 
     height:         83px; 
     width:          83px; 
-    position:       relative; 
+    position:       relative;
+    -webkit-user-select: none;
 }
 .imageCreatorToolImage .imageRotate .thumb { 
-    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 0 0; 
-    height:         10px; 
-    width:          10px; 
+    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 50% 50%; 
+    height:         31px; 
+    width:          31px; 
     position:       absolute; 
-    margin:         -5px 0 0 -5px; 
+    margin:         -15px 0 0 -15px; 
     top:            8px; 
     left:           42px; 
     cursor:         pointer; 

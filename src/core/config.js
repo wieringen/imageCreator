@@ -17,8 +17,8 @@ function( utils )
     {
         options : 
         {
-            viewportWidth  : 490
-        ,   viewportHeight : 360
+            viewportWidth  : 550
+        ,   viewportHeight : 625
         
         ,   engines :  
             {
@@ -66,7 +66,7 @@ function( utils )
             ,   image : 
                 {
                     title          : "Image"
-                ,   imageDownScale : 3
+                ,   imageDownScale : 300
                 ,   imageZoomScale : [ 30, 300 ]
                 ,   target         : ".imageCreatorToolImage" 
                 }
@@ -74,11 +74,11 @@ function( utils )
             ,   text : 
                 {
                     title          : "Text"
-                ,   textWidth      : 180
-                ,   textHeight     : 30
                 ,   textSizeScale  : [ 10, 99 ]
+                ,   textLineHeight : 1.2
                 ,   font           : "Arial" 
-                ,   target         : ".imageCreatorToolText"                 
+                ,   googleFonts    : [ ]
+                ,   target         : ".imageCreatorToolText"                
                 }
             }
         }

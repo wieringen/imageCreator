@@ -125,9 +125,9 @@ function( moduleHTML, config )
 
         // Set Button events.
         //  
-        $layerContainer.delegate( ".objectLayer",  "click", layerSelect );
-        $layerContainer.delegate( ".objectToggle", "click", layerToggle );
-        $layerContainer.delegate( ".objectRemove", "click", layerRemove );
+        $layerContainer.delegate( ".objectLayer",  "tap", layerSelect );
+        $layerContainer.delegate( ".objectToggle", "tap", layerToggle );
+        $layerContainer.delegate( ".objectRemove", "tap", layerRemove );
         $selectRenderEngine.change( optionRenderEngineSelect );
         $inputConstrainLayers.change( optionConstrainLayersToggle );
         $( "body" ).delegate( ".buttonImageSave", "click", function(){ alert("Saving!!!"); });        

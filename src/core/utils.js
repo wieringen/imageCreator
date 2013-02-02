@@ -198,6 +198,26 @@ function()
         ];
     };
 
+    module.getDistanceBetweenPoints = function( point1, point2 )
+    {
+      var xs = 0
+      ,   ys = 0
+      ;
+     
+      xs = point2.x - point1.x;
+      xs = xs * xs;
+     
+      ys = point2.y - point1.y;
+      ys = ys * ys;
+     
+      return Math.sqrt( xs + ys );
+    }
+
+    module.getRandomInt = function( min, max )
+    {
+      return Math.floor( Math.random() * (max - min + 1) ) + min;
+    }
+
     /**
       * @description Function that tests the browser for VML support.
       *
@@ -244,7 +264,7 @@ function()
         ,   testForForeignObject = "function" === typeof SVGForeignObjectElement
         ;
 
-        return testForSVG && testForForeignObject;
+        return testForSVG;
     };
   
     return module;

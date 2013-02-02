@@ -148,7 +148,15 @@ function( config, layers )
         if( "text" === layer.type )
         {
             htmlParagraphCurrent = $( vmlLayerCurrent ).find( "p" )[0];
-            htmlParagraphCurrent.innerHTML        = layer.text;
+
+            var buildTextString = "";
+
+            $.each( layer.textLines, function( index, line )
+            {
+                buildTextString += line + "</br>";
+            });
+
+            htmlParagraphCurrent.innerHTML        = buildTextString;
             htmlParagraphCurrent.style.color      = layer.color; 
             htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";
             htmlParagraphCurrent.style.fontFamily = layer.font;

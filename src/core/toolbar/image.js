@@ -133,9 +133,10 @@ function( moduleHTML, config, utils )
         });
         $imageZoom.slider( 
         { 
-            "start" : 100
-        ,   "scale" : module.options.imageZoomScale
-        ,   "unit"  : "%"
+            "start"     : 100
+        ,   "scale"     : module.options.imageZoomScale
+        ,   "downScale" : module.options.imageDownScale
+        ,   "unit"      : "%"
         });
         $imageRotate.circleSlider();
         $imageCreatorViewport.dropArea();
@@ -143,6 +144,7 @@ function( moduleHTML, config, utils )
         // Listen to global app events.
         //
         $imageCreatorViewport.bind( "viewportMove", imagePosition );
+        $imageCreatorViewport.bind( "viewportPinch", imagePinch );
         $imageCreatorViewport.bind( "layerSelect", imageSelect );
         $imageCreatorViewport.bind( "layerVisibility", imageSelect );
         $imageCreatorViewport.bind( "fileUpload", imageAdd );
@@ -159,14 +161,14 @@ function( moduleHTML, config, utils )
  
         // Set Button events.
         //       
-        $buttonImageUpload.click( imageUpload );  
+        $buttonImageUpload.bind( "click", imageUpload );  
         $buttonImageAdd.click( function()
         {
             $module.trigger( "setTab", [ 1 ] );
             $buttonImageAdd.hide();
 
             return false;
-        });      
+        });
     };
 
     function imageSelect( event, layer )
@@ -191,7 +193,7 @@ function( moduleHTML, config, utils )
             //
             $module.trigger( "setTab", [ 0 ] );
             $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
-            $imageZoom.trigger( "setPosition", [ layer ? Math.round( layerCurrent.sizeCurrent.width * module.options.imageZoomScale[ 1 ] / layerCurrent.sizeReal.width ) : 0 ] );        
+            $imageZoom.trigger( "setPosition", [ layerCurrent.scale ] );        
         }
     }
 
@@ -235,12 +237,12 @@ function( moduleHTML, config, utils )
     function imageAdd( event, url )
     {
         // Temp
-        //
+        /*
         if( ! url )
         {
             var  dummy = [ "images/girl.jpg", "images/girl2.jpg" ];
             url = dummy[Math.floor(Math.random()*dummy.length)];    
-        }
+        }*/
 
         // Clone and set layer defaults.
         //
@@ -273,14 +275,14 @@ function( moduleHTML, config, utils )
         layerCurrent.sizeReal.width  = this.width;
         layerCurrent.sizeReal.height = this.height;
 
-        // Scale the unrotated size of the image also downscale it a bit.
-        //
-        layerCurrent.sizeCurrent.width  = Math.round( this.width / module.options.imageDownScale );
-        layerCurrent.sizeCurrent.height = Math.round( this.height / module.options.imageDownScale );
-
         // Adjust the scale to reflect the initial downscale.
         //
-        layerCurrent.scale = 1 / module.options.imageDownScale;
+        layerCurrent.scale = 100 / module.options.imageDownScale;
+
+        // Scale the unrotated size of the image also downscale it a bit.
+        //
+        layerCurrent.sizeCurrent.width  = Math.round( this.width * layerCurrent.scale );
+        layerCurrent.sizeCurrent.height = Math.round( this.height * layerCurrent.scale  );
 
         // In this stage no manipulation has happend so rotated size is the same as the unrotated size.
         //       
@@ -288,10 +290,10 @@ function( moduleHTML, config, utils )
 
         // Set the layer's position to the center of the viewport. 
         //   
-        var position = 
+        position = 
         {
-            x : ( config.options.viewportWidth / 2 ) - ( layerCurrent.sizeCurrent.width / 2 )
-        ,   y : ( config.options.viewportHeight / 2 ) - ( layerCurrent.sizeCurrent.height / 2)
+            x : utils.getRandomInt( 0, config.options.viewportWidth - layerCurrent.sizeCurrent.width)
+        ,   y : utils.getRandomInt( 0, config.options.viewportHeight - layerCurrent.sizeCurrent.height)
         };
 
         imagePosition( false, position, true );
@@ -306,11 +308,31 @@ function( moduleHTML, config, utils )
 
     }
 
-    function imageRotate( event, rotation )
+    function imagePinch( event, delta )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            if( "onRotate" === event.type )
+            var deltaScale    = ( layerCurrent.scale + ( delta.scale / 2 ) ).toFixed( 2 )
+            ,   radians       = utils.sanitizeRadians( layerCurrent.rotation.radians + utils.toRadians( delta.rotate ) )
+            ,   deltaRotation = 
+                {
+                    radians : radians
+                ,   degrees : Math.round( utils.toDegrees( radians ) )
+                ,   sin     : Math.sin( radians )
+                ,   cos     : Math.cos( radians )
+                }
+            ;
+
+            imageZoom( event, deltaScale, true );
+            imageRotate( event, deltaRotation, true );
+        }
+    }
+
+    function imageRotate( event, rotation, setUI )
+    {
+        if( module.enabled && layerCurrent && layerCurrent.visible )
+        {
+            if( "onRotate" === event.type || setUI )
             {
                 $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
             }
@@ -327,11 +349,16 @@ function( moduleHTML, config, utils )
         }
     }
 
-    function imageZoom( event, sliderScale )
+    function imageZoom( event, scale, setUI )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-           layerCurrent.scale = ( sliderScale / module.options.imageDownScale ) / 100;
+            if( "onResize" === event.type || setUI )
+            {
+                $imageZoom.trigger( "setPosition", [ layerCurrent.scale ] );
+            }
+
+            layerCurrent.scale = Math.max( 0.1, Math.min( 1, scale )  );
 
             var sizeNew = 
                 {

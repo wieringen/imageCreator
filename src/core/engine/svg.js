@@ -142,8 +142,6 @@ function( config, layers )
             svgLayerCurrent.appendChild( htmlParagraphCurrent );
         }
 
-        // Set ID.
-        //
         svgLayerCurrent.setAttribute( "id", layer.id + module.name );
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
@@ -159,7 +157,16 @@ function( config, layers )
         if( "text" === layer.type )
         {
             htmlParagraphCurrent = $( svgLayerCurrent ).find( "p" );
-            htmlParagraphCurrent.html( layer.text );
+            
+            var buildTextString = "";
+
+            $.each( layer.textLines, function( index, line )
+            {
+                buildTextString += line + "</br>";
+            });
+
+            htmlParagraphCurrent.html( buildTextString );
+
             htmlParagraphCurrent.css(
             {   
                 color      : layer.color
@@ -170,6 +177,23 @@ function( config, layers )
             });
             svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
             svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );
+
+            /*
+            var buildTextString = "";
+
+            $.each( layer.textLines, function( index, line )
+            {
+                buildTextString += "<tspan>" + line + "</tspan>";
+            });
+
+            svgLayerCurrent.textContent = buildTextString;
+            svgLayerCurrent.setAttribute( "color", layer.color);
+            svgLayerCurrent.setAttribute( "fontFamily", layer.font);
+            svgLayerCurrent.setAttribute( "fontWeight", layer.weight ? "bold" : "normal");
+            svgLayerCurrent.setAttribute( "fontStyle", layer.style ? "italic" : "normal" );
+            svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
+            svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );
+            */
         }
 
         // Set attributes.

@@ -49,6 +49,15 @@ function()
                 return false; 
             });
 
+            this.$thumb.bind( "touchmove", function( event )
+            {
+                var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent;
+
+                _self.drag( target );
+
+               return false;
+            });
+
             $( this.element ).bind( "setPosition", function( event, degrees )
             { 
                 _self.setPosition( event, degrees );

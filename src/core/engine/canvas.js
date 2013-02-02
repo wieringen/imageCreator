@@ -110,10 +110,25 @@ function( config, layers )
     {
         context.save();
 
+        context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
+
         if( "image" === layer.type )
         {   
-            context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
             context.drawImage( layer.image, 0, 0, layer.sizeReal.width, layer.sizeReal.height );
+        }
+
+        if( "text" === layer.type )
+        {
+            context.fillStyle    = layer.color;
+            context.font         = ( layer.style ? "italic" : "normal" ) + " " + ( layer.weight ? "bold" : "normal" ) + " " + layer.fontSize + "px " + layer.font;
+            context.textBaseline = 'top';
+
+            var buildTextString = "";
+
+            $.each( layer.textLines, function( index, line )
+            {
+                context.fillText( line, 5, Math.round( index * ( layer.fontSize * config.options.toolbar.text.textLineHeight ) ) );
+            });
         }
 
         context.restore();

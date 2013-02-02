@@ -5,22 +5,28 @@
 
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <meta name="robots" content="all" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 
         <link rel="stylesheet" type="text/css" href="css/imageCreator.css" />
         <style>
         /* Just some styles to create a basic laout example.  */
-        body { background: #bfbfbf repeat 0 0; }
+        body { margin: 20px 20px 0 20px; }
         .imageCreatorViewport { float: left;  margin: 0 0 20px; }
         .justASimpleWrapper { float: left; padding: 0 0 0 20px; }
+        .justASimpleWrapperLeft { float: left; padding: 0 20px 0 0; }
         .imageCreatorTool { margin: 0 0 20px; }
-        .imageCreatorToolText { float: left; margin: 0 0 20px 20px;  }
-        .imageCreatorToolImage { float: left; clear: left; }
         </style>
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript" src="lib/require/require.js" data-main="core/main"></script>
     </head>
     <body>
+
+        <div class="justASimpleWrapperLeft">
+            <div class="imageCreatorToolImage"></div>
+            <div class="imageCreatorToolText"></div>
+        </div>
+
         <div class="imageCreatorViewport">
             <div class="imageCreatorCanvas"></div>
             <div class="imageCreatorSelection"></div>
@@ -31,7 +37,5 @@
             <div class="imageCreatorToolLayers"></div>
         </div>
 
-        <div class="imageCreatorToolImage"></div>
-        <div class="imageCreatorToolText"></div>
     </body>
 </html>

@@ -82,30 +82,46 @@ function()
 
         setEvents: function()
         {
-            var _self = this;
+            var _self       = this
+            ,   touchEvents = 'ontouchstart' in document.documentElement
+            ;
 
-            this.$canvas.mousedown( function( event )
+            if( ! touchEvents )
             { 
-                _self.mouseIsDown = true;
+                this.$canvas.mousedown( function( event )
+                { 
+                    _self.mouseIsDown = true;
 
-                _self.getColor.call( _self, event );
+                    _self.getColor.call( _self, event );
 
-                $( document ).mouseup( function( event )
+                    $( document ).mouseup( function( event )
+                    {
+                        _self.mouseIsDown = false;
+
+                        $( document ).unbind( 'mouseup' );
+
+                        return false;
+                    });
+
+                    return false; 
+                });
+
+                this.$canvas.mousemove( function( event )
                 {
-                    _self.mouseIsDown = false;
+                    _self.getColor.call( _self, event );
+                });
+            }
+            else
+            {
+                this.$canvas.bind( "touchmove", function( event )
+                {
+                    _self.mouseIsDown = true;
 
-                    $( document ).unbind( 'mouseup' );
+                    _self.getColor.call( _self, event.originalEvent.touches[0] );
 
                     return false;
                 });
-
-                return false; 
-            });
-
-            this.$canvas.mousemove( function( event )
-            {
-                _self.getColor.call( _self, event );
-            });
+            }
 
             $( this.element ).bind( "setColor", function( event, hexColor )
             { 
@@ -118,7 +134,9 @@ function()
         {
             if( this.mouseIsDown )
             {
-                var rgbColor = this.context.getImageData( event.offsetX, event.offsetY, 1, 1 ).data
+                var $target  = $( event.target )
+                ,   offset   = $target.offset()
+                ,   rgbColor = this.context.getImageData( event.pageX - offset.left, event.pageY - offset.top, 1, 1 ).data
                 ,   hexColor = this.rgbToHex( rgbColor )
                 ;
                 

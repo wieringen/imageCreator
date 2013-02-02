@@ -85,6 +85,7 @@ module.exports = function(grunt)
                     ,   "plugins"     : "../lib"
                     ,   "templates"   : "../templates"
                     ,   "text"        : "../lib/require/text"
+                    ,   "hammer"      : "../lib/hammer"
                     }
                 ,   replaceRequireScript : 
                     [
@@ -199,7 +200,7 @@ module.exports = function(grunt)
 
     //  Define the default build task.
     //
-    grunt.registerTask( "default", [ "clean:dist", "copy:dist", "jshint", "concat:dist", "cssmin:dist", "requirejs:dist" ] );
+    grunt.registerTask( "default", [ "clean:dist", "copy:dist", "concat:dist", "cssmin:dist", "requirejs:dist" ] );
 
     //  Check yourself before you wreck yourself.
     //

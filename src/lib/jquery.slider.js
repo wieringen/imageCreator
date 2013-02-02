@@ -15,6 +15,8 @@ function()
             scale : [ 0, 100 ]
         ,   start : 0
         ,   unit  : ""
+        ,   thumbSize : 10
+        ,   downScale : 1 
         }
     ;
 
@@ -48,15 +50,38 @@ function()
         
         setEvents: function()
         {
-            var _self = this;
+            var _self = this
+            ,   touchEvents = 'ontouchstart' in document.documentElement
+            ;
 
-            this.$thumb.mousedown( function( event )
+            if( ! touchEvents )
             { 
-                _self.start( event ); 
+                this.$thumb.mousedown( function( event )
+                { 
+                    _self.start( event ); 
 
-                return false; 
-            });
+                    return false; 
+                });
+            }
+            else
+            {
+                this.$thumb.bind( "touchstart", function( event )
+                {
+                    var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
 
+                    _self.mouse.x = touch.pageX;
+                });
+
+                this.$thumb.bind( "touchmove", function( event )
+                {
+                    event.preventDefault();
+
+                    var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+                    
+                    _self.drag( touch );
+                });
+            }
+            
             $( this.element ).bind( "setPosition", function( event, position )
             { 
                 _self.setPosition( event, position ); 
@@ -104,19 +129,18 @@ function()
 
         setPosition: function( event, scale )
         {
-            var sanitizedScale = Math.min( this.options.scale[ 1 ], Math.max( this.options.scale[ 0 ], scale || 0 ) )
-            ,   realScale      = sanitizedScale - this.options.scale[ 0 ]
-            ,   position       = Math.round( realScale * ( this.$track.width() - this.$thumb.width() ) / ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) )
+            var realScale = Math.round( scale * this.options.downScale )
+            ,   position  = Math.round( ( realScale - this.options.scale[ 0 ] ) * ( this.$track.width() - this.options.thumbSize ) / ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) )
             ;
 
             this.$thumb.css( "left", position );
-            this.$indicator.text( sanitizedScale + this.options.unit );         
+            this.$indicator.text( realScale + this.options.unit );         
         },
 
         drag: function( event )
         {
-            var position = Math.min( this.$track.width() - this.$thumb.width(), Math.max( 0, this.$thumb.position().left + ( event.pageX - this.mouse.x )))
-            ,   scale    = Math.round( this.options.scale[ 0 ] + ( position * ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) / ( this.$track.width() - this.$thumb.width() ) ) )
+            var position = Math.min( this.$track.width() - this.options.thumbSize, Math.max( 0, this.$thumb.position().left + ( event.pageX - this.mouse.x )))
+            ,   scale    = Math.round( this.options.scale[ 0 ] + ( position * ( this.options.scale[ 1 ] - this.options.scale[ 0 ] ) / ( this.$track.width() - this.options.thumbSize ) ) )
             ;
 
             this.mouse.x = event.pageX;
@@ -124,7 +148,7 @@ function()
             this.$thumb.css( "left", position );
             this.$indicator.text( scale + this.options.unit );
 
-            $( this.element ).trigger( "onDrag", [ scale, position ] );
+            $( this.element ).trigger( "onDrag", [ scale / this.options.downScale ] );
             
             return false;
         }

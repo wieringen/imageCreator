@@ -108,9 +108,19 @@
     margin-bottom: 10px;
     padding-bottom: 10px; 
     border-bottom: 1px solid #909090; 
-    overflow: hidden;
     position: relative;
+    zoom: 1;
+    -webkit-user-select: none;
 }
+.imageCreatorTool .moduleSub:after {
+    visibility:         hidden;
+    display:            block;
+    font-size:          0;
+    content:            " ";
+    clear:              both;
+    height:             0;
+}
+
 .imageCreatorTool.moduleDisabled .moduleSub
 {
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";

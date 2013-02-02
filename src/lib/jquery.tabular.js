@@ -47,7 +47,7 @@ function()
         {
             var _self = this;
 
-            this.$menu.delegate( this.options.tabs, "click", function( event )
+            this.$menu.delegate( this.options.tabs, "tap", function( event )
             { 
                 var tabIndex = _self.$tabs.index( this );
 
