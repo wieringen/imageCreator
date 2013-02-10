@@ -164,7 +164,7 @@ function( utils )
         var startDistance = utils.getDistance( positionStart[0], positionStart[1] )
         ,   endDistance   = utils.getDistance( positionMove[0],  positionMove[1]  )
         ;
-        .
+        
         return endDistance / startDistance;
     }
 
@@ -308,7 +308,7 @@ STILL UNDER CONSTRUCTION THIS PART
                 ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
                 }
             ,   distanceMove = utils.getDistance
-            ,   scaleDelta   = 
+            ,   scaleDelta   = 0
             ;
 
             $imageCreatorSelection.trigger( "onScale", [ scale ] );
