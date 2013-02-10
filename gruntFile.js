@@ -38,9 +38,9 @@ module.exports = function(grunt)
             {
                 files : 
                 [
-                    { expand: true, cwd: "src", src: "images/*",   dest: "dist/" }
-                ,   { expand: true, cwd: "src", src: "temp/*",     dest: "dist/" }
-                ,   { expand: true, cwd: "src", src: "index.html", dest: "dist/" }
+                    { expand: true, cwd: "src", src: "images/**/*", dest: "dist/" }
+                ,   { expand: true, cwd: "src", src: "temp/*",      dest: "dist/" }
+                ,   { expand: true, cwd: "src", src: "index.html",  dest: "dist/" }
                 ]
             }
         }

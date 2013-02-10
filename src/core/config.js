@@ -1,7 +1,7 @@
 /**
  * @description A element cropper plugin.
  *
- * @name settings
+ * @name config
  * @version 1.0
  * @author mbaijs
  */
@@ -17,7 +17,7 @@ function( utils )
     {
         options : 
         {
-            viewportWidth  : 550
+            viewportWidth  : 500
         ,   viewportHeight : 625
         
         ,   engines :  
@@ -41,7 +41,7 @@ function( utils )
                 }    
             }
 
-        ,   engineOrder : [ "svg", "vml", "canvas" ]
+        ,   engineOrder : [ "svg", "canvas", "vml" ]
 
         ,   toolbar : 
             { 
@@ -55,6 +55,7 @@ function( utils )
                 {
                     title            : "Layers"
                 ,   constrainLayers  : true
+                ,   autoSelectLayer  : false
                 ,   showMenu         : true
                 ,   buttonLayersSave : 
                     {

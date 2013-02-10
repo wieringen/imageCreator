@@ -198,20 +198,17 @@ function()
         ];
     };
 
-    module.getDistanceBetweenPoints = function( point1, point2 )
+   /**
+     * calculate the distance between two points
+     * @param   object  pos1 { x: int, y: int }
+     * @param   object  pos2 { x: int, y: int }
+     */
+    module.getDistance = function( pos1, pos2 )
     {
-      var xs = 0
-      ,   ys = 0
-      ;
-     
-      xs = point2.x - point1.x;
-      xs = xs * xs;
-     
-      ys = point2.y - point1.y;
-      ys = ys * ys;
-     
-      return Math.sqrt( xs + ys );
+        var x = pos2.x - pos1.x, y = pos2.y - pos1.y;
+        return Math.sqrt((x * x) + (y * y));
     }
+
 
     module.getRandomInt = function( min, max )
     {

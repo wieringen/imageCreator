@@ -21,7 +21,6 @@ function( utils )
                 offsetWidth : 2
             ,   grips : 
                 [
-
                     { 
                         "name"       : "N"
                     ,   "position"   : [ 50, 0 ]
@@ -133,28 +132,40 @@ function( utils )
     { 
         layerCurrent = layer;
         
-        if( layerCurrent && layerCurrent.visible )
+        if( layerCurrent )
         {
             $imageCreatorSelection.css({
                     "left"    : layer.positionRotated.x  - module.settings.offsetWidth
                 ,   "top"     : layer.positionRotated.y  - module.settings.offsetWidth
                 ,   "width"   : layer.sizeRotated.width  + module.settings.offsetWidth
                 ,   "height"  : layer.sizeRotated.height + module.settings.offsetWidth
-                ,   "display" : "block"
             });
         }
-        else
-        {
-            $imageCreatorSelection.hide();
-        }
+   
+        $imageCreatorSelection.toggle( layerCurrent && layerCurrent.visible && ! layerCurrent.locked );
     }
 
     function selectionVisibility( event, layer )
     { 
-        if( layer.selected )
+        if( layer.selected && ! layer.locked )
         {
             $imageCreatorSelection.toggle( layer.visible );
         }
+    }
+
+    /**
+     * calculate the scale size between two fingers
+     * @param   object  pos_start
+     * @param   object  pos_move
+     * @return  float   scale
+     */
+    function calculateScale( positionStart, positionMove )
+    {
+        var startDistance = utils.getDistance( positionStart[0], positionStart[1] )
+        ,   endDistance   = utils.getDistance( positionMove[0],  positionMove[1]  )
+        ;
+        .
+        return endDistance / startDistance;
     }
 
     function selectionResize( event )
@@ -275,6 +286,46 @@ STILL UNDER CONSTRUCTION THIS PART
 
         return false;
     } 
+
+   function selectionScale( event )
+    {
+        var grip              = $( this ).data( "grip" )
+        ,   gripPositionStart = 
+            {
+                x : event.pageX - $imageCreatorSelection.offset().left
+            ,   y : event.pageY - $imageCreatorSelection.offset().top
+            }
+        ,   scaleStart = 0
+        ;
+
+        $( "body" ).addClass( "noSelect" );
+
+        $( document ).mousemove( function( event )
+        {
+            var gripPositionCenter = 
+                {
+                    x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width() / 2 )
+                ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
+                }
+            ,   distanceMove = utils.getDistance
+            ,   scaleDelta   = 
+            ;
+
+            $imageCreatorSelection.trigger( "onScale", [ scale ] );
+        });
+
+        $( document ).mouseup( function( event )
+        {
+            $( document ).unbind( "mousemove" );
+            $( document ).unbind( "mouseup" );
+            $( "body" ).removeClass( "noSelect" );
+
+            return false;
+        });
+
+        return false;
+    }
+
 
     function selectionRotate( event )
     {

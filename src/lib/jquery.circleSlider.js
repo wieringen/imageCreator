@@ -40,23 +40,30 @@ function()
         
         setEvents: function()
         {
-            var _self = this;
+            var _self       = this
+            ,   touchEvents = 'ontouchstart' in document.documentElement
+            ;
 
-            this.$thumb.mousedown( function( event )
+            if( ! touchEvents )
             { 
-                _self.start( event ); 
+                this.$track.mousedown( function( event )
+                { 
+                    _self.start( event ); 
 
-                return false; 
-            });
-
-            this.$thumb.bind( "touchmove", function( event )
+                    return false; 
+                });
+            }
+            else
             {
-                var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent;
+                this.$track.bind( "touchmove", function( event )
+                {
+                    var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent;
 
-                _self.drag( target );
+                    _self.drag( target );
 
-               return false;
-            });
+                   return false;
+                });
+            }
 
             $( this.element ).bind( "setPosition", function( event, degrees )
             { 
@@ -107,8 +114,9 @@ function()
 
             this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
             this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );    
-            this.$thumb.css( "transform", "rotate(" + degrees + "deg)" ); 
-            this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );      
+            this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" ); 
+            this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );   
+            this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );      
         },
 
         sanitizeRadians: function( radians )
@@ -132,9 +140,10 @@ function()
             this.$degrees.html( degrees + "&deg;" );
             this.$thumb.css( "top",  Math.round( -cos * 34 +42 ) );
             this.$thumb.css( "left", Math.round(  sin * 34 +42 ) );
-            this.$thumb.css( "transform", "rotate(" + degrees + "deg)" );
+            this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" );
             this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );
-            
+            this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );      
+
             var rotation = {
                     degrees : degrees
                 ,   radians : radians

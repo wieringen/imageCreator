@@ -1,15 +1,19 @@
 /*********************** TOOL : INFO ***********************/
 
+.imageCreatorToolInfo {
+    width: 195px;
+}
+
 .imageCreatorToolInfo .objectPosition { 
     margin:         0 0 10px;
     padding:        0 0 10px; 
     border-right:   1px solid #909090; 
-    width:          49%;
+    width:          48%;
     float:          left;
 }
 .imageCreatorToolInfo .objectRotation { 
     padding:        0 0 10px 8%; 
-    width:          43%;
+    width:          44%;
     margin:         0 0 0 -1px;
     float:          left;
 }

@@ -40,22 +40,29 @@ require(
 function( config, lazyRequire, utils, selection )
 {   
     var mouse   = {}
-    ,   pinch   =   { 
-                        scale  : 1
-                    ,   rotate : 0
-                    }
+    ,   pinch   = 
+        { 
+            scale  : 1
+        ,   rotate : 0
+        }
     ,   toolbar = {}
 
     ,   $imageCreatorViewport
     ,   $imageCreatorIntro
+    ,   $imageCreatorMessage
+    ,   $imageCreatorMessageInner
+    ,   $imageCreatorMessageClose
     ;
 
     $( document ).ready( function()
     {
         // Get basic app DOM elements.
         //
-        $imageCreatorViewport = $( ".imageCreatorViewport" );
-        $imageCreatorIntro    = $( ".imageCreatorIntro" );
+        $imageCreatorViewport      = $( ".imageCreatorViewport" );
+        $imageCreatorIntro         = $( ".imageCreatorIntro" );
+        $imageCreatorMessage       = $( ".imageCreatorMessage" );
+        $imageCreatorMessageInner  = $( ".imageCreatorMessageInner" );
+        $imageCreatorMessageClose  = $( ".imageCreatorMessageClose" );
 
         // Setup the layer resizer/rotater selection.
         //
@@ -68,12 +75,15 @@ function( config, lazyRequire, utils, selection )
         ,   scale_treshold    : 0
         ,   drag_min_distance : 0
         });
+        
         $imageCreatorViewport.bind( "dragstart", viewportDragStart );
         $imageCreatorViewport.bind( "drag", viewportDrag );
         $imageCreatorViewport.bind( "dragend", viewportDragEnd );
         $imageCreatorViewport.bind( "transformstart", viewportPinchStart );
         $imageCreatorViewport.bind( "transform", viewportPinch );
         $imageCreatorViewport.bind( "transformend", viewportPinchEnd );
+        $imageCreatorViewport.bind( "setMessage", function( events, options ){ setMessage( options ) });
+        $imageCreatorMessageClose.bind( "tap", function(){ $imageCreatorMessage.hide(); });
 
         // Create toolbar.
         //
@@ -103,12 +113,49 @@ function( config, lazyRequire, utils, selection )
 
     } );
 
+    function setMessage( options )
+    {
+        var defaults = 
+            {
+                "message"   : ""
+            ,   "status"    : ""
+            ,   "fade"      : true
+            ,   "fadeTimer" : 300
+            }
+        ,   options      = $.extend( {}, defaults, options )   
+        ,   messageTimer = $imageCreatorMessage.data( "messageTimer" )
+        ;
+
+        $imageCreatorMessage.removeClass( "error loading notice" );
+        $imageCreatorMessage.addClass( options.status );
+        $imageCreatorMessage.show();
+
+        $imageCreatorMessageInner.text( options.message );
+
+        if( options.fade )
+        {
+            clearTimeout( messageTimer );
+            messageTimer = setTimeout( function()
+            {
+                $imageCreatorMessage.hide();
+            }, options.fadeTimer );
+
+            $imageCreatorMessage.data( "messageTimer", messageTimer );
+        }
+    }
+
     function loadEngine( engineNane )
     {
         var engineObject = config.options.engines[ engineNane ];
 
         if( "function" === typeof engineObject.support && engineObject.support() )
         {
+            setMessage( {
+                "message" : "Loading " + engineNane + " engine..."
+            ,   "status"  : "loading"
+            ,   "fade"    : true
+            }); 
+
             var requireOnce = lazyRequire.once();
 
             requireOnce(
@@ -133,6 +180,12 @@ function( config, lazyRequire, utils, selection )
     {
         if( config.options.toolbar[ toolName ] )
         {
+            setMessage( {
+                "message" : "Loading " + toolName + " tool..."
+            ,   "status"  : "loading"
+            ,   "fade"    : true
+            }); 
+
             var requireOnce = lazyRequire.once();
 
             requireOnce(
@@ -214,5 +267,4 @@ function( config, lazyRequire, utils, selection )
     {
 
     }
-
 } );

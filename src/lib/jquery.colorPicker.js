@@ -68,16 +68,17 @@ function()
         
         setImage: function()
         {
-            var _self       = this
-            ,   colorPicker = new Image()
+            var _self         = this
+            ,   colorPicker   = new Image()
+            ,   backgroundUrl = this.$track.css( "background-image" ).replace( /"/g, "" ).replace( /url\(|\)$/ig, "" )
             ;
-    
-            colorPicker.onload = function()
+
+            $( colorPicker ).load( function()
             {
                 _self.context.drawImage( colorPicker, 0, 0, _self.canvasWidth, _self.canvasHeight );
-            };
+            });
 
-            colorPicker.src = this.$track.css( "background-image" ).replace( "url(", "" ).replace( ")", "" );
+            colorPicker.src = backgroundUrl;
         },
 
         setEvents: function()
@@ -126,7 +127,7 @@ function()
             $( this.element ).bind( "setColor", function( event, hexColor )
             { 
                 _self.$hex.text( hexColor );
-                _self.$color.css( "backgroundColor", hexColor );
+                _self.$color.find( ".colorInner" ).css( "backgroundColor", hexColor );
             });
         },
 
@@ -141,7 +142,7 @@ function()
                 ;
                 
                 this.$hex.text( hexColor );
-                this.$color.css( "backgroundColor", hexColor );
+                this.$color.find( ".colorInner" ).css( "backgroundColor", hexColor );
 
                 $( this.element ).trigger( "colorUpdate", [ hexColor, rgbColor ] );
             }

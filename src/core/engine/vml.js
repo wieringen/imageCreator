@@ -42,8 +42,8 @@ function( config, layers )
 
         // Set the viewport's dimensions.
         //
-        canvasWidth  = theApp.settings.viewportWidth;
-        canvasHeight = theApp.settings.viewportHeight;
+        canvasWidth  = config.options.viewportWidth;
+        canvasHeight = config.options.viewportHeight;
 
         $imageCreatorCanvas.css( { width : canvasWidth, height : canvasHeight } );
 
@@ -71,6 +71,7 @@ function( config, layers )
         $imageCreatorViewport.bind( "layerSelect.engine", vmlLayerSelect );
         $imageCreatorViewport.bind( "layerVisibility.engine", vmlLayerVisibility );
         $imageCreatorViewport.bind( "layerRemove.engine", vmlLayerRemove );
+        $imageCreatorViewport.bind( "layersRedraw.engine", vmlBuildLayers );
 
         // Do we have any layers allready?
         //
@@ -79,6 +80,9 @@ function( config, layers )
 
     function vmlBuildLayers()
     {
+        $imageCreatorCanvas.find( "image" ).remove();
+        $imageCreatorCanvas.find( "p" ).remove();
+
         var layersObject = layers && layers.getAllLayers() || {};
 
         $.each( layersObject.layers || [], vmlLayerCheck );
@@ -164,25 +168,34 @@ function( config, layers )
             htmlParagraphCurrent.style.fontStyle  = layer.style ? "italic" : "normal";
 
             vmlLayerCurrent.style.setAttribute( 'height', layer.sizeCurrent.height + "px" );
+            vmlLayerCurrent.style.setAttribute( 'width', layer.sizeCurrent.width + "px" );
         }
  
         // Only use the icky ms proprietary matrix filter if the browser is pre ie9.
         //
-        if( ! document.addEventListener )
+        //if( ! document.addEventListener )
+
+        // Filters suck.. So lets use them only if we really have too.
+        //
+        if( layer.type !== "text" || layer.rotation.degrees > 0 && layer.rotation.degrees < 360)
         {
             vmlLayerCurrent.style.setAttribute( "filter", 'progid:DXImageTransform.Microsoft.Matrix(' + 'M11=' + layer.matrix[ 0 ] + ', M12=' + layer.matrix[ 1 ] + ', M21=' + layer.matrix[ 3 ] + ', M22=' + layer.matrix[ 4 ] + ', sizingMethod=\'auto expand\'' + ')' );
-
-            // Since we unfortunately do not have the possibility to use translate with sizing method 'auto expand', we need to do
-            // something hacky to work around supporting the transform-origin property.
-            //
-            var originCorrection = ieCorrectOrigin( layer.sizeCurrent, layer.rotation.radians );
-            vmlLayerCurrent.style.setAttribute( "top",  layer.position.y + originCorrection.y + "px" );
-            vmlLayerCurrent.style.setAttribute( "left", layer.position.x + originCorrection.x + "px" );
         }
         else
         {
-            $( vmlLayerCurrent ).css( "msTransform", 'matrix(' + layer.rotation.cos + ',' + layer.rotation.sin + ',' + -layer.rotation.sin + ',' + layer.rotation.cos + ',' + layer.position.x + ',' + layer.position.y + ')' );
+            vmlLayerCurrent.style.removeAttribute( "filter" ); 
         }
+
+        // Since we unfortunately do not have the possibility to use translate with sizing method 'auto expand', we need to do
+        // something hacky to work around supporting the transform-origin property.
+        //
+        var originCorrection = ieCorrectOrigin( layer.sizeCurrent, layer.rotation.radians );
+
+        vmlLayerCurrent.style.setAttribute( "top",  layer.position.y + originCorrection.y + "px" );
+        vmlLayerCurrent.style.setAttribute( "left", layer.position.x + originCorrection.x + "px" );
+
+        //$( vmlLayerCurrent ).css( "msTransform", 'matrix(' + layer.rotation.cos + ',' + layer.rotation.sin + ',' + -layer.rotation.sin + ',' + layer.rotation.cos + ',' + layer.position.x + ',' + layer.position.y + ')' );
+        //$( vmlLayerCurrent ).css( "msTransform", 'matrix(' + layer.matrix[ 0 ] + ',' + layer.matrix[ 3 ] + ',' + layer.matrix[ 1 ] + ',' + layer.matrix[ 4 ] + ',' + layer.matrix[ 2 ] + ',' + layer.matrix[ 5 ] + ')' );
 
         // It is no longer possible to create a VML element outside of the DOM in >= ie8. This hack fixes that.
         //

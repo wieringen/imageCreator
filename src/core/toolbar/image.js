@@ -42,6 +42,8 @@ function( moduleHTML, config, utils )
     ,   $imageRotate
     ,   $buttonImageUpload
     ,   $buttonImageAdd
+    ,   $imageDecorationsList
+    ,   $imageBackgroundsList 
 
     // The default properties of a image layer.
     //
@@ -51,10 +53,13 @@ function( moduleHTML, config, utils )
         ,   name            : ""
         ,   type            : "image"
         ,   visible         : true
+        ,   locked          : false
 
         // Image layer specific properties.
         //
         ,   image           : null
+        ,   imageType       : "default"
+
         ,   sizeReal        : { "width": 0, "height": 0 }
         
         // Unrotated position and size.
@@ -75,7 +80,7 @@ function( moduleHTML, config, utils )
         //
         ,   scale           : 1
         ,   rotation        : { degrees: 0, radians : 0, sin: 0, cos: 1 }
-        ,   matrix          : [ 1, 0, 0, 1, 0, 0 ]
+        ,   matrix          : [ 1, 0, 0, 0, 1, 0 ]
         }
 
     // The curent layer that is being edited.
@@ -108,13 +113,15 @@ function( moduleHTML, config, utils )
 
         // Get module DOM elements.
         //
-        $module            = $( ".imageCreatorToolImage" );
-        $moduleTitle       = $module.find( ".moduleTitle" );
-        $imageZoom         = $module.find( ".imageZoom" );
-        $imageRotate       = $module.find( ".imageRotate" ); 
-        $buttonImageUpload = $module.find( ".buttonImageUpload" ); 
-        $buttonImageAdd    = $module.find( ".buttonImageAdd" ); 
-
+        $module               = $( ".imageCreatorToolImage" );
+        $moduleTitle          = $module.find( ".moduleTitle" );
+        $imageZoom            = $module.find( ".imageZoom" );
+        $imageRotate          = $module.find( ".imageRotate" ); 
+        $buttonImageUpload    = $module.find( ".buttonImageUpload" ); 
+        $buttonImageAdd       = $module.find( ".buttonImageAdd" ); 
+        $imageDecorationsList = $module.find( ".imageDecorationsList" ); 
+        $imageBackgroundsList = $module.find( ".imageBackgroundsList" );
+       
         // Set module title.
         //
         $moduleTitle.text( module.options.title );
@@ -164,11 +171,36 @@ function( moduleHTML, config, utils )
         $buttonImageUpload.bind( "click", imageUpload );  
         $buttonImageAdd.click( function()
         {
-            $module.trigger( "setTab", [ 1 ] );
+            $module.trigger( "setTab", [ 3 ] );
             $buttonImageAdd.hide();
 
             return false;
         });
+        $imageDecorationsList.delegate( "li", "tap", function()
+        {
+            imageAdd( false, $( this ).find( "img").attr( "src") );
+
+            return false;
+        });
+        $imageBackgroundsList.delegate( "li", "tap", function()
+        {
+            var layer = 
+            {
+                locked    : true
+            ,   imageType : "background"
+            ,   position  : 
+                {
+                    x : 0
+                ,   y : 0
+                } 
+            ,   scale : 1
+            }
+
+            imageAdd( false, $( this ).find( "img" ).attr( "src" ), layer );
+
+            return false;
+        });
+
     };
 
     function imageSelect( event, layer )
@@ -182,7 +214,7 @@ function( moduleHTML, config, utils )
 
         // Enable module if layer is of the correct type and layer is visible.
         //
-        module.enabled = layer.visible && layer.type === "image" || false;
+        module.enabled = ! layer.locked && layer.visible && layer.type === "image" || false;
         $module.toggleClass( "moduleDisabled", ! module.enabled ); 
 
         if( module.enabled )
@@ -191,7 +223,7 @@ function( moduleHTML, config, utils )
             
             // Set the UI to match the selected layers properties.
             //
-            $module.trigger( "setTab", [ 0 ] );
+            $module.trigger( "setTab", [ 2 ] );
             $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
             $imageZoom.trigger( "setPosition", [ layerCurrent.scale ] );        
         }
@@ -226,24 +258,25 @@ function( moduleHTML, config, utils )
         {
             var json = $.parseJSON( $( this ).contents().text() );
 
-            $( ".message" ).html( json.message ).show();
-
-            imageAdd( event, json.src );
+            if( json && json.code !== 200 )
+            {
+                $imageCreatorViewport.trigger( "setMessage", [ {
+                    "message" : json.message
+                ,   "status"  : "error"
+                ,   "fade"    : false
+                }]);
+            }
+            else
+            {
+                imageAdd( event, json.src );
+            }
         });
 
         return false;
     }
 
-    function imageAdd( event, url )
+    function imageAdd( event, url, layerOptions )
     {
-        // Temp
-        /*
-        if( ! url )
-        {
-            var  dummy = [ "images/girl.jpg", "images/girl2.jpg" ];
-            url = dummy[Math.floor(Math.random()*dummy.length)];    
-        }*/
-
         // Clone and set layer defaults.
         //
         layerCurrent = $.extend( true, {}, layerDefault );
@@ -254,21 +287,37 @@ function( moduleHTML, config, utils )
         layerCurrent.image = new Image();
         layerCurrent.name  = url.substring( url.lastIndexOf("/") + 1 );
 
+        $imageCreatorViewport.trigger( "setMessage", [ {
+            "message" : "Loading image: " + layerCurrent.name
+        ,   "status"  : "loading"
+        }]);
+
         // Set image loading events.
         //
-        layerCurrent.image.onload  = imageLoadSuccess;
+        layerCurrent.image.onload = function()
+        { 
+            imageLoadSuccess.call( this, layerOptions );  
+        };
         layerCurrent.image.onerror = imageLoadError;
 
         layerCurrent.image.src = url;
+        layerCurrent.imageType = layerOptions && layerOptions.imageType || "default";
 
         return false;
     }
 
-    function imageLoadSuccess()
+    function imageLoadSuccess( layerOptions )
     {
+        $imageCreatorViewport.trigger( "setMessage", [ {
+            "message" : "Loading image: " + layerCurrent.name
+        ,   "status"  : "loading"
+        }]);
+
+        layerCurrent.locked = layerOptions && layerOptions.locked || false;
+
         // Since loading of the image is a success we can enable the module.
         //
-        module.enabled = true;
+        module.enabled = ! layerCurrent.locked;
 
         // Set the unmanipulated size of the image.
         //
@@ -277,7 +326,7 @@ function( moduleHTML, config, utils )
 
         // Adjust the scale to reflect the initial downscale.
         //
-        layerCurrent.scale = 100 / module.options.imageDownScale;
+        layerCurrent.scale = layerOptions && layerOptions.scale || 100 / module.options.imageDownScale;
 
         // Scale the unrotated size of the image also downscale it a bit.
         //
@@ -290,7 +339,7 @@ function( moduleHTML, config, utils )
 
         // Set the layer's position to the center of the viewport. 
         //   
-        position = 
+        position = layerOptions && layerOptions.position || 
         {
             x : utils.getRandomInt( 0, config.options.viewportWidth - layerCurrent.sizeCurrent.width)
         ,   y : utils.getRandomInt( 0, config.options.viewportHeight - layerCurrent.sizeCurrent.height)
@@ -305,7 +354,10 @@ function( moduleHTML, config, utils )
 
     function imageLoadError()
     {
-
+        $imageCreatorViewport.trigger( "setMessage", [ {
+                "message" : "Error loading image."
+        ,       "fade"    : true
+        }]);
     }
 
     function imagePinch( event, delta )
@@ -358,7 +410,7 @@ function( moduleHTML, config, utils )
                 $imageZoom.trigger( "setPosition", [ layerCurrent.scale ] );
             }
 
-            layerCurrent.scale = Math.max( 0.1, Math.min( 1, scale )  );
+            layerCurrent.scale = Math.max( 0.1, Math.min( 1, scale ) );
 
             var sizeNew = 
                 {
@@ -367,7 +419,7 @@ function( moduleHTML, config, utils )
                 }
             ,   newPosition =
                 {
-                    x : ( layerCurrent.sizeCurrent.width - sizeNew.width ) / 2
+                    x : ( layerCurrent.sizeCurrent.width  - sizeNew.width  ) / 2
                 ,   y : ( layerCurrent.sizeCurrent.height - sizeNew.height ) / 2
                 }
             ;

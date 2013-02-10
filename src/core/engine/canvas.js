@@ -127,7 +127,7 @@ function( config, layers )
 
             $.each( layer.textLines, function( index, line )
             {
-                context.fillText( line, 5, Math.round( index * ( layer.fontSize * config.options.toolbar.text.textLineHeight ) ) );
+                context.fillText( line, 5, Math.ceil( index * ( layer.fontSize * config.options.toolbar.text.textLineHeight ) ) );
             });
         }
 
@@ -140,6 +140,12 @@ function( config, layers )
         
         context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
         context.strokeStyle = "#666";
+/*
+        if( context.setLineDash )
+        {    
+           context.setLineDash([5,5]);
+        }
+*/
         context.lineWidth   = 2 / layer.scale;
 
         context.strokeRect( 0, 0, ( layer.sizeReal ? layer.sizeReal.width : layer.sizeCurrent.width ), ( layer.sizeReal ? layer.sizeReal.height : layer.sizeCurrent.height ) ); 

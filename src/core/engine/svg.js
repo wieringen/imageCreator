@@ -2,7 +2,7 @@
  * @description <p>The SVG engine implementation.</p>
  *
  * @namespace imageCreator.engine
- * @name SVG
+ * @name svg
  * @version 1.0
  * @author mbaijs
  */
@@ -86,6 +86,7 @@ function( config, layers )
         $imageCreatorViewport.bind( "layerSelect.engine", svgLayerSelect );
         $imageCreatorViewport.bind( "layerVisibility.engine", svgLayerVisibility );
         $imageCreatorViewport.bind( "layerRemove.engine", svgLayerRemove );
+        $imageCreatorViewport.bind( "layersRedraw.engine", svgBuildLayers );
 
         // Do we have any layers allready?
         //
@@ -94,6 +95,13 @@ function( config, layers )
 
     function svgBuildLayers()
     {
+        // Remove all svg children if there are any
+        //
+        $( svgContainer ).find( "image" ).remove();
+        $( svgContainer.getElementsByTagName( "foreignObject" ) ).remove();
+
+        //$( svgContainer ).find( "text, image" ).remove();
+
         var layersObject = layers && layers.getAllLayers() || {};
 
         $.each( layersObject.layers || [], svgLayerCheck );
@@ -137,15 +145,22 @@ function( config, layers )
 
         if( "text" === layer.type )
         {
+            //svgLayerCurrent = document.createElementNS( "http://www.w3.org/2000/svg", "text" );
+
             svgLayerCurrent      = document.createElementNS( "http://www.w3.org/2000/svg", "foreignObject" );
             htmlParagraphCurrent = document.createElement( "p" );
             svgLayerCurrent.appendChild( htmlParagraphCurrent );
         }
 
         svgLayerCurrent.setAttribute( "id", layer.id + module.name );
+        
+        if( ! layer.locked && config.options.toolbar.layers && config.options.toolbar.layers.autoSelectLayer )
+        {
+            $( svgLayerCurrent ).bind( "tap", svgLayerTapSelect );
+        }
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
-        //   
+        //
         $( svgContainer ).append( svgSelect );  
         $( svgContainer ).append( svgLayerCurrent );
     }
@@ -175,25 +190,36 @@ function( config, layers )
             ,   fontWeight : layer.weight ? "bold" : "normal"
             ,   fontStyle  : layer.style ? "italic" : "normal"
             });
-            svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
-            svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );
 
-            /*
-            var buildTextString = "";
+            /* Doesn't work on ipad but is preferred method need to test.
+
+            $( svgLayerCurrent ).find( "tspan" ).remove();
 
             $.each( layer.textLines, function( index, line )
             {
-                buildTextString += "<tspan>" + line + "</tspan>";
+                var tspannode = document.createElementNS( "http://www.w3.org/2000/svg", "tspan" )
+                ,   textnode  = document.createTextNode( line )
+                ;
+                
+                tspannode.setAttribute( "x", "5px" );
+                tspannode.setAttribute( "y", "0.95em");
+                tspannode.setAttribute( "dy", Math.ceil( index * ( layer.fontSize * config.options.toolbar.text.textLineHeight ) )  );
+
+                tspannode.appendChild(textnode);                       
+                svgLayerCurrent.appendChild(tspannode);
             });
 
-            svgLayerCurrent.textContent = buildTextString;
-            svgLayerCurrent.setAttribute( "color", layer.color);
-            svgLayerCurrent.setAttribute( "fontFamily", layer.font);
-            svgLayerCurrent.setAttribute( "fontWeight", layer.weight ? "bold" : "normal");
-            svgLayerCurrent.setAttribute( "fontStyle", layer.style ? "italic" : "normal" );
+            $( svgLayerCurrent ).css(
+            {   
+                fill       : layer.color
+            ,   fontSize   : layer.fontSize
+            ,   fontFamily : layer.font
+            ,   fontWeight : layer.weight ? "bold" : "normal"
+            ,   fontStyle  : layer.style ? "italic" : "normal"
+            });*/
+
             svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
             svgLayerCurrent.setAttribute( 'width', layer.sizeCurrent.width );
-            */
         }
 
         // Set attributes.
@@ -215,7 +241,16 @@ function( config, layers )
             if( "text" === layer.type )
             {
                 svgSelect.setAttribute( "height", layer.sizeCurrent.height );
+                svgSelect.setAttribute( "width",  layer.sizeCurrent.width );
             }
+
+            if( layer.locked )
+            {
+                svgSelect.setAttribute( "visibility", "hidden" );
+
+                return false;
+            }
+
         }
 
         // If we have no layer to select or if its hidden hide the selection rectangle as well.
@@ -229,11 +264,6 @@ function( config, layers )
                 svgSelect.setAttribute( "height", layer.sizeReal.height );
                 svgSelect.setAttribute( "width", layer.sizeReal.width ); 
             }
-
-            if( "text" === layer.type )
-            {
-                svgSelect.setAttribute( "width", layer.sizeCurrent.width );  
-            }
         }
     }
 
@@ -243,7 +273,7 @@ function( config, layers )
 
         $svgLayerToToggle.attr( "visibility", layer.visible ? "visible" : "hidden" );
 
-        // We only want to hide the selection layer if its around the currently selected layer.
+        // We only want to toggle the selection layer if its around the currently selected layer.
         //
         if( layer.selected )
         {
@@ -259,9 +289,17 @@ function( config, layers )
         //
         $svgLayerToRemove.remove();
         
-        // Hide selection rectangles.
+        // We only want to hide the selection layer if its around the currently selected layer.
         //
-        svgSelect.setAttribute( "visibility", "hidden" );
+        if( layer.selected )
+        {
+            svgSelect.setAttribute( "visibility", "hidden" );
+        }
+    }
+
+    function svgLayerTapSelect( event )
+    {
+        $imageCreatorViewport.trigger( "layerSelectByID", [ event.target.id.replace( module.name, "" ) ] );
     }
 
     return module;

@@ -16,10 +16,10 @@ $fieldname = 'inputImageUpload';
 // Now let's deal with the upload
 
 // possible PHP upload errors
-$errors = array(1 => 'php.ini max file size exceeded', 
-                2 => 'html form max file size exceeded', 
-                3 => 'file upload was only partial', 
-                4 => 'no file was attached');
+$errors = array(1 => 'Error uploading image: php.ini max file size exceeded', 
+                2 => 'Error uploading image: Html form max file size exceeded', 
+                3 => 'Error uploading image: File upload was only partial', 
+                4 => 'Error uploading image: No file was attached');
 
 // check for PHP's built-in uploading errors 
 ($_FILES[$fieldname]['error'] == 0) 
@@ -27,12 +27,12 @@ $errors = array(1 => 'php.ini max file size exceeded',
 
 // check that the file we are working on really was an HTTP upload
 @is_uploaded_file($_FILES[$fieldname]['tmp_name'])
-	or error('not an HTTP upload');
+	or error('Error uploading image: Not an HTTP upload');
 	
 // validation... since this is an image upload script we 
 // should run a check to make sure the upload is an image
 @getimagesize($_FILES[$fieldname]['tmp_name'])
-	or error('only image uploads are allowed');
+	or error('Error uploading image: Only image uploads are allowed');
 	
 // make a unique filename for the uploaded file and check it is 
 // not taken... if it is keep trying until we find a vacant one
@@ -44,7 +44,7 @@ while(file_exists($uploadFilename = $uploadsDirectory.$now.'-'.$_FILES[$fieldnam
 
 // now let's move the file to its final and allocate it with the new filename
 @move_uploaded_file($_FILES[$fieldname]['tmp_name'], $uploadFilename)
-	or error('receiving directory insuffiecient permission');
+	or error('Error uploading image: Receiving directory has insuffiecient permission');
 
 // *** Include the class
 include("resize-class.php");
@@ -57,7 +57,7 @@ $resizeObj -> saveImage($uploadsDirectory.$now.'-'.$_FILES[$fieldname]['name'], 
 
 // If you got this far, everything has worked and the file has been successfully saved.
 header('content-type: text/html');
-echo json_encode( array( "message" => "Image uploaded succesfully.", "src" => "temp/uploads/" .$now.'-'.$_FILES[$fieldname]['name'] ) );
+echo json_encode( array( "code" => 200, "message" => "Image uploaded succesfully.", "src" => "temp/uploads/" .$now.'-'.$_FILES[$fieldname]['name'] ) );
 
 // make an error handler which will be used if the upload fails
 function error( $error )

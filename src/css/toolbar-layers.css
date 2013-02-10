@@ -1,5 +1,9 @@
 /*********************** TOOL : LAYERS ***********************/
 
+.imageCreatorToolLayers {
+    width: 195px;
+}
+
 .imageCreatorToolLayers .layerContainer {
     list-style:         none;
     padding:            0;

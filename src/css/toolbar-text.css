@@ -44,14 +44,22 @@
     float:          left;
     font-size:      10px;
     margin:         0 0 0 5px;
+    line-height:    13px;
 }
 .imageCreatorToolText .textColor .color { 
     width:          10px;
     height:         10px;
     float:          left;
     border-radius:  10px;
+    padding:        1px;
     border:         1px solid #8b8b8b;
 }
+.imageCreatorToolText .textColor .colorInner { 
+    width:          10px;
+    height:         10px;
+    border-radius:  10px;
+}
+
 .imageCreatorToolText.moduleDisabled .color,
 .imageCreatorToolText.moduleDisabled .hex {
     display:        none;
@@ -114,7 +122,7 @@
 /* Text */
 .imageCreatorToolText .areaTextEdit {
     min-height:     128px;
-    width:          167px;
+    width:          213px;
     margin:         0;
 }
 

@@ -1,4 +1,4 @@
-[imageCreator](http://baijs.com/imagecreator) 
+[imageCreator](http://baijs.com/imagecreator) [![Build Status](https://secure.travis-ci.org/wieringen/imagecreator.png?branch=master)](http://travis-ci.org/wieringen/imagecreator)
 ==================================================
 
 What you need to build your own version of imageCreator

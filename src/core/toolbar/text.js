@@ -85,7 +85,7 @@ function( moduleHTML, config, utils )
         //
         ,   scale           : 1
         ,   rotation        : { degrees: 0, radians : 0, sin: 0, cos: 1 }
-        ,   matrix          : [ 1, 0, 0, 1, 0, 0 ]
+        ,   matrix          : [ 1, 0, 0, 0, 1, 0 ]
         }
 
     // The curent layer that is being edited.
@@ -264,7 +264,7 @@ function( moduleHTML, config, utils )
 
         layerCurrent.sizeRotated = layerCurrent.sizeCurrent;
 
-        layerCurrent.text        = layerCurrent.text.slice( 0, utils.getRandomInt( 0, layerCurrent.text.length ) );
+        layerCurrent.text        = layerCurrent.text.slice( 0, utils.getRandomInt( 10, layerCurrent.text.length ) );
 
         textGetLines();
         textSize( false, layerCurrent.fontSize );
@@ -347,11 +347,16 @@ function( moduleHTML, config, utils )
       * @function
       *
       */
-    function textSize( event, fontSize, internal )
+    function textSize( event, fontSize, setUI )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.fontSize = fontSize || layerCurrent.fontSize;
+            layerCurrent.fontSize = Math.max( module.options.textSizeScale[0], Math.min( module.options.textSizeScale[1], fontSize || layerCurrent.fontSize ) );
+
+            if( "onResize" === event.type || setUI )
+            {
+                $textSize.trigger( "setPosition", [ layerCurrent.fontSize ] );
+            }  
 
             var sizeNew = 
                 {
@@ -370,10 +375,7 @@ function( moduleHTML, config, utils )
 
             textPosition( false, newPosition, true );
 
-            if( ! internal )
-            {
-                $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
-            }
+            $imageCreatorViewport.trigger( "layerUpdate", [ layerCurrent ] ); 
         }
     }
 
@@ -456,7 +458,8 @@ function( moduleHTML, config, utils )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            var radians       = utils.sanitizeRadians( layerCurrent.rotation.radians + utils.toRadians( delta.rotate ) )
+            var deltaScale    = layerCurrent.fontSize + ( delta.scale * 10 )
+            ,   radians       = utils.sanitizeRadians( layerCurrent.rotation.radians + utils.toRadians( delta.rotate ) )
             ,   deltaRotation = 
                 {
                     radians : radians
@@ -467,6 +470,7 @@ function( moduleHTML, config, utils )
             ;
 
             textRotate( event, deltaRotation, true );
+            textSize( event, deltaScale, true );
         }
     }
 

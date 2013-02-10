@@ -49,6 +49,8 @@ function()
 
             this.$menu.delegate( this.options.tabs, "tap", function( event )
             { 
+                event.preventDefault();
+                
                 var tabIndex = _self.$tabs.index( this );
 
                 _self.setTab( event, tabIndex );

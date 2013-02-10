@@ -1,3 +1,14 @@
+@import url(http://fonts.googleapis.com/css?family=Bonbon);
+
+.tempfontpreploadtest {
+    font-family: "bonbon";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
+}
+
 .noSelect { 
     user-select: none; 
     -o-user-select: none; 
@@ -107,3 +118,45 @@
     position:  absolute;
     cursor: url('../images/cursor-rotate.cur'), auto;
 }
+
+.imageCreatorMessage{
+    position: absolute;
+    height: 50px;
+    background-color: #dbdbdb;
+    width: 100%;
+    right: 0;
+    top: 0;
+    display: none;
+}
+
+.imageCreatorMessage .imageCreatorMessageInner {
+    font: 10px/50px Arial, Helvetica, sans-serif;
+    padding: 0 20px;
+}
+
+.imageCreatorMessage .imageCreatorMessageClose {
+    display: none;
+    width: 20px;
+    height: 20px;
+    background-color: #8d8d8d;
+    position: absolute;
+    right: 20px;
+    top: 50%;    
+    margin: -10px 0 0 0;
+    font: 10px/20px Arial, Helvetica, sans-serif;
+    text-align: center;
+    cursor: pointer;
+}
+
+.imageCreatorMessage.loading {
+    background: #dbdbdb url(../images/loader.gif) no-repeat 10px 50%;
+}
+
+.imageCreatorMessage.loading .imageCreatorMessageInner {
+    padding: 0 10px 0 55px;
+}
+
+.imageCreatorMessage.error .imageCreatorMessageClose {
+    display: block;
+}
+

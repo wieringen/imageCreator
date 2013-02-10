@@ -36,6 +36,7 @@ function( moduleHTML, config )
     ,   $layerContainer
     ,   $selectRenderEngine
     ,   $inputConstrainLayers
+    ,   $inputAutoSelectLayer
     ,   $buttonImageSave
     ,   $emptyMessage
 
@@ -73,6 +74,7 @@ function( moduleHTML, config )
         $layerContainer       = $module.find( ".layerContainer" );
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
         $inputConstrainLayers = $module.find( ".inputConstrainLayers" );
+        $inputAutoSelectLayer = $module.find( ".inputAutoSelectLayer" );
         $buttonImageSave      = $( ".buttonImageSave" );
         $emptyMessage         = $module.find( ".emptyMessage" );
 
@@ -104,6 +106,8 @@ function( moduleHTML, config )
         // Set inputs to match module options.
         //
         $inputConstrainLayers.attr( "checked", module.options.constrainLayers );
+        $inputAutoSelectLayer.attr( "checked", module.options.autoSelectLayer );
+
         $.each( config.options.engines, function( engineName, engine )
         {
             if( engine.support() )
@@ -122,15 +126,29 @@ function( moduleHTML, config )
         // Listen to global app events.
         //
         $imageCreatorViewport.bind( "layerUpdate", layerUpdate );
+        $imageCreatorViewport.bind( "layerSelectByID", layerSelect );
 
         // Set Button events.
         //  
-        $layerContainer.delegate( ".objectLayer",  "tap", layerSelect );
+        $layerContainer.delegate( ".objectLayer", "tap", function()
+        { 
+            layerSelect.call( this, event ); 
+            return false; 
+        });
         $layerContainer.delegate( ".objectToggle", "tap", layerToggle );
         $layerContainer.delegate( ".objectRemove", "tap", layerRemove );
         $selectRenderEngine.change( optionRenderEngineSelect );
         $inputConstrainLayers.change( optionConstrainLayersToggle );
-        $( "body" ).delegate( ".buttonImageSave", "click", function(){ alert("Saving!!!"); });        
+        $inputAutoSelectLayer.change( optionAutoSelectLayerToggle );
+
+        $( "body" ).delegate( ".buttonImageSave", "click", function()
+        { 
+            $imageCreatorViewport.trigger( "setMessage", [ {
+                "message" : "I'm sorry... This is just a frontend demo there is no connection with any backend or server."
+            ,   "status"  : "error"
+            ,   "fade"    : false
+            }]);
+        });        
     };
 
     module.getAllLayers = function()
@@ -152,10 +170,10 @@ function( moduleHTML, config )
         return $layerContainer.find( ".active" ).data( "layer" );
     };
 
-    function layerSelect()
+    function layerSelect( event, layerID )
     {
         var $oldLayer    = $layerContainer.find( ".active" )
-        ,   $newLayer    = $( this )
+        ,   $newLayer    = $( layerID ? ( "#objectLayer" + layerID ) : this )
         ,   oldLayerData = $oldLayer.data( "layer" )
         ,   newLayerData = $newLayer.data( "layer" )
         ;
@@ -180,8 +198,6 @@ function( moduleHTML, config )
         // Tell the app what layer is now selected.
         //
         $imageCreatorViewport.trigger( "layerSelect", [ newLayerData ] );
-
-        return false;
     }
 
     function layerUpdate( event, objectLayer )
@@ -211,7 +227,33 @@ function( moduleHTML, config )
                 $layerClone.find( ".objectLayerName" ).text( objectLayer.text );
                 //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );   
             }
-            $layerContainer.prepend( $layerClone );
+
+            if( "background" === objectLayer.imageType )
+            {
+                var foundBackgroundLayer = false;
+
+                $layerContainer.find( ".objectLayer" ).each( function( index, layer )
+                {
+                    var layerData = $( layer ).data( "layer" );
+
+                    if( layerData.imageType === "background" )
+                    {
+                        $( this ).replaceWith( $layerClone );
+                        foundBackgroundLayer = true
+                    }
+                });
+
+                if( ! foundBackgroundLayer )
+                {
+                    $layerContainer.append( $layerClone );
+                }
+
+                $imageCreatorViewport.trigger( "layersRedraw" );
+            }
+            else
+            {
+                $layerContainer.prepend( $layerClone );
+            }
 
             layerSelect.call( $layerClone[0] );
         }
@@ -294,6 +336,22 @@ function( moduleHTML, config )
                 }
             }
         });
+    }
+
+    function optionAutoSelectLayerToggle( event )
+    {
+        config.setOptions(
+        { 
+            toolbar : 
+            {
+                layers : 
+                {
+                    autoSelectLayer : $inputAutoSelectLayer.is( ":checked" )
+                }
+            }
+        });
+
+        $imageCreatorViewport.trigger( "layersRedraw" );
     }
 
     return module;
