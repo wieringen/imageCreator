@@ -56,7 +56,7 @@ function()
 
             if( ! touchEvents )
             { 
-                this.$thumb.mousedown( function( event )
+                this.$thumb.bind( "mousedown.slider", function( event )
                 { 
                     _self.start( event ); 
 
@@ -65,14 +65,14 @@ function()
             }
             else
             {
-                this.$thumb.bind( "touchstart", function( event )
+                this.$thumb.bind( "touchstart.slider", function( event )
                 {
                     var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
 
                     _self.mouse.x = touch.pageX;
                 });
 
-                this.$thumb.bind( "touchmove", function( event )
+                this.$thumb.bind( "touchmove.slider", function( event )
                 {
                     event.preventDefault();
 
@@ -94,21 +94,21 @@ function()
         {
             var _self = this;
 
-            $( document ).mousemove( function( event )
+            $( document ).bind( "mousemove.slider", function( event )
             {
                 _self.drag( event );
 
                 return false;
             });
 
-            $( document ).mouseup( function( event )
+            $( document ).bind( "mouseup.slider", function( event )
             {
                 _self.end( event );
 
                 return false;
             });
 
-            this.$thumb.mouseup( function( event )
+            this.$thumb.bind( "mouseup.slider", function( event )
             {
                 _self.end( event );
 
@@ -120,9 +120,8 @@ function()
         
         end: function()
         {
-            $( document ).unbind( "mousemove", null );
-            $( document ).unbind( "mouseup", null );
-            this.$thumb.unbind( "mouseup", null );
+            $( document ).unbind( ".slider", null );
+            this.$thumb.unbind( "mouseup.slider", null );
 
             return false;
         },

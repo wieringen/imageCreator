@@ -95,11 +95,11 @@ function()
 
                     _self.getColor.call( _self, event );
 
-                    $( document ).mouseup( function( event )
+                    $( document ).bind( "mouseup.colorpicker", function( event )
                     {
                         _self.mouseIsDown = false;
 
-                        $( document ).unbind( 'mouseup' );
+                        $( document ).unbind( ".colorpicker" );
 
                         return false;
                     });

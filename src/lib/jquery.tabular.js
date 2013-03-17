@@ -47,20 +47,25 @@ function()
         {
             var _self = this;
 
-            this.$menu.delegate( this.options.tabs, "tap", function( event )
+            this.$menu.delegate( this.options.tabs, "click", function()
             { 
-                event.preventDefault();
-                
+                return false; 
+            });
+            
+            this.$menu.delegate( this.options.tabs, "tap", function( event )
+            {                 
                 var tabIndex = _self.$tabs.index( this );
 
                 _self.setTab( event, tabIndex );
 
-                return false; 
+                return false;
             });
 
             $( this.element ).bind( "setTab", function( event, index )
             {
                 _self.setTab( event, index );
+
+                return false;
             });
         }
 
@@ -76,6 +81,8 @@ function()
             {
                this.options.callback( $( this.$pages[ index ] ) );
             }
+
+            return false;
         }
 
     };

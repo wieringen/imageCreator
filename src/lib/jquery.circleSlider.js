@@ -46,7 +46,7 @@ function()
 
             if( ! touchEvents )
             { 
-                this.$track.mousedown( function( event )
+                this.$track.bind( "mousedown.circleslider", function( event )
                 { 
                     _self.start( event ); 
 
@@ -55,7 +55,7 @@ function()
             }
             else
             {
-                this.$track.bind( "touchmove", function( event )
+                this.$track.bind( "touchmove.circleslider", function( event )
                 {
                     var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent;
 
@@ -75,21 +75,21 @@ function()
         {
             var _self = this;
 
-            $( document ).mousemove( function( event )
+            $( document ).bind( "mousemove.circleslider", function( event )
             {
                 _self.drag( event );
 
                 return false;
             });
 
-            $( document ).mouseup( function( event )
+            $( document ).bind( "mouseup.circleslider", function( event )
             {
                 _self.end( event );
 
                 return false;
             });
 
-            this.$thumb.mouseup( function( event )
+            this.$thumb.bind( "mouseup.circleslider", function( event )
             {
                 _self.end( event );
 
@@ -99,9 +99,8 @@ function()
         
         end: function()
         {
-            $( document ).unbind( "mousemove", null );
-            $( document ).unbind( "mouseup", null );
-            this.$thumb.unbind( "mouseup", null );
+            $( document ).unbind( ".circleslider", null );
+            this.$thumb.unbind( "mouseup.circleslider", null );
 
             return false;
         },
