@@ -25,7 +25,8 @@ requirejs.config(
     ,   "lazyRequire" : "../lib/require/lazyRequire"
     ,   "text"        : "../lib/require/text"
 
-    ,   "hammer"      : "../lib/hammer"
+    ,   "hammer"      : "../lib/jquery.hammer"
+    ,   "pubsub"      : "../lib/jquery.pubsub"    
     }
 });
 
@@ -35,6 +36,7 @@ require(
 ,   "lazyRequire"
 ,   "utils"
 ,   "selection"
+,   "pubsub"
 ,   "hammer"
 ],
 function( config, lazyRequire, utils, selection )
@@ -70,9 +72,8 @@ function( config, lazyRequire, utils, selection )
 
         // Set viewport events.
         //
-        $imageCreatorViewport.hammer({
-            prevent_default   : true
-        ,   scale_treshold    : 0
+        $( document ).hammer({
+            scale_treshold    : 0
         ,   drag_min_distance : 0
         });
         
@@ -82,14 +83,14 @@ function( config, lazyRequire, utils, selection )
         $imageCreatorViewport.bind( "transformstart", viewportPinchStart );
         $imageCreatorViewport.bind( "transform", viewportPinch );
         $imageCreatorViewport.bind( "transformend", viewportPinchEnd );
-        $imageCreatorViewport.bind( "setMessage", function( events, options ){ setMessage( options ) });
         $imageCreatorMessageClose.bind( "tap", function(){ $imageCreatorMessage.hide(); });
+        $.pubsub( "subscribe", "setMessage", setMessage );
 
         // Create toolbar.
         //
         $.each( config.options.toolbar || [], loadTool );
 
-        $imageCreatorViewport.bind( "loadTool", function( event, toolName, toolOptions )
+        $.pubsub( "subscribe", "loadTool", function( event, toolName, toolOptions )
         { 
             loadTool( toolName, toolOptions );
         });
@@ -101,7 +102,7 @@ function( config, lazyRequire, utils, selection )
             return loadEngine( engineName );
         });
 
-        $imageCreatorViewport.bind( "loadEngine", function( event, engineName )
+        $.pubsub( "subscribe", "loadEngine", function( event, engineName )
         { 
             loadEngine( engineName );
         });
@@ -135,6 +136,7 @@ function( config, lazyRequire, utils, selection )
         if( options.fade )
         {
             clearTimeout( messageTimer );
+
             messageTimer = setTimeout( function()
             {
                 $imageCreatorMessage.hide();
@@ -208,59 +210,60 @@ function( config, lazyRequire, utils, selection )
     {
         event.preventDefault();
 
-        var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent;
-        mouse.x = target.clientX;
-        mouse.y = target.clientY; 
+        mouse.x = event.gesture && event.gesture.deltaX || 0;
+        mouse.y = event.gesture && event.gesture.deltaY || 0;
 
         $( "body" ).addClass( "noSelect" );
+
+        event.gesture && event.gesture.preventDefault();
     }
 
     function viewportDrag( event )
     {
-        event.preventDefault();
-
-        var target = event.originalEvent.touches && event.originalEvent.touches[0] || event.originalEvent
-        ,   delta  = 
+        var delta = 
         {
-            x : target.clientX - mouse.x
-        ,   y : target.clientY - mouse.y
+            x : event.gesture && event.gesture.deltaX - mouse.x
+        ,   y : event.gesture && event.gesture.deltaY - mouse.y
         };
 
-        $imageCreatorViewport.trigger( "viewportMove", delta );
+        // temp fix until my hammer issue gets resolves
+        //
+        delta.x = isNaN(delta.x) ? 0 : delta.x;
+        delta.y = isNaN(delta.y) ? 0 : delta.y;
 
-        mouse.x = target.clientX;
-        mouse.y = target.clientY;
+        $.pubsub( "publish", "viewportMove", delta );
+
+        mouse.x = event.gesture && event.gesture.deltaX || 0;
+        mouse.y = event.gesture && event.gesture.deltaY || 0;  
     }
 
     function viewportDragEnd( event )
     {
-        event.preventDefault();
-
         $( "body" ).removeClass( "noSelect" );
     }
 
     function viewportPinchStart( event )
     {
-        event.preventDefault();
+        event.gesture.preventDefault();
 
-        pinch.scale  = event.scale;
-        pinch.rotate = event.rotation; 
+        pinch.scale  = event.gesture.scale;
+        pinch.rotate = event.gesture.rotation; 
     }
 
     function viewportPinch( event )
     {
-        event.preventDefault();
+        event.gesture.preventDefault();
 
         var delta = 
         {
-            scale  : event.scale    - pinch.scale
-        ,   rotate : event.rotation - pinch.rotate
+            scale  : event.gesture.scale    - pinch.scale
+        ,   rotate : event.gesture.rotation - pinch.rotate
         }
 
-        $imageCreatorViewport.trigger( "viewportPinch", [ delta ] );
+        $.pubsub( "publish", "viewportPinch", delta );
 
-        pinch.scale  = event.scale;
-        pinch.rotate = event.rotation;
+        pinch.scale  = event.gesture.scale;
+        pinch.rotate = event.gesture.rotation;
     }
 
     function viewportPinchEnd( event )

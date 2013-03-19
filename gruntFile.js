@@ -3,7 +3,17 @@ module.exports = function(grunt)
 {
     grunt.initConfig(
     {
-        pkg  : "<json:package.json>"
+        pkg  : grunt.file.readJSON( "package.json" )
+
+    ,   meta : 
+        {
+            banner : 
+            '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' + 
+            '<%= grunt.template.today("yyyy-mm-dd") %>\n ' + 
+            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n *\\n " : "" %>' + 
+            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %> <<%= pkg.author.email %>>;\n' + 
+            ' * Licensed under the <%= _.pluck(pkg.licenses, "type").join(", ") %> license */\n\n'
+        }
         
     //  Remove old build.
     //
@@ -131,7 +141,11 @@ module.exports = function(grunt)
     //
     ,   cssmin : 
         {
-            dist : 
+            options :
+            {
+                banner : "<%= meta.banner %>"
+            }
+        ,   dist : 
             {
                 src  : "dist/css/imageCreator.css"
             ,   dest : "dist/css/imageCreator.css"
@@ -196,7 +210,7 @@ module.exports = function(grunt)
     grunt.loadNpmTasks( "grunt-contrib-concat" );
     grunt.loadNpmTasks( "grunt-css" );    
     grunt.loadNpmTasks( "grunt-contrib-watch" );  
-    //grunt.loadNpmTasks( "grunt-string-replace" ); Damn it no grunt 0.4 support...
+    grunt.loadNpmTasks( "grunt-string-replace" );
 
     //  Define the default build task.
     //

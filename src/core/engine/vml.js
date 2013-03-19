@@ -61,17 +61,17 @@ function( config, layers )
         var vmlSelect = $( "<rvml:rect id='vmlSelect' strokecolor='#666' strokeweight='1px'><rvml:stroke dashstyle='dash'></rvml:stroke></rvml:rect>" )[0];
         $imageCreatorCanvas.html( vmlSelect );
 
-        // Remove other engines that may be listening.
-        //
-        $imageCreatorViewport.unbind( ".engine" );
-
         // Listen to global app events.
         //
-        $imageCreatorViewport.bind( "layerUpdate.engine", vmlLayerCheck );
-        $imageCreatorViewport.bind( "layerSelect.engine", vmlLayerSelect );
-        $imageCreatorViewport.bind( "layerVisibility.engine", vmlLayerVisibility );
-        $imageCreatorViewport.bind( "layerRemove.engine", vmlLayerRemove );
-        $imageCreatorViewport.bind( "layersRedraw.engine", vmlBuildLayers );
+        $.pubsub( "subscribe", "layerUpdate", vmlLayerCheck );
+        $.pubsub( "subscribe", "layerSelect", vmlLayerSelect );
+        $.pubsub( "subscribe", "layerVisibility", vmlLayerVisibility );
+        $.pubsub( "subscribe", "layerRemove", vmlLayerRemove );
+        $.pubsub( "subscribe", "layersRedraw", vmlBuildLayers );
+
+        // Set UI events.
+        //
+        $imageCreatorCanvas.delegate( ".vmlObject", "click", vmlLayerTapSelect );
 
         // Do we have any layers allready?
         //
@@ -80,8 +80,7 @@ function( config, layers )
 
     function vmlBuildLayers()
     {
-        $imageCreatorCanvas.find( "image" ).remove();
-        $imageCreatorCanvas.find( "p" ).remove();
+        $imageCreatorCanvas.find( ".vmlObject" ).remove();
 
         var layersObject = layers && layers.getAllLayers() || {};
 
@@ -96,18 +95,18 @@ function( config, layers )
         //
         if( ! vmlLayerCurrent )
         {
-            vmlLayerCreate( false, layer );
+            vmlLayerCreate( event, layer );
         }
 
         // Update layer properties
         //
-        vmlLayerUpdate( false, layer );
+        vmlLayerUpdate( event, layer );
 
         // Set the selection rectangle around the current layer.
         //
         if( layer.selected )
         {
-            vmlLayerSelect( false, layer );
+            vmlLayerSelect( event, layer );
         }
     }
 
@@ -117,7 +116,7 @@ function( config, layers )
         //
         if( "image" === layer.type )
         {
-            vmlLayerCurrent = document.createElement('rvml:image');
+            vmlLayerCurrent = document.createElement( "img" );
             vmlLayerCurrent.setAttribute( "src", layer.image.src );
 
             vmlLayerCurrent.style.setAttribute( "height", layer.sizeReal.height + "px" );
@@ -136,6 +135,8 @@ function( config, layers )
         // Set attributes.
         //
         vmlLayerCurrent.setAttribute( "id", layer.id + module.name );
+        vmlLayerCurrent.setAttribute( "class", "vmlObject" );
+
         vmlLayerCurrent.style.setAttribute( "zoom", "1" );
         vmlLayerCurrent.style.setAttribute( "position", "absolute" );
 
@@ -147,9 +148,11 @@ function( config, layers )
 
     function vmlLayerUpdate( event, layer )
     {
+        var isPartialUpdate = event.indexOf && event.indexOf( "partial" ) > -1;
+
         // Set type specific attributes.
         // 
-        if( "text" === layer.type )
+        if( "text" === layer.type && ! isPartialUpdate )
         {
             htmlParagraphCurrent = $( vmlLayerCurrent ).find( "p" )[0];
 
@@ -196,10 +199,6 @@ function( config, layers )
 
         //$( vmlLayerCurrent ).css( "msTransform", 'matrix(' + layer.rotation.cos + ',' + layer.rotation.sin + ',' + -layer.rotation.sin + ',' + layer.rotation.cos + ',' + layer.position.x + ',' + layer.position.y + ')' );
         //$( vmlLayerCurrent ).css( "msTransform", 'matrix(' + layer.matrix[ 0 ] + ',' + layer.matrix[ 3 ] + ',' + layer.matrix[ 1 ] + ',' + layer.matrix[ 4 ] + ',' + layer.matrix[ 2 ] + ',' + layer.matrix[ 5 ] + ')' );
-
-        // It is no longer possible to create a VML element outside of the DOM in >= ie8. This hack fixes that.
-        //
-        vmlLayerCurrent.outerHTML = vmlLayerCurrent.outerHTML;
     }
 
     function vmlLayerSelect( event, layer )
@@ -231,7 +230,7 @@ function( config, layers )
 
         // If we have no layer to select or if its hidden hide the selection rectangle as well.
         //
-        if( event.type !== "layerUpdate" )
+        if( event.indexOf && event.indexOf( "layerUpdate" ) === -1 )
         {
             vmlSelect.style.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
         }
@@ -264,6 +263,11 @@ function( config, layers )
         vmlSelect.setAttribute( 'visibility', 'hidden' );
     }
 
+    function vmlLayerTapSelect( event )
+    {
+        $.pubsub( "publish", "layerSelectByID", this.id.replace( module.name, "" ) );
+    }
+
     // http://balzerg.blogspot.co.il/2012/08/analytical-fix-for-ie-rotation-origin.html
     //
     function ieCorrectOrigin( size, radians )
@@ -278,6 +282,7 @@ function( config, layers )
         var sin = Math.sin( -rad )
         ,   cos = Math.cos(  rad )
         ;
+
         return {
             y : ( size.height - size.height * cos + size.width  * sin ) / 2
         ,   x : ( size.width  - size.width  * cos + size.height * sin ) / 2

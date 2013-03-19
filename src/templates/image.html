@@ -2,8 +2,8 @@
     <h2 class="moduleTitle"></h2>
 
     <ul class="moduleMenu">
-        <li><a class="tabActive" href="#">Clips</a></li>
-        <li><a href="#">Backgrounds</a></li>
+        <li><a class="tabActive" href="#">Library</a></li>
+        <li><a href="#">Filters</a></li>
         <li><a href="#">Dimensions</a></li>
     </ul>
 
@@ -12,6 +12,7 @@
         <div class="moduleTab tabActive">
         
             <div class="moduleSub imageDecorations">
+                <h3>Clipart</h3>
                 <ul class="imageDecorationsList">
                     <li><img src="images/decorations/lemons.png" height="40" /></li>
                     <li><img src="images/decorations/gift.png" width="40"  /></li>
@@ -27,14 +28,33 @@
                     <li><img src="images/decorations/bug2.png" width="40"  /></li>
                 </ul>
             </div>
-        </div>
 
-        <div class="moduleTab">
             <div class="moduleSub imageBackgrounds">
+                <h3>Backgrounds</h3>
                 <ul class="imageBackgroundsList">
                     <li><img src="images/backgrounds/island.jpg" width="40"  /></li>
                     <li><img src="images/backgrounds/forest.jpg" width="40"  /></li>
                 </ul>
+            </div>
+
+        </div>
+
+        <div class="moduleTab">
+            <div class="moduleSub imageFilters">
+                <h3>Fillters</h3>
+                <label>
+                    <select class="selectFilter">
+                        <option value="none">None</option>
+                        <option class="selectFilterItem" value=""></option>
+                    </select>
+                </label>
+            </div>
+            <div class="moduleSub imageFilterStrength">
+                <h3>Filter strength</h3>
+                <div class="track">
+                    <div class="thumb"></div>
+                </div>
+                <div class="indicator">100%</div>
             </div>
         </div>
 
