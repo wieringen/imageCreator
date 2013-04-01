@@ -1,4 +1,4 @@
-/*! Hammer.JS - v1.0.4dev - 2013-03-07
+/*! Hammer.JS - v1.0.4 - 2013-03-23
  * http://eightmedia.github.com/hammer.js
  *
  * Copyright (c) 2013 Jorik Tangelder <j.tangelder@gmail.com>;
@@ -471,7 +471,7 @@ Hammer.PointerEvent = {
      */
     updatePointer: function(type, pointerEvent) {
         if(type == Hammer.EVENT_END) {
-            delete this.pointers[pointerEvent.pointerId];
+            this.pointers = {};
         }
         else {
             pointerEvent.identifier = pointerEvent.pointerId;
@@ -517,6 +517,7 @@ Hammer.PointerEvent = {
         this.pointers = {};
     }
 };
+
 
 Hammer.utils = {
     /**
@@ -1464,7 +1465,7 @@ else {
         if(el.has(eventData.target).length) {
             el = $(eventData.target);
         }
-        
+
         return el.trigger({
             type: gesture,
             gesture: eventData

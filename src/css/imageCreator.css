@@ -1,8 +1,9 @@
-@import url( "core-base.css"    );
-@import url( "core-buttons.css" );
+@import url( "base.css"    );
+@import url( "buttons.css" );
 
-@import url( "toolbar-base.css" );
-@import url( "toolbar-text.css" );
-@import url( "toolbar-image.css" );
-@import url( "toolbar-info.css" );
-@import url( "toolbar-layers.css" );
+@import url( "ui.base.css" );
+@import url( "ui.text.css" );
+@import url( "ui.info.css" );
+@import url( "ui.image.css" );
+@import url( "ui.layers.css" );
+@import url( "ui.selection.css" );

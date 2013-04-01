@@ -48,9 +48,9 @@ module.exports = function(grunt)
             {
                 files : 
                 [
-                    { expand: true, cwd: "src", src: "images/**/*", dest: "dist/" }
-                ,   { expand: true, cwd: "src", src: "temp/*",      dest: "dist/" }
-                ,   { expand: true, cwd: "src", src: "index.html",  dest: "dist/" }
+                    { expand: true, cwd: "src", src: "images/**/*", dest: "dist/src" }
+                ,   { expand: true, cwd: "src", src: "temp/*",      dest: "dist/src" }
+                ,   { expand: true, cwd: "src", src: "index.html",  dest: "dist/src" }
                 ]
             }
         }
@@ -81,13 +81,14 @@ module.exports = function(grunt)
                 {
                     include : 
                     [
-                        "toolbar/image"
-                    ,   "toolbar/text"
-                    ,   "toolbar/layers"
-                    ,   "toolbar/info"
-                    ,   "engine/svg"
-                    ,   "engine/canvas"
-                    ,   "engine/vml"
+                        "ui.image"
+                    ,   "ui.text"
+                    ,   "ui.info"
+                    ,   "ui.layers"
+                    ,   "ui.selection"
+                    ,   "engine.svg"
+                    ,   "engine.canvas"
+                    ,   "engine.vml"
                     ]
                 ,   paths : 
                     {
@@ -95,12 +96,11 @@ module.exports = function(grunt)
                     ,   "plugins"     : "../lib"
                     ,   "templates"   : "../templates"
                     ,   "text"        : "../lib/require/text"
-                    ,   "hammer"      : "../lib/hammer"
                     }
                 ,   replaceRequireScript : 
                     [
                         {
-                            files      : [ "dist/index.html" ]
+                            files      : [ "dist/src/index.html" ]
                         ,   module     : "main"
                         ,   modulePath : "jquery.imageCreator"
                         }
@@ -108,7 +108,7 @@ module.exports = function(grunt)
 
                 ,   name    : "main"
                 ,   baseUrl : "src/core"
-                ,   out     : "dist/jquery.imageCreator.js"
+                ,   out     : "dist/src/jquery.imageCreator.js"
                 ,   wrap    : true
                 ,   almond  : true
                 }
@@ -123,16 +123,17 @@ module.exports = function(grunt)
             {
                 src : 
                 [
-                    "src/css/core-base.css"
-                ,   "src/css/core-buttons.css"
-                ,   "src/css/toolbar-base.css"
-                ,   "src/css/toolbar-image.css"
-                ,   "src/css/toolbar-text.css"
-                ,   "src/css/toolbar-info.css"
-                ,   "src/css/toolbar-layers.css"
+                    "src/css/base.css"
+                ,   "src/css/buttons.css"
+                ,   "src/css/ui.base.css"
+                ,   "src/css/ui.image.css"
+                ,   "src/css/ui.text.css"
+                ,   "src/css/ui.info.css"
+                ,   "src/css/ui.layers.css"
+                ,   "src/css/ui.selection.css"
                 ]
 
-            ,   dest : "dist/css/imageCreator.css"
+            ,   dest : "dist/src/css/imageCreator.css"
             }
         }
 
@@ -147,8 +148,8 @@ module.exports = function(grunt)
             }
         ,   dist : 
             {
-                src  : "dist/css/imageCreator.css"
-            ,   dest : "dist/css/imageCreator.css"
+                src  : "dist/src/css/imageCreator.css"
+            ,   dest : "dist/src/css/imageCreator.css"
             }
         }
 
@@ -160,7 +161,7 @@ module.exports = function(grunt)
             {
                 files : 
                 {
-                    "dist/imageCreator.css" : "dist/imageCreator.css"
+                    "dist/src/imageCreator.css" : "dist/src/imageCreator.css"
                 }
 
             ,   options : 
@@ -173,6 +174,23 @@ module.exports = function(grunt)
                         }
                     ]
                 }
+            }
+        }
+    
+    // Make a zipfile.
+    //
+    ,   compress : 
+        {
+            dist : 
+            {
+                options : 
+                {
+                    archive: "dist/<%= pkg.name %>-<%= pkg.version %>.zip"
+                }
+            ,   expand  : true
+            ,   cwd     : "dist/src"
+            ,   src     : ["**/*"]
+            ,   dest    : "."
             }
         }
     
@@ -202,19 +220,20 @@ module.exports = function(grunt)
 
     //  Load all the task modules we need.
     //
+    grunt.loadNpmTasks( "grunt-css" );
+    grunt.loadNpmTasks( "grunt-jsdoc" );    
+    grunt.loadNpmTasks( "grunt-requirejs" ); 
+    grunt.loadNpmTasks( "grunt-contrib-copy" );       
     grunt.loadNpmTasks( "grunt-contrib-clean" );
-    grunt.loadNpmTasks( "grunt-contrib-jsdoc" );
-    grunt.loadNpmTasks( "grunt-contrib-copy" );
+    grunt.loadNpmTasks( "grunt-contrib-watch" );
     grunt.loadNpmTasks( "grunt-contrib-jshint" );    
-    grunt.loadNpmTasks( "grunt-requirejs" );
-    grunt.loadNpmTasks( "grunt-contrib-concat" );
-    grunt.loadNpmTasks( "grunt-css" );    
-    grunt.loadNpmTasks( "grunt-contrib-watch" );  
+    grunt.loadNpmTasks( "grunt-contrib-concat" );  
     grunt.loadNpmTasks( "grunt-string-replace" );
+    grunt.loadNpmTasks( "grunt-contrib-compress" );  
 
     //  Define the default build task.
     //
-    grunt.registerTask( "default", [ "clean:dist", "copy:dist", "concat:dist", "cssmin:dist", "requirejs:dist" ] );
+    grunt.registerTask( "default", [ "clean:dist", "copy:dist", "concat:dist", "cssmin:dist", "requirejs:dist", "compress:dist" ] );
 
     //  Check yourself before you wreck yourself.
     //

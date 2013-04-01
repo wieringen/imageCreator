@@ -17,8 +17,9 @@
         .imageCreatorTool { margin: 0 0 20px; }
         </style>
 
-        <script type="text/javascript" src="lib/jquery.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script type="text/javascript" src="lib/require/require.js" data-main="core/main"></script>
+
     </head>
     <body>
 
@@ -28,8 +29,12 @@
         </div>
 
         <div class="imageCreatorViewport">
+            
             <div class="imageCreatorCanvas"></div>
+     
             <div class="imageCreatorSelection"></div>
+            <textarea class="imageCreatorSelectionTextEdit" wrap="soft" spellcheck="false"></textarea>
+
             <div class="imageCreatorMessage">
                 <div class="imageCreatorMessageInner"></div>
                 <div class="imageCreatorMessageClose">X</div>

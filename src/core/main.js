@@ -16,107 +16,73 @@ requirejs.config(
         // App paths
         //
         "plugins"     : "../lib"
-    ,   "engine"      : "engine"
-    ,   "toolbar"     : "toolbar"
     ,   "templates"   : "../templates"
 
         // Require plugins
         //
     ,   "lazyRequire" : "../lib/require/lazyRequire"
     ,   "text"        : "../lib/require/text"
-
-    ,   "hammer"      : "../lib/jquery.hammer"
-    ,   "pubsub"      : "../lib/jquery.pubsub"    
     }
 });
 
 require(
 [
     "config"
-,   "lazyRequire"
-,   "utils"
-,   "selection"
-,   "pubsub"
-,   "hammer"
-],
-function( config, lazyRequire, utils, selection )
-{   
-    var mouse   = {}
-    ,   pinch   = 
-        { 
-            scale  : 1
-        ,   rotate : 0
-        }
-    ,   toolbar = {}
+,   "cache"
 
-    ,   $imageCreatorViewport
-    ,   $imageCreatorIntro
-    ,   $imageCreatorMessage
-    ,   $imageCreatorMessageInner
-    ,   $imageCreatorMessageClose
-    ;
+,   "lazyRequire"
+
+,   "plugins/jquery.pubsub"
+,   "plugins/jquery.hammer"
+],
+function( config, cache, lazyRequire )
+{
+    var toolbar = {};
 
     $( document ).ready( function()
-    {
-        // Get basic app DOM elements.
+    {        
+        // Initialize config.
         //
-        $imageCreatorViewport      = $( ".imageCreatorViewport" );
-        $imageCreatorIntro         = $( ".imageCreatorIntro" );
-        $imageCreatorMessage       = $( ".imageCreatorMessage" );
-        $imageCreatorMessageInner  = $( ".imageCreatorMessageInner" );
-        $imageCreatorMessageClose  = $( ".imageCreatorMessageClose" );
+        config.initialize();
 
-        // Setup the layer resizer/rotater selection.
+        // Initialize cache.
         //
-        selection.initialize();
+        cache.initialize();
 
-        // Set viewport events.
+        // Listen for global app events.
         //
-        $( document ).hammer({
-            scale_treshold    : 0
-        ,   drag_min_distance : 0
-        });
-        
-        $imageCreatorViewport.bind( "dragstart", viewportDragStart );
-        $imageCreatorViewport.bind( "drag", viewportDrag );
-        $imageCreatorViewport.bind( "dragend", viewportDragEnd );
-        $imageCreatorViewport.bind( "transformstart", viewportPinchStart );
-        $imageCreatorViewport.bind( "transform", viewportPinch );
-        $imageCreatorViewport.bind( "transformend", viewportPinchEnd );
-        $imageCreatorMessageClose.bind( "tap", function(){ $imageCreatorMessage.hide(); });
-        $.pubsub( "subscribe", "setMessage", setMessage );
+        $.subscribe( "setMessage", setMessage );
+        $.subscribe( "loadTool", loadTool );
+        $.subscribe( "loadEngine", loadEngine );
 
-        // Create toolbar.
+        // Create UI.
         //
-        $.each( config.options.toolbar || [], loadTool );
-
-        $.pubsub( "subscribe", "loadTool", function( event, toolName, toolOptions )
-        { 
-            loadTool( toolName, toolOptions );
+        $.each( config.options.ui || [], function( toolName, toolOptions )
+        {
+            loadTool( false, toolName, toolOptions ) 
         });
 
         // Load engine.
         //
-        $.each( config.options.engineOrder || [], function( engineIndex, engineName )
+        $.each( config.options.engines.order || [], function( engineIndex, engineName )
         {
-            return loadEngine( engineName );
+            return loadEngine( false, engineName );
         });
 
-        $.pubsub( "subscribe", "loadEngine", function( event, engineName )
+        // Setup notifications events.
+        //
+        $( ".imageCreatorMessageClose" ).bind( "tap", function()
         { 
-            loadEngine( engineName );
-        });
-
-        $imageCreatorViewport.bind( "layerSelect layerVisibility", function( event, layer )
-        {
-            $imageCreatorIntro.toggle( layer === false || ( !layer.visible && layer.selected ) );   
+            $imageCreatorMessage.hide(); 
         });
 
     } );
 
     function setMessage( options )
     {
-        var defaults = 
+        var $imageCreatorMessage      = $( ".imageCreatorMessage" )
+        ,   $imageCreatorMessageInner = $( ".imageCreatorMessageInner" )
+        ,   defaults = 
             {
                 "message"   : ""
             ,   "status"    : ""
@@ -146,11 +112,11 @@ function( config, lazyRequire, utils, selection )
         }
     }
 
-    function loadEngine( engineNane )
+    function loadEngine( event, engineNane )
     {
-        var engineObject = config.options.engines[ engineNane ];
+        var engineObject = config.options.engines.types[ engineNane ];
 
-        if( "function" === typeof engineObject.support && engineObject.support() )
+        if( engineObject.support && engineObject.support() )
         {
             setMessage( {
                 "message" : "Loading " + engineNane + " engine..."
@@ -162,7 +128,7 @@ function( config, lazyRequire, utils, selection )
 
             requireOnce(
                 [
-                    "engine/" + engineNane
+                    "engine." + engineNane
                 ]
             ,   function( engine )
                 {
@@ -178,9 +144,9 @@ function( config, lazyRequire, utils, selection )
         }
     }
 
-    function loadTool( toolName, toolOptions )
+    function loadTool( event, toolName, toolOptions )
     {
-        if( config.options.toolbar[ toolName ] )
+        if( config.options.ui[ toolName ] )
         {
             setMessage( {
                 "message" : "Loading " + toolName + " tool..."
@@ -192,82 +158,18 @@ function( config, lazyRequire, utils, selection )
 
             requireOnce(
                 [
-                    "toolbar/" + toolName
+                    "ui." + toolName
                 ]
             ,   function( tool )
                 {
                     toolbar[ toolName ] = tool;
                 }
             ,   function( tool )
-                {   
+                {
                     toolbar[ toolName ].initialize();
                 }
             );
         }
     }
 
-    function viewportDragStart( event )
-    {
-        event.preventDefault();
-
-        mouse.x = event.gesture && event.gesture.deltaX || 0;
-        mouse.y = event.gesture && event.gesture.deltaY || 0;
-
-        $( "body" ).addClass( "noSelect" );
-
-        event.gesture && event.gesture.preventDefault();
-    }
-
-    function viewportDrag( event )
-    {
-        var delta = 
-        {
-            x : event.gesture && event.gesture.deltaX - mouse.x
-        ,   y : event.gesture && event.gesture.deltaY - mouse.y
-        };
-
-        // temp fix until my hammer issue gets resolves
-        //
-        delta.x = isNaN(delta.x) ? 0 : delta.x;
-        delta.y = isNaN(delta.y) ? 0 : delta.y;
-
-        $.pubsub( "publish", "viewportMove", delta );
-
-        mouse.x = event.gesture && event.gesture.deltaX || 0;
-        mouse.y = event.gesture && event.gesture.deltaY || 0;  
-    }
-
-    function viewportDragEnd( event )
-    {
-        $( "body" ).removeClass( "noSelect" );
-    }
-
-    function viewportPinchStart( event )
-    {
-        event.gesture.preventDefault();
-
-        pinch.scale  = event.gesture.scale;
-        pinch.rotate = event.gesture.rotation; 
-    }
-
-    function viewportPinch( event )
-    {
-        event.gesture.preventDefault();
-
-        var delta = 
-        {
-            scale  : event.gesture.scale    - pinch.scale
-        ,   rotate : event.gesture.rotation - pinch.rotate
-        }
-
-        $.pubsub( "publish", "viewportPinch", delta );
-
-        pinch.scale  = event.gesture.scale;
-        pinch.rotate = event.gesture.rotation;
-    }
-
-    function viewportPinchEnd( event )
-    {
-
-    }
 } );

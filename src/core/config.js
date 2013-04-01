@@ -9,112 +9,145 @@ define(
 [
     // App core modules.
     //
-    "utils"
+    "util.detect"
 ],
-function( utils )
+function( utilDetect )
 {
     var module =
     {
-        options : 
+        defaults : 
         {
-            viewportWidth  : 500
-        ,   viewportHeight : 625
-        
+
+            viewport : 
+            {
+                width  : 500
+            ,   height : 625
+            ,   constrainLayers : true
+            }
+
+        // Render engines
+        //
         ,   engines :  
             {
-                svg : 
+                order : [ "svg", "canvas", "vml" ]
+            ,   types : 
                 {
-                    name    : "svg"
-                ,   support : utils.testForSVG
-                }
+                    svg : 
+                    {
+                        name    : "svg"
+                    ,   support : utilDetect.hasSVG
+                    }
 
-            ,   vml : 
-                {
-                    name    : "vml"
-                ,   support : utils.testForVML
-                }
+                ,   vml : 
+                    {
+                        name    : "vml"
+                    ,   support : utilDetect.hasVML
+                    }
 
-            ,   canvas :
-                {
-                    name    : "canvas"
-                ,   support : utils.testForCanvas
+                ,   canvas :
+                    {
+                        name    : "canvas"
+                    ,   support : utilDetect.hasCanvas
+                    }
                 }    
             }
 
-        ,   engineOrder : [ "svg", "canvas", "vml" ]
+        // Filters
+        //
+        ,   filters: 
+            {
+                color : 
+                {
+                    sepia : 
+                    {
+                        name : "Sepia"
+                    ,   strength : 0.5
+                    ,   matrix : 
+                        [
+                        0.393, 0.769, 0.189, 0, 0,
+                        0.349, 0.686, 0.168, 0, 0,
+                        0.272, 0.534, 0.131, 0, 0,
+                        0,     0,     0,     1, 0
+                        ]
+                    }
+                ,   inversed : 
+                    {
+                        name   : "Inversed"
+                    ,   strength : 1
+                    ,   locked : true
+                    ,   matrix : 
+                        [
+                        -1,  0,  0, 0, 1,
+                         0, -1,  0, 0, 1,
+                         0,  0, -1, 0, 1,
+                         0,  0,  0, 1, 0
+                        ]
+                    }
+                }
+            }
 
-        ,   toolbar : 
+        // layers settings
+        //
+        ,   layers :
+            {
+                text : 
+                {
+                    lineHeight : 1.25
+                ,   fontSize   : 14
+                ,   font       : "Arial" 
+                }
+            ,   image :
+                {
+
+                }
+            }
+
+        // User interface
+        //
+        ,   ui : 
             { 
                 info : 
                 {
-                    title           : "Info"
-                ,   target          : ".imageCreatorToolInfo"
+                    title  : "Info"
+                ,   target : ".imageCreatorToolInfo"
                 }
 
             ,   layers : 
                 {
-                    title            : "Layers"
-                ,   constrainLayers  : true
-                ,   autoSelectLayer  : false
-                ,   showMenu         : true
-                ,   buttonLayersSave : 
-                    {
-                        text : "Save image"
-                    }
-                ,   target           : ".imageCreatorToolLayers"
+                    title  : "Layers"
+                ,   target : ".imageCreatorToolLayers"
                 }
 
             ,   image : 
                 {
-                    title          : "Image"
-                ,   imageDownScale : 300
-                ,   imageZoomScale : [ 30, 300 ]
-                ,   target         : ".imageCreatorToolImage"
-                ,   filters        : 
-                    {
-                        sepia : 
-                        {
-                            name : "Sepia"
-                        ,   type : "color"    
-                        ,   strength : 0.5
-                        ,   matrix : 
-                            [
-                            0.393, 0.769, 0.189, 0, 0,
-                            0.349, 0.686, 0.168, 0, 0,
-                            0.272, 0.534, 0.131, 0, 0,
-                            0,     0,     0,     1, 0
-                            ]
-                        }
-                    ,   inversed : 
-                        {
-                            name   : "Inversed"
-                        ,   type   : "color"
-                        ,   strength : 1
-                        ,   strengthLocked : true
-                        ,   matrix : 
-                            [
-                            -1,  0,  0, 0, 1,
-                             0, -1,  0, 0, 1,
-                             0,  0, -1, 0, 1,
-                             0,  0,  0, 1, 0
-                            ]
-                        }
-                    }
+                    title     : "Image"
+                ,   target    : ".imageCreatorToolImage"
+                ,   downScale : 300
+                ,   zoomScale : [ 30, 300 ]
                 }
 
             ,   text : 
                 {
-                    title          : "Text"
-                ,   textSizeScale  : [ 10, 99 ]
-                ,   textLineHeight : 1.2
-                ,   font           : "Arial" 
-                ,   googleFonts    : [ ]
-                ,   target         : ".imageCreatorToolText"                
+                    title     : "Text"
+                ,   target    : ".imageCreatorToolText"
+                ,   sizeScale : [ 10, 99 ]
+                }
+
+            ,   selection : 
+                {
+                    offset : 2
+                ,   grips  : [ "N", "NE", "E", "SE", "S", "SW", "W", "NW" ]
                 }
             }
         }
 
-    ,   engine : {}
+    ,   options : {}
+    ,   engine  : {}
+    };
+
+    module.initialize = function()
+    {
+        module.options = $.extend( true, {}, module.defaults, window.imageCreatorSettings || {} );
     };
 
     module.setOptions = function( options )
@@ -126,11 +159,6 @@ function( utils )
     {
         module.engine = engineName || "";
     };
-
-    if( "object" === typeof imageCreatorSettings )
-    {
-        module.setOptions( imageCreatorSettings );
-    }
 
     return module;
 });

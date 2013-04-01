@@ -1,6 +1,6 @@
 {
   "name": "imageCreator",
-  "version": "0.5.0",
+  "version": "3.4.0",
   "description": "A image creation tool.",
   "homepage": "http://www.baijs.com/imageCreator",
   "author": {
@@ -20,6 +20,8 @@
     "grunt-contrib-concat": "~0.1.2rc6",
     "grunt-contrib-watch": "~0.2.0rc7",
     "grunt-jsdoc": "~0.2.3",
-    "grunt-contrib-clean": "~0.4.0rc6"
+    "grunt-contrib-clean": "~0.4.0rc6",
+    "grunt-contrib-compress": "~0.4.6",
+    "grunt-string-replace": "~0.2.3"
   }
 }
