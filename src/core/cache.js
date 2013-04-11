@@ -47,7 +47,7 @@ function( config, modelText, modelImage, utilMisc )
 
         if( layersStored )
         {
-            layersStored = JSON.parse( layersStored );
+            layersStored = $.parseJSON( layersStored );
 
             for( var layerIndex = layersStored.length; layerIndex--; )
             {
