@@ -56,9 +56,9 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
             this.setOptions(options);
         }
 
-    ,   toObject: function()
+    ,   toObject: function( propertiesToInclude )
         {
-            return this.callSuper( "toObject",
+            return $.extend( this.callSuper( "toObject", propertiesToInclude ),
             {
                 type            : this.type
             ,   text            : this.text
