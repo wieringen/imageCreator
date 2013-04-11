@@ -51,6 +51,10 @@ function( config, cache, lazyRequire )
         $.subscribe( "loadTool", loadTool );
         $.subscribe( "loadEngine", loadEngine );
 
+        // Save state of canvas when we leave this page.
+        //
+        $( window ).unload( cache.storeLayers );
+
         // Create UI.
         //
         $.each( config.options.ui || [], function( toolName, toolOptions )
