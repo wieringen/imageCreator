@@ -75,9 +75,7 @@ function( config, utilMath, utilClass, utilMisc )
                 id              : this.id
             ,   name            : this.name
 
-            ,   visible         : this.visible
             ,   locked          : this.locked
-            ,   selected        : this.selected
 
             ,   sizeCurrent     : this.sizeCurrent
             ,   position        : this.position
