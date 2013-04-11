@@ -27,20 +27,20 @@ function()
     {
         return radians * 180 / Math.PI;
     };
-    
+
     module.getBoundingBox = function( sizeUnrotated, rotation )
     {
         var sin = Math.abs( rotation.sin )
         ,   cos = Math.abs( rotation.cos )
         ;
-        
-        return { 
+
+        return {
             width  : sizeUnrotated.height * sin + sizeUnrotated.width * cos
         ,   height : sizeUnrotated.height * cos + sizeUnrotated.width * sin
         };
     };
 
-    module.getMatrix = function( rotation, scale, position, sizeReal ) 
+    module.getMatrix = function( rotation, scale, position, sizeReal )
     {
         var sin = scale * rotation.sin
         ,   cos = scale * rotation.cos
@@ -53,7 +53,7 @@ function()
                 0, 1, scale * ( sizeReal.height / 2 ),
                 0, 0, 1
             ]
-        
+
         // Scale, rotate and translate to the layers position.
         //
         ,   matrix =
@@ -62,7 +62,7 @@ function()
                 sin,  cos, position.y,
                 0,    0,   1
             ]
-        
+
         // Translate origin back to top left of layer.
         //
          ,  matrixPost =
@@ -76,7 +76,7 @@ function()
         return module.matrixMultiply( matrixPre, module.matrixMultiply( matrix, matrixPost ) );
     };
 
-    module.matrixMultiply = function( a, b ) 
+    module.matrixMultiply = function( a, b )
     {
         // Cache matrix values.
         //
@@ -110,15 +110,15 @@ function()
         var x = pos2.x - pos1.x
         ,   y = pos2.y - pos1.y
         ;
-        
+
         return Math.sqrt((x * x) + (y * y));
     };
-    
+
     module.getRandomInt = function( min, max )
     {
       return Math.floor( Math.random() * (max - min + 1) ) + min;
     };
-  
+
     module.isPointInPath = function( mouse, size, position, radians )
     {
         var dx    = mouse.x - ( position.x + ( size.width / 2 ) )

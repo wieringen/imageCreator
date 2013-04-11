@@ -12,18 +12,18 @@ function()
 {
     var module = {};
 
-    module.populateWithProperties = function(source, destination, properties) 
+    module.populateWithProperties = function(source, destination, properties)
     {
-        if(properties && Object.prototype.toString.call(properties) === '[object Array]') 
+        if(properties && Object.prototype.toString.call(properties) === '[object Array]')
         {
-            for (var i = 0, len = properties.length; i < len; i++) 
+            for (var i = 0, len = properties.length; i < len; i++)
             {
                 destination[properties[i]] = source[properties[i]];
             }
         }
     }
 
-    module.measureText = function( object ) 
+    module.measureText = function( object )
     {
         var measureDiv = document.createElement( "measureDiv" );
         measureDiv.className = "imageCreatorMeasureText"
@@ -37,9 +37,9 @@ function()
         if( window.attachEvent && !window.addEventListener )
         {
             measureDiv.innerText = object.text;
-        }   
+        }
         else
-        { 
+        {
             $( measureDiv ).text( object.text );
         }
 
@@ -50,6 +50,6 @@ function()
 
         return textWidth;
     };
-  
+
     return module;
 });

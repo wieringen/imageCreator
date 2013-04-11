@@ -18,16 +18,16 @@ function()
 
     var IS_DONTENUM_BUGGY = (function()
     {
-        for (var p in { toString: 1 }) 
+        for (var p in { toString: 1 })
         {
             if (p === 'toString') return false;
         }
         return true;
     })();
 
-    var addMethods = function(base, source, parent) 
+    var addMethods = function(base, source, parent)
     {
-        for (var property in source) 
+        for (var property in source)
         {
 
         if (property in base.prototype &&
@@ -110,7 +110,7 @@ function()
     base.prototype.callSuper = callSuper;
     return base;
   }
- 
-  
+
+
     return module;
 });

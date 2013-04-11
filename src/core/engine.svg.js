@@ -22,7 +22,7 @@ function( config, cache )
         }
 
     ,   $imageCreatorViewport
-    ,   $imageCreatorCanvas 
+    ,   $imageCreatorCanvas
     ,   svgContainer
 
     ,   svgSelect
@@ -86,7 +86,7 @@ function( config, cache )
 
         var svgFilterMatrix    = document.createElementNS( "http://www.w3.org/2000/svg", "feColorMatrix" );
         var svgFilterComposite = document.createElementNS( "http://www.w3.org/2000/svg", "feComposite" );
-        
+
         svgFilterComposite.setAttribute( "in2", "SourceGraphic" );
         svgFilterComposite.setAttribute( "operator", "arithmetic" );
         svgFilterComposite.setAttribute( "k2", 0 );
@@ -154,16 +154,16 @@ function( config, cache )
 
             svgLayerFilter = $( module.snippets.svgFilter ).clone();
             svgLayerFilter.attr( "id", layer.id + "filter" );
-            
+
             svgLayerFilterColorMatrix = svgLayerFilter.find( "feColorMatrix" )[0];
-            svgLayerFilterColorMatrix.setAttribute( "result", layer.id + "result"  );  
-            
+            svgLayerFilterColorMatrix.setAttribute( "result", layer.id + "result"  );
+
             svgLayerFilterComposite = svgLayerFilter.find( "feComposite" )[0];
             svgLayerFilterComposite.setAttribute( "in", layer.id + "result" );
 
             svgDefs.appendChild( svgLayerFilter[0] );
-            
-            svgLayerCurrent.setAttribute( "width", layer.sizeReal.width );  
+
+            svgLayerCurrent.setAttribute( "width", layer.sizeReal.width );
             svgLayerCurrent.setAttribute( "height", layer.sizeReal.height );
         }
 
@@ -173,11 +173,11 @@ function( config, cache )
         }
 
         svgLayerCurrent.setAttribute( "id", layer.id + module.name );
-        
+
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //
         svgContainer.appendChild( svgLayerCurrent );
-        svgContainer.appendChild( svgSelect );  
+        svgContainer.appendChild( svgSelect );
     }
 
     function svgLayerUpdate( event, layer, partial )
@@ -188,7 +188,7 @@ function( config, cache )
         ;
 
         // Set type specific attributes.
-        // 
+        //
         if( "text" === layer.type && ! partial )
         {
             $( svgLayerCurrent ).find( "tspan" ).remove();
@@ -210,12 +210,12 @@ function( config, cache )
                 tspannode.setAttribute( "dx", 0 );
                 tspannode.setAttribute( "dy", index * Math.floor( layer.fontSize * layer.lineHeight )  + "px" );
 
-                tspannode.textContent = line;                     
+                tspannode.textContent = line;
                 svgLayerCurrent.appendChild(tspannode);
             });
 
             $( svgLayerCurrent ).css(
-            {   
+            {
                 fill       : layer.color
             ,   fontSize   : layer.fontSize
             ,   fontFamily : layer.font
@@ -231,7 +231,7 @@ function( config, cache )
             if( layer.filter.matrix )
             {
                 svgLayerFilterColorMatrix.setAttribute( "values", layer.filter.matrix.join(" ") );
-                
+
                 svgLayerFilterComposite = $( "#" + layer.id + "filter" ).find( "feComposite" )[0];
                 svgLayerFilterComposite.setAttribute( "k2", layer.filter.strength );
                 svgLayerFilterComposite.setAttribute( "k3", 1 - layer.filter.strength );
@@ -281,7 +281,7 @@ function( config, cache )
             if( "image" === layer.type )
             {
                 svgSelect.setAttribute( "height", layer.sizeReal.height );
-                svgSelect.setAttribute( "width", layer.sizeReal.width ); 
+                svgSelect.setAttribute( "width", layer.sizeReal.width );
             }
         }
     }

@@ -15,7 +15,7 @@ define(
 ],
 function( config, cache )
 {
-    var module = 
+    var module =
         {
             name : "vml"
         }
@@ -45,7 +45,7 @@ function( config, cache )
 
         // Initialize VML.
         //
-        document.createStyleSheet().cssText = 'rvml\\:* { behavior:url(#default#VML); }';                              
+        document.createStyleSheet().cssText = 'rvml\\:* { behavior:url(#default#VML); }';
 
         if( "object" === typeof document.namespaces )
         {
@@ -118,8 +118,8 @@ function( config, cache )
         if( "text" === layer.type )
         {
             vmlLayerCurrent = document.createElement( "div" );
-            vmlLayerCurrent.style.setAttribute( 'width', layer.sizeCurrent.width + "px" );  
-            
+            vmlLayerCurrent.style.setAttribute( 'width', layer.sizeCurrent.width + "px" );
+
             vmlLayerCurrent.appendChild( document.createElement( "p" ) );
         }
 
@@ -130,7 +130,7 @@ function( config, cache )
         vmlLayerCurrent.style.setAttribute( "position", "absolute" );
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
-        //   
+        //
         $imageCreatorCanvas.append( vmlSelect );
         $imageCreatorCanvas.append( vmlLayerCurrent );
     }
@@ -140,14 +140,14 @@ function( config, cache )
         var vmlLayerCurrent = $( "#" + layer.id + module.name )[0];
 
         // Set type specific attributes.
-        // 
+        //
         if( "text" === layer.type && ! partial )
         {
             var htmlParagraphCurrent = $( vmlLayerCurrent ).find( "p" )[0];
 
 
             htmlParagraphCurrent.innerText        = layer.text;
-            htmlParagraphCurrent.style.color      = layer.color; 
+            htmlParagraphCurrent.style.color      = layer.color;
             htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";
             htmlParagraphCurrent.style.fontFamily = layer.font;
             htmlParagraphCurrent.style.fontWeight = layer.weight ? "bold" : "normal";
@@ -157,7 +157,7 @@ function( config, cache )
             vmlLayerCurrent.style.setAttribute( 'height', layer.sizeCurrent.height + "px" );
             vmlLayerCurrent.style.setAttribute( 'width', layer.sizeCurrent.width + "px" );
         }
- 
+
         // MS Filters suck.. So lets use them only if we really have too.
         //
         if( layer.type !== "text" || layer.rotation.degrees > 0 && layer.rotation.degrees < 360)
@@ -166,7 +166,7 @@ function( config, cache )
         }
         else
         {
-            vmlLayerCurrent.style.removeAttribute( "filter" ); 
+            vmlLayerCurrent.style.removeAttribute( "filter" );
         }
 
         // Since we unfortunately do not have the possibility to use translate with sizing method 'auto expand', we need to do
@@ -184,7 +184,7 @@ function( config, cache )
         //
         if( layer && layer.selected )
         {
-            vmlSelect.style.setAttribute( "rotation", layer.rotation.degrees ); 
+            vmlSelect.style.setAttribute( "rotation", layer.rotation.degrees );
             vmlSelect.style.setAttribute( "height", ( layer.sizeCurrent.height + 1 ) + "px" );
             vmlSelect.style.setAttribute( "width",  ( layer.sizeCurrent.width  + 1 )+ "px" );
             vmlSelect.style.setAttribute( "position", "absolute" );
@@ -193,7 +193,7 @@ function( config, cache )
 
             // It is no longer possible to create/append a VML element outside of the DOM in >= ie8. This hack fixes that.
             //
-            if( document.all && document.querySelector ) 
+            if( document.all && document.querySelector )
             {
                 vmlSelect.outerHTML = vmlSelect.outerHTML;
             }
@@ -233,7 +233,7 @@ function( config, cache )
     function ieCorrectOrigin( size, radians )
     {
         var rad = radians %= Math.PI;
-    
+
         if( rad > Math.PI / 2 )
         {
             rad = Math.PI - rad;
