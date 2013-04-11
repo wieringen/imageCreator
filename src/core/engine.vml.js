@@ -207,13 +207,13 @@ function( config, cache )
         //
         if( event.type !== "layerUpdate" )
         {
-            vmlSelect.style.setAttribute( 'visibility', layer.visible ? 'visible' : 'hidden' );
+            vmlSelect.style.setAttribute( "visibility", layer.visible && layer.selected ? "visible" : "hidden" );
         }
     }
 
     function vmlLayerVisibility( event, layer )
     {
-        $( "#" + layer.id + module.name ).css( 'visibility', layer.visible ? 'visible' : 'hidden' );
+        $( "#" + layer.id + module.name ).css( "visibility", layer.visible ? "visible" : "hidden" );
 
         // We only want to hide the selection layer if its around the currently selected layer.
         //
