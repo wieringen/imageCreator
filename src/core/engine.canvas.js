@@ -12,10 +12,11 @@ define(
     //
     "config"
 ,   "cache"
+,   "util.math"
 ],
-function( config, cache )
+function( config, cache, utilMath )
 {
-    var module = 
+    var module =
         {
             name : "canvas"
         }
@@ -33,10 +34,10 @@ function( config, cache )
     module.initialize = function()
     {
         // Get basic app DOM elements.
-        //        
+        //
         $imageCreatorViewport = $( ".imageCreatorViewport" );
         $imageCreatorCanvas   = $( ".imageCreatorCanvas" );
-        
+
         // Set the viewport's dimensions.
         //
         canvasWidth  = config.options.viewport.width;
@@ -49,7 +50,7 @@ function( config, cache )
         canvas  = document.createElement( "canvas" );;
         context = canvas.getContext( "2d" );
         canvas.setAttribute( "width", canvasWidth );
-        canvas.setAttribute( "height", canvasHeight );    
+        canvas.setAttribute( "height", canvasHeight );
         $imageCreatorCanvas.html( canvas );
 
         // Remove other engines that may be listening.
@@ -135,27 +136,27 @@ function( config, cache )
     function canvasLayerSelect( event, layer )
     {
         context.save();
-        
+
         context.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
-        context.strokeStyle = "#666";
+        context.strokeStyle = "#000000";
 
         // We want a dashed line for our stroke. Too bad that not all browsers support this.
         //
         if( context.setLineDash )
-        {    
+        {
            context.setLineDash( [ 5 / layer.scale ] );
         }
 
         // The stroke must stay consistent in size so we need to cancel out the scaling effect.
         //
-        context.lineWidth = 2 / layer.scale;
+        context.lineWidth = 1 / layer.scale;
 
-        context.strokeRect( 0, 0, ( layer.sizeReal ? layer.sizeReal.width : layer.sizeCurrent.width ), ( layer.sizeReal ? layer.sizeReal.height : layer.sizeCurrent.height ) ); 
-        
+        context.strokeRect( 0, 0, ( layer.sizeReal ? layer.sizeReal.width : layer.sizeCurrent.width ), ( layer.sizeReal ? layer.sizeReal.height : layer.sizeCurrent.height ) );
+
         context.restore();
     }
 
-    function applyFilter( context, layer ) 
+    function applyFilter( context, layer )
     {
         var canvasData = context.getImageData( layer.positionRotated.x, layer.positionRotated.y, layer.sizeRotated.width, layer.sizeRotated.height )
         ,   len        = layer.sizeRotated.width * layer.sizeRotated.height * 4
@@ -166,12 +167,12 @@ function( config, cache )
         return canvasData;
      }
 
-    function colorDistance( scale, dest, src ) 
+    function colorDistance( scale, dest, src )
     {
         return (scale * dest + (1 - scale) * src);
     };
 
-    function processFilter( binaryData, filter, len ) 
+    function processFilter( binaryData, filter, len )
     {
         var r, g, b
         ,   m         = filter.matrix
@@ -182,7 +183,7 @@ function( config, cache )
         ,   m19       = m[19] * 255
         ;
 
-        for (var i = 0; i < len; i += 4) 
+        for (var i = 0; i < len; i += 4)
         {
             r = binaryData[i];
             g = binaryData[i + 1];
@@ -196,5 +197,3 @@ function( config, cache )
 
     return module;
 } );
-
-

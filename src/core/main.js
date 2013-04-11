@@ -11,7 +11,7 @@
 //
 requirejs.config(
 {
-    paths : 
+    paths :
     {
         // App paths
         //
@@ -40,14 +40,10 @@ function( config, cache, lazyRequire )
     var toolbar = {};
 
     $( document ).ready( function()
-    {        
+    {
         // Initialize config.
         //
         config.initialize();
-
-        // Initialize cache.
-        //
-        cache.initialize();
 
         // Listen for global app events.
         //
@@ -59,7 +55,7 @@ function( config, cache, lazyRequire )
         //
         $.each( config.options.ui || [], function( toolName, toolOptions )
         {
-            loadTool( false, toolName, toolOptions ) 
+            loadTool( false, toolName, toolOptions );
         });
 
         // Load engine.
@@ -69,11 +65,15 @@ function( config, cache, lazyRequire )
             return loadEngine( false, engineName );
         });
 
+        // Initialize cache.
+        //
+        cache.initialize();
+
         // Setup notifications events.
         //
         $( ".imageCreatorMessageClose" ).bind( "tap", function()
-        { 
-            $imageCreatorMessage.hide(); 
+        {
+            $imageCreatorMessage.hide();
         });
 
     } );
@@ -82,14 +82,14 @@ function( config, cache, lazyRequire )
     {
         var $imageCreatorMessage      = $( ".imageCreatorMessage" )
         ,   $imageCreatorMessageInner = $( ".imageCreatorMessageInner" )
-        ,   defaults = 
+        ,   defaults =
             {
                 "message"   : ""
             ,   "status"    : ""
             ,   "fade"      : true
             ,   "fadeTimer" : 300
             }
-        ,   options      = $.extend( {}, defaults, options )   
+        ,   options      = $.extend( {}, defaults, options )
         ,   messageTimer = $imageCreatorMessage.data( "messageTimer" )
         ;
 
@@ -116,13 +116,13 @@ function( config, cache, lazyRequire )
     {
         var engineObject = config.options.engines.types[ engineNane ];
 
-        if( engineObject.support && engineObject.support() )
+        if( engineObject.support )
         {
             setMessage( {
                 "message" : "Loading " + engineNane + " engine..."
             ,   "status"  : "loading"
             ,   "fade"    : true
-            }); 
+            });
 
             var requireOnce = lazyRequire.once();
 
@@ -152,7 +152,7 @@ function( config, cache, lazyRequire )
                 "message" : "Loading " + toolName + " tool..."
             ,   "status"  : "loading"
             ,   "fade"    : true
-            }); 
+            });
 
             var requireOnce = lazyRequire.once();
 

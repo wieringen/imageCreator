@@ -16,7 +16,7 @@ define(
 ],
 function( config, utilMath, utilClass, utilMisc, modelLayer )
 {
-    var module = 
+    var module =
     {
         options : config.options.layers.text
     };
@@ -26,7 +26,6 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
         type            : "text"
     ,   text            : ""
     ,   textLines       : []
-    ,   textLongestLine : ""
     ,   color           : "#000000"
     ,   fontSize        : module.options.fontSize
     ,   lineHeight      : module.options.lineHeight
@@ -50,21 +49,20 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
             this.setFontSize();
         }
 
-    ,   _initConfig: function(options) 
+    ,   _initConfig: function(options)
         {
             options || (options = { });
 
             this.setOptions(options);
         }
 
-    ,   toObject: function() 
+    ,   toObject: function()
         {
             return this.callSuper( "toObject",
             {
                 type            : this.type
             ,   text            : this.text
             ,   textLines       : this.textLines
-            ,   textLongestLine : this.textLongestLine
             ,   color           : this.color
             ,   fontSize        : this.fontSize
             ,   lineHeight      : this.lineHeight
@@ -75,32 +73,28 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
         }
 
     ,   setText: function( text )
-        {       
+        {
             this.text = text;
 
             this.setLines();
             this.setFontSize();
         }
-    
+
     ,   setLines: function()
         {
-            this.textLines       = this.text.replace(/\r\n/g, "\n").split("\n");
-            this.textLongestLine = "";
+            this.textLines = this.text.replace(/\r\n/g, "\n").split("\n");
+        }
 
-            for( var lineIndex = this.textLines.length; lineIndex--; )
-            { 
-                if( this.textLines[lineIndex].length > this.textLongestLine.length )
-                {
-                    this.textLongestLine = this.textLines[lineIndex];
-                }
-            }
+    ,   setScale : function( scale )
+        {
+            this.setFontSize( scale );
         }
 
     ,   setFontSize: function( fontSize )
         {
-            this.fontSize = fontSize || this.fontSize;
+            this.fontSize = Math.max( 10, Math.min( 99, fontSize || this.fontSize ) );
 
-            var sizeNew = 
+            var sizeNew =
                 {
                     width  : utilMisc.measureText( this )
                 ,   height : this.textLines.length * Math.floor( this.fontSize * this.lineHeight )
@@ -108,7 +102,7 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
             ,   newPosition =
                 {
                     x : ( this.sizeCurrent.width - sizeNew.width ) / 2
-                ,   y : 0
+                ,   y : ( this.sizeCurrent.height - sizeNew.height ) / 2
                 }
             ;
 
@@ -143,5 +137,5 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
         }
     });
 
-    return module.model;  
+    return module.model;
 } );

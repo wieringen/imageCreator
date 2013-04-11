@@ -20,13 +20,14 @@
     position: absolute;
     resize: none;
     overflow: hidden;
-    background: rgba( 0,0,0, 0.2 );
+    background: #ccc;
     border: 0px solid transparent;
     margin: 0;
     padding: 0;
     outline: none;
     cursor: text;
-    z-index: 100;
+    z-index: 1000;
+    zoom: 1;
     white-space: pre-wrap;
     word-wrap: break-word;
 }

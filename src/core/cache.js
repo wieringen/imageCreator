@@ -12,14 +12,17 @@
 define(
 [
     "config"
+,   "model.text"
+,   "model.image"
+
 ,   "plugins/jquery.storage"
 ],
-function( config )
-{  
+function( config, modelText, modelImage )
+{
     var module = {}
 
     // Cache keys
-    //    
+    //
     ,   keyLayers      = "ImageCreatorLayers"
     ,   keyLayerActive = "ImageCreatorLayerActive"
 
@@ -36,17 +39,41 @@ function( config )
 
     module.loadLayers = function()
     {
-        var storedLayers = $.Storage.get( keyLayers );
+        var layersStored = $.Storage.get( keyLayers );
 
-        if( storedLayers )
+        if( layersStored )
         {
-            layers = JSON.parse( storedLayers );
+            layersStored = JSON.parse( layersStored );
+
+            for( var layerIndex = layersStored.length; layerIndex--; )
+            {
+                if( layersStored[ layerIndex ].type === "image" )
+                {
+                    modelImage.fromObject( layersStored[ layerIndex ], function( instance )
+                    {
+                         layers.unshift( instance );
+                    });
+                }
+
+                if( layersStored[ layerIndex ].type === "text" )
+                {
+                    console.log( layersStored[ layerIndex ]  );
+                    layers.unshift( new modelText( layersStored[ layerIndex ] ) );
+                }
+            }
         }
     };
 
     module.storeLayers = function()
     {
-        $.Storage.set( keyLayers, JSON.stringify( layers ) );
+        var layersToSave = [];
+
+        for( var layerIndex = layers.length; layerIndex--; )
+        {
+            layersToSave.push( layers[ layerIndex ].toObject() );
+        }
+
+        $.Storage.set( keyLayers, JSON.stringify( layersToSave ) );
     };
 
     module.clearLayers = function()
@@ -67,28 +94,9 @@ function( config )
         {
             layers = data;
         }
+
+        return layers;
     };
-
-    module.setLayerActiveByID = function( layerID )
-    {
-        if( layerID )
-        {
-            for( var layerIndex = layers.length; layerIndex--; )
-            { 
-                layers[ layerIndex ].set( "selected", false );
-
-                if( layers[ layerIndex ].id === layerID )
-                {
-                    layerActive = layers[ layerIndex ];
-                    layerActive.set( "selected", true );
-                }
-            }
-        }
-
-        $.publish( "layerSelect", [ layerActive ] );
-
-        return layerActive;
-    }
 
     module.setLayerActive = function( layer )
     {
@@ -97,7 +105,7 @@ function( config )
         if( typeof layer === "object" )
         {
             for( var layerIndex = layers.length; layerIndex--; )
-            { 
+            {
                 layers[ layerIndex ].set( "selected", false );
 
                 if( layers[ layerIndex ].id === layer.id )
@@ -113,18 +121,23 @@ function( config )
                 layers.push( layer );
                 layerActive = layer;
             }
-     
+
             layerActive.set( "selected", true );
         }
         else
         {
-            layerActive = false;   
+            layerActive = false;
         }
 
         $.publish( "layerSelect", [ layerActive ] );
 
         return layerActive;
     };
+
+    module.setLayerActiveByID = function( layerID )
+    {
+        return module.setLayerActive( module.getLayerById( layerID ) );
+    }
 
     module.getLayerActive = function()
     {
@@ -138,7 +151,7 @@ function( config )
         if( layerID )
         {
             for( var layerIndex = layers.length; layerIndex--; )
-            { 
+            {
                 if( layers[ layerIndex ].id === layerID )
                 {
                     layer = layers[ layerIndex ];
@@ -148,12 +161,33 @@ function( config )
 
         return layer;
     };
-    
+
     module.removeLayer = function( layer )
     {
-        var layerIndex = $.inArray(layer, layers);
+        var layerIndex = $.inArray( layer, layers );
 
-        layers.splice(layerIndex, 1);
+        if( layer.selected )
+        {
+            module.setLayerActive( false );
+        }
+
+        layers.splice( layerIndex, 1 );
+
+        $.publish( "layerRemove", [ layer.id ] );
+
+        layer = null;
+    }
+
+    module.removeLayerByID = function( layerID )
+    {
+        var layer = module.getLayerById( layerID );
+
+        if( layer )
+        {
+            module.removeLayer( layer );
+        }
+
+        layer = null;
     }
 
     return module;

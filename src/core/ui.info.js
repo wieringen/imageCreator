@@ -58,7 +58,7 @@ function( moduleHTML, config )
 
         // Get module DOM elements.
         //
-        $module              = $( ".imageCreatorToolInfo" );
+        $module              = $( ".imageCreatorUIInfo" );
         $moduleTitle         = $module.find( ".moduleTitle" );
         $layerName           = $module.find( ".objectName" );
         $layerRotationValue  = $module.find( ".objectRotationValue" );
@@ -100,7 +100,7 @@ function( moduleHTML, config )
                 $layerName.text( layer.text.replace( "<br/>", "" ) );
             } 
 
-            $layerRotationValue.text( layer.rotation && layer.rotation.degrees || 0 );
+            $layerRotationValue.text( layer.rotation && Math.round( layer.rotation.degrees ) || 0 );
             
             $layerSizeWidth.text( layer.sizeCurrent && layer.sizeCurrent.width || 0 );
             $layerSizeHeight.text( layer.sizeCurrent && layer.sizeCurrent.height || 0 );

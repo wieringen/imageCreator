@@ -23,8 +23,8 @@ function()
         this.init();
     }
 
-    Plugin.prototype = 
-    {   
+    Plugin.prototype =
+    {
         $track   : null,
         $thumb   : null,
         $degrees : null,
@@ -36,8 +36,8 @@ function()
             this.$degrees = $( this.element ).find( ".degrees" );
 
             this.setEvents();
-        }, 
-        
+        },
+
         setEvents: function()
         {
             var _self       = this
@@ -45,12 +45,12 @@ function()
             ;
 
             if( ! touchEvents )
-            { 
+            {
                 this.$track.bind( "mousedown.circleslider", function( event )
-                { 
-                    _self.start( event ); 
+                {
+                    _self.start( event );
 
-                    return false; 
+                    return false;
                 });
             }
             else
@@ -66,7 +66,7 @@ function()
             }
 
             $( this.element ).bind( "setPosition", function( event, degrees )
-            { 
+            {
                 _self.setPosition( event, degrees );
             });
         },
@@ -96,7 +96,7 @@ function()
                 return false;
             });
         },
-        
+
         end: function()
         {
             $( document ).unbind( ".circleslider", null );
@@ -109,13 +109,13 @@ function()
         {
             var sanitizedDegrees = degrees || 0;
 
-            this.$degrees.html( sanitizedDegrees + "&deg;" );
+            this.$degrees.html( Math.round( sanitizedDegrees ) + "&deg;" );
 
             this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
-            this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );    
-            this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" ); 
-            this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );   
-            this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );      
+            this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
+            this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" );
+            this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );
+            this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );
         },
 
         sanitizeRadians: function( radians )
@@ -126,22 +126,22 @@ function()
 
         drag: function( event )
         {
-            var position = 
+            var position =
                 {
                     x : event.pageX - this.$track.offset().left -41
                 ,   y : event.pageY - this.$track.offset().top  -41
                 }
             ,   radians = this.sanitizeRadians( Math.atan2( position.x, -position.y ) )
-            ,   degrees = Math.round( radians * 180 / Math.PI )
+            ,   degrees = radians * 180 / Math.PI
             ,   cos     = Math.cos( radians )
             ,   sin     = Math.sin( radians )
             ;
-            this.$degrees.html( degrees + "&deg;" );
+            this.$degrees.html( Math.round( degrees )+ "&deg;" );
             this.$thumb.css( "top",  Math.round( -cos * 34 +42 ) );
             this.$thumb.css( "left", Math.round(  sin * 34 +42 ) );
             this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" );
             this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );
-            this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );      
+            this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );
 
             var rotation = {
                     degrees : degrees
@@ -151,7 +151,7 @@ function()
             };
 
             $( this.element ).trigger( "onDrag", [ rotation ] );
-            
+
             return false;
         }
     };

@@ -1,6 +1,6 @@
-/** 
+/**
  * Image tool Class
- * 
+ *
  * @name Image
  * @class Image
  * @constructor
@@ -15,7 +15,7 @@ define(
 ],
 function( config, utilMath, utilClass, modelLayer )
 {
-    var module = 
+    var module =
     {
         options : config.options.layers.image
     };
@@ -24,17 +24,17 @@ function( config, utilMath, utilClass, modelLayer )
     {
         imageType : "default"
     ,   type      : "image"
-    ,   sizeReal : 
-        { 
+    ,   sizeReal :
+        {
             width  : 0
-        ,   height : 0 
+        ,   height : 0
         }
-    
-    ,   filter : 
-        { 
+
+    ,   filter :
+        {
             name     : "none"
         ,   matrix   : false
-        ,   strength : 1 
+        ,   strength : 1
         }
 
     ,   initialize : function( element, options )
@@ -42,7 +42,7 @@ function( config, utilMath, utilClass, modelLayer )
             options || ( options = { } );
 
             this.callSuper("initialize", options);
-            
+
             this.image = element;
             this.name  = this.src.substring( this.src.lastIndexOf("/") + 1 );
 
@@ -52,7 +52,7 @@ function( config, utilMath, utilClass, modelLayer )
             ,   height : this.image.height
             });
 
-            this.id = options.id || "image" + new Date().getTime().toString();        
+            this.id = options.id || "image" + new Date().getTime().toString();
 
             if( ! options.sizeCurrent )
             {
@@ -68,16 +68,16 @@ function( config, utilMath, utilClass, modelLayer )
             this.setScale();
         }
 
-    ,   _initConfig: function(options) 
+    ,   _initConfig: function(options)
         {
             options || (options = { });
 
             this.setOptions(options);
         }
 
-    ,   toObject: function( propertiesToInclude ) 
+    ,   toObject: function( propertiesToInclude )
         {
-            return $.extend( this.callSuper('toObject', propertiesToInclude ), 
+            return $.extend( this.callSuper( "toObject", propertiesToInclude ),
             {
                 src       : this.src
             ,   type      : this.type
@@ -91,7 +91,7 @@ function( config, utilMath, utilClass, modelLayer )
         {
             this.scale = Math.max( 0.1, Math.min( 1, scale || this.scale ) );
 
-            var sizeNew = 
+            var sizeNew =
                 {
                     width  : Math.round( this.scale * this.sizeReal.width )
                 ,   height : Math.round( this.scale * this.sizeReal.height )
@@ -111,10 +111,10 @@ function( config, utilMath, utilClass, modelLayer )
 
     ,   setFilter: function( filter )
         {
-            this.filter = filter || { 
+            this.filter = filter || {
                 name     : "none"
             ,   matrix   : false
-            ,   strength : 1 
+            ,   strength : 1
             };
         }
 
@@ -124,11 +124,11 @@ function( config, utilMath, utilClass, modelLayer )
         }
     });
 
-    module.model.fromObject = function( object, callback ) 
+    module.model.fromObject = function( object, callback )
     {
-        var img = document.createElement('img');
+        var img = document.createElement( "img" );
 
-        img.onload = function() 
+        img.onload = function()
         {
             if (callback)
             {
@@ -136,7 +136,7 @@ function( config, utilMath, utilClass, modelLayer )
             }
             img = img.onload = null;
         };
-        
+
         img.src = object.src;
     };
 

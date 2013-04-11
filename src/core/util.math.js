@@ -112,12 +112,30 @@ function()
         ;
         
         return Math.sqrt((x * x) + (y * y));
-    }
+    };
     
     module.getRandomInt = function( min, max )
     {
       return Math.floor( Math.random() * (max - min + 1) ) + min;
-    }
+    };
   
+    module.isPointInPath = function( mouse, size, position, radians )
+    {
+        var dx    = mouse.x - ( position.x + ( size.width / 2 ) )
+        ,   dy    = mouse.y - ( position.y + ( size.height / 2 ) )
+        ,   h1    = Math.sqrt( dx * dx + dy * dy )
+        ,   currA = Math.atan2( dy, dx )
+        ,   newA  = currA - radians
+
+        ,   x2    = Math.cos(newA) * h1
+        ,   y2    = Math.sin(newA) * h1
+        ;
+
+        if ( x2 > -0.5 * size.width && x2 < 0.5 * size.width && y2 > -0.5 * size.height && y2 < 0.5 * size.height )
+        {
+            return true;
+        }
+    }
+
     return module;
 });

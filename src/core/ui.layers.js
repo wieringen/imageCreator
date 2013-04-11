@@ -31,7 +31,7 @@ function( moduleHTML, config, cache )
         ,   snippets : {}
         }
 
-    ,   $imageCreatorViewport 
+    ,   $imageCreatorViewport
     ,   $module
     ,   $moduleTitle
     ,   $layerContainer
@@ -56,12 +56,12 @@ function( moduleHTML, config, cache )
         $( module.options.target ).replaceWith( moduleHTML );
 
         // Get basic app DOM elements.
-        //       
+        //
         $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
-        $module               = $( ".imageCreatorToolLayers" );
+        $module               = $( ".imageCreatorUILayers" );
         $moduleTitle          = $module.find( ".moduleTitle" );
         $layerContainer       = $module.find( ".layerContainer" );
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
@@ -79,7 +79,7 @@ function( moduleHTML, config, cache )
         {
             "menu"  : ".moduleMenu"
         ,   "tabs"  : "a"
-        ,   "pages" : ".moduleTab" 
+        ,   "pages" : ".moduleTab"
         });
 
         // Get snippets.
@@ -98,7 +98,7 @@ function( moduleHTML, config, cache )
             if( engine.support() )
             {
                 var $engineClone = module.snippets.$engineSnippet.clone();
-                
+
                 $engineClone.attr( "value", engineName );
                 $engineClone.text( engineName );
                 $engineClone.attr( "selected", engineName === config.engine.name );
@@ -106,29 +106,33 @@ function( moduleHTML, config, cache )
 
                 $selectRenderEngine.append( $engineClone );
             }
-        }); 
+        });
 
         // Listen to global app events.
         //
         $.subscribe( "layerSelect", layerCheck );
+        $.subscribe( "layerRemove", layerRemove );
+        $.subscribe( "layerVisibility", layerVisibility );
 
         // Set Button events.
-        //  
+        //
         $layerContainer.delegate( ".objectLayer", "tap", layerSelectByID );
-        $layerContainer.delegate( ".objectToggle", "tap", layerToggle );
-        $layerContainer.delegate( ".objectRemove", "tap", layerRemove );
+        $layerContainer.delegate( ".objectToggle", "tap", layerVisibilityById );
+        $layerContainer.delegate( ".objectRemove", "tap", layerRemoveByID );
 
         $selectRenderEngine.change( optionRenderEngineSelect );
         $inputConstrainLayers.change( optionConstrainLayersToggle );
 
         $( "body" ).delegate( ".buttonImageSave", "click", function()
-        { 
+        {
             $imageCreatorViewport.trigger( "setMessage", [ {
                 "message" : "I'm sorry... This is just a frontend demo there is no connection with any backend or server."
             ,   "status"  : "error"
             ,   "fade"    : false
             }]);
-        });        
+
+            cache.storeLayers();
+        });
     };
 
     function layerCheck( event, layer )
@@ -157,16 +161,10 @@ function( moduleHTML, config, cache )
         if( objectLayer.text )
         {
             $layerClone.find( ".objectLayerName" ).text( objectLayer.text );
-            //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );   
+            //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );
         }
-        
-        $layerContainer.prepend( $layerClone );
-    }
 
-    function layerSelect( event, layer )
-    {
-        $layerContainer.find( ".active" ).removeClass( "active" );
-        $( "#objectLayer" + layer.id ).addClass( "active" );
+        $layerContainer.prepend( $layerClone );
     }
 
     function layerSelectByID( event )
@@ -178,45 +176,24 @@ function( moduleHTML, config, cache )
         return false;
     }
 
-    function layerToggle( event )
+    function layerSelect( event, layer )
     {
-        var $layerToToggle    = $( this ).parent()
-        ,   layerID           = $layerToToggle.attr( "id" ).replace( "objectLayer", "" )
-        ,   layerToToggleData = cache.getLayerById( layerID )
-        ;
+        $layerContainer.find( ".active" ).removeClass( "active" );
+        $( "#objectLayer" + layer.id ).addClass( "active" );
+    }
 
-        $layerToToggle.toggleClass( "hide" );
+    function layerRemoveByID( event )
+    {
+        var layerID = $( this ).parent().attr( "id" ).replace( "objectLayer", "" );
 
-        layerToToggleData.set( "visible", ! $layerToToggle.hasClass( "hide" ) );
-        
-        $.publish( "layerVisibility", [ layerToToggleData ] );
+        cache.removeLayerByID( layerID );
 
         return false;
     }
 
-    function layerRemove( event )
+    function layerRemove( event, layerID )
     {
-        var $layerToRemove    = $( this ).parent()
-        ,   layerID           = $layerToRemove.attr( "id" ).replace( "objectLayer", "" )
-        ,   layerToRemoveData = cache.getLayerById( layerID )
-        ;
-
-        $layerToRemove.remove();
-
-        cache.removeLayer(layerToRemoveData);
-
-        if( layerToRemoveData.selected )
-        {
-            cache.setLayerActive( false );
-        }
-
-        // Make sure the layer is elegible for garbage collection. 
-        //
-        layerToRemoveData = null;
-
-        // Tell the app to remove this layer.
-        //
-        $.publish( "layerRemove", [ layerID ] );
+        $( "#objectLayer" + layerID ).remove();
 
         // Show empty message if we have no more layers.
         //
@@ -224,6 +201,25 @@ function( moduleHTML, config, cache )
         {
             $emptyMessage.show();
         }
+    }
+
+    function layerVisibilityById( event )
+    {
+        var $layerToToggle = $( this ).parent()
+        ,   layerID        = $layerToToggle.attr( "id" ).replace( "objectLayer", "" )
+        ,   layer          = cache.getLayerById( layerID )
+        ;
+
+        layer.set( "visible", ! $layerToToggle.hasClass( "hide" ) );
+
+        $.publish( "layerVisibility", [ layer ] );
+
+        return false;
+    }
+
+    function layerVisibility( event, layer )
+    {
+        $layerToToggle.toggleClass( "hide", layer.visibility );
 
         return false;
     }
@@ -236,10 +232,10 @@ function( moduleHTML, config, cache )
     function optionConstrainLayersToggle( event )
     {
         config.setOptions(
-        { 
-            toolbar : 
+        {
+            toolbar :
             {
-                layers : 
+                layers :
                 {
                     constrainLayers : $inputConstrainLayers.is( ":checked" )
                 }

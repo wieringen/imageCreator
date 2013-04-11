@@ -1,34 +1,46 @@
 /*********************** TOOL : IMAGE ***********************/
 
+.buttonImageAdd {
+    background:     transparent url(../images/icon-image.png) no-repeat 50% 50%;
+    height: 50px;
+    width: 50px;
+    display: block;
+    float: left;
+}
+
+.imageCreatorUIImage.moduleDisabled {
+    display: none;
+}
+
 /* Create */
-.imageCreatorToolImage .imageCreate .inputImageUpload {
+.imageCreatorUIImage .imageCreate .inputImageUpload {
     margin:         0 0 20px;
     font:           11px Arial, Helvetica, sans-serif;
     width:          100%;
 }
-.imageCreatorToolImage .buttonImageAdd {
+.imageCreatorUIImage .buttonImageAdd {
     margin:         0;
     display:        block;
 }
 
-.imageCreatorToolImage .buttonImageUpload {
+.imageCreatorUIImage .buttonImageUpload {
     margin:         0;
     display:        block;
 }
 
-.imageCreatorToolImage #iframeImageUpload {
+.imageCreatorUIImage #iframeImageUpload {
     width:          0;
     height:         0;
     border:         0;
     position:       absolute;
 }
-.imageCreatorToolImage .message{
+.imageCreatorUIImage .message{
     background-color: #ccc;
     margin:         0 0 10px;
     display:        none;
     padding:        10px;
 }
-.imageCreatorToolImage.moduleDisabled .imageCreate {
+.imageCreatorUIImage.moduleDisabled .imageCreate {
   -ms-filter:       "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
   filter:           alpha(opacity=100);
   -moz-opacity:     1.0;
@@ -38,7 +50,7 @@
 
 
 /* Clipart */
-.imageCreatorToolImage.moduleDisabled .imageDecorations {
+.imageCreatorUIImage.moduleDisabled .imageDecorations {
   -ms-filter:       "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
   filter:           alpha(opacity=100);
   -moz-opacity:     1.0;
@@ -46,13 +58,13 @@
   opacity:          1.0;
 }
 
-.imageCreatorToolImage .imageDecorationsList {
+.imageCreatorUIImage .imageDecorationsList {
     padding: 0;
     margin: 0;
     list-style: none;
 }
 
-.imageCreatorToolImage .imageDecorationsList li {
+.imageCreatorUIImage .imageDecorationsList li {
     list-style: none;
     float: left;
     width: 47px;
@@ -64,11 +76,11 @@
     cursor: pointer;
 }
 
-.imageCreatorToolImage .imageDecorationsList li:hover {
+.imageCreatorUIImage .imageDecorationsList li:hover {
     background-color: #ccc;
 }
 
-.imageCreatorToolImage .imageDecorationsList img {
+.imageCreatorUIImage .imageDecorationsList img {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -77,7 +89,7 @@
 }
 
 /* Backgrounds */
-.imageCreatorToolImage.moduleDisabled .imageBackgrounds {
+.imageCreatorUIImage.moduleDisabled .imageBackgrounds {
   -ms-filter:       "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
   filter:           alpha(opacity=100);
   -moz-opacity:     1.0;
@@ -85,13 +97,13 @@
   opacity:          1.0;
 }
 
-.imageCreatorToolImage .imageBackgroundsList {
+.imageCreatorUIImage .imageBackgroundsList {
     padding: 0;
     margin: 0;
     list-style: none;
 }
 
-.imageCreatorToolImage .imageBackgroundsList li {
+.imageCreatorUIImage .imageBackgroundsList li {
     list-style: none;
     float: left;
     margin: 0 3px 3px 3px;
@@ -100,88 +112,30 @@
     cursor: pointer;
 }
 
-/* Zoom */
-.imageCreatorToolImage .imageZoom .track { 
-    background:     #cdcdcd; 
+/* Filter opacity */
+.imageCreatorUIImage .imageFilterStrength .track {
+    background:     #cdcdcd;
     height:         4px;
     width:          140px;
-    margin:         0 0 5px; 
+    margin:         0 0 5px;
     border-radius:  5px;
     border:         1px solid #aeaeae;
     border-top:     1px solid #747474;
-    position:       relative; 
-    -webkit-user-select: none;
-    float:          left;
-}
-.imageCreatorToolImage .imageZoom .thumb { 
-    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 50% 50%; 
-    height:         40px; 
-    width:          40px; 
-    position:       absolute; 
-    left:           0; 
-    top:            -4px; 
-    cursor:         pointer;
-    margin:         -15px 0 0 -15px; 
-}
-.imageCreatorToolImage .imageZoom .indicator {
-    font-size: 10px;
-    float: left;
-    margin: -3px 0 0 5px;
-}
-
-/* Rotate */
-.imageCreatorToolImage .imageRotate .track { 
-    background:     transparent url(../images/image-rotate-track.png) no-repeat 0 0; 
-    height:         83px; 
-    width:          83px; 
     position:       relative;
     -webkit-user-select: none;
-}
-.imageCreatorToolImage .imageRotate .thumb { 
-    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 50% 50%; 
-    height:         31px; 
-    width:          31px; 
-    position:       absolute; 
-    margin:         -15px 0 0 -15px; 
-    top:            8px; 
-    left:           42px; 
-    cursor:         pointer; 
-}
-.imageCreatorToolImage .imageRotate .degrees{ 
-    font-size:      10px; 
-    position:       absolute;
-    left:           50%; 
-    top:            50%; 
-    width:          20px; 
-    line-height:    14px; 
-    text-align:     center; 
-    margin:         -7px 0 0 -10px;
-}
-
-/* Filter opacity */
-.imageCreatorToolImage .imageFilterStrength .track { 
-    background:     #cdcdcd; 
-    height:         4px;
-    width:          140px;
-    margin:         0 0 5px; 
-    border-radius:  5px;
-    border:         1px solid #aeaeae;
-    border-top:     1px solid #747474;
-    position:       relative; 
-    -webkit-user-select: none;
     float:          left;
 }
-.imageCreatorToolImage .imageFilterStrength .thumb { 
-    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 50% 50%; 
-    height:         40px; 
-    width:          40px; 
-    position:       absolute; 
-    left:           0; 
-    top:            -4px; 
+.imageCreatorUIImage .imageFilterStrength .thumb {
+    background:     transparent url(../images/image-zoom-thumb.png) no-repeat 50% 50%;
+    height:         40px;
+    width:          40px;
+    position:       absolute;
+    left:           0;
+    top:            -4px;
     cursor:         pointer;
-    margin:         -15px 0 0 -15px; 
+    margin:         -15px 0 0 -15px;
 }
-.imageCreatorToolImage .imageFilterStrength .indicator {
+.imageCreatorUIImage .imageFilterStrength .indicator {
     font-size: 10px;
     float: left;
     margin: -3px 0 0 5px;

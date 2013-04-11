@@ -10,13 +10,13 @@ define(
 function()
 {
     var pluginName = 'slider'
-    ,   defaults   = 
-        { 
+    ,   defaults   =
+        {
             scale : [ 0, 100 ]
         ,   start : 0
         ,   unit  : ""
         ,   thumbSize : 10
-        ,   downScale : 1 
+        ,   downScale : 1
         }
     ;
 
@@ -30,8 +30,8 @@ function()
         this.init();
     }
 
-    Plugin.prototype = 
-    {   
+    Plugin.prototype =
+    {
         $track      : null,
         $thumb      : null,
         $percentage : null,
@@ -46,8 +46,8 @@ function()
             this.setEvents();
 
             this.setPosition( false, this.options.start );
-        }, 
-        
+        },
+
         setEvents: function()
         {
             var _self = this
@@ -55,12 +55,12 @@ function()
             ;
 
             if( ! touchEvents )
-            { 
+            {
                 this.$thumb.bind( "mousedown.slider", function( event )
-                { 
-                    _self.start( event ); 
+                {
+                    _self.start( event );
 
-                    return false; 
+                    return false;
                 });
             }
             else
@@ -77,17 +77,27 @@ function()
                     event.preventDefault();
 
                     var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-                    
+
                     _self.drag( touch );
                 });
             }
-            
-            $( this.element ).bind( "setPosition", function( event, position )
-            { 
-                _self.setPosition( event, position ); 
 
-                return false; 
-            });         
+            $( this.element ).bind( "setScale", function( event, options )
+            {
+                _self.options.scale = [ options.min, options.max ];
+                _self.options.unit  = options.unit;
+                _self.options.start = options.start;
+                _self.options.downScale = options.reduce;
+
+                return false;
+            });
+
+            $( this.element ).bind( "setPosition", function( event, position )
+            {
+                _self.setPosition( event, position );
+
+                return false;
+            });
         },
 
         start: function( event )
@@ -114,10 +124,10 @@ function()
 
                 return false;
             });
-        
+
             this.mouse.x = event.pageX;
         },
-        
+
         end: function()
         {
             $( document ).unbind( ".slider", null );
@@ -133,7 +143,7 @@ function()
             ;
 
             this.$thumb.css( "left", position );
-            this.$indicator.text( realScale + this.options.unit );         
+            this.$indicator.text( realScale + this.options.unit );
         },
 
         drag: function( event )
@@ -148,7 +158,7 @@ function()
             this.$indicator.text( scale + this.options.unit );
 
             $( this.element ).trigger( "onDrag", [ scale / this.options.downScale ] );
-            
+
             return false;
         }
 

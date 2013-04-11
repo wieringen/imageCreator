@@ -10,39 +10,37 @@ define(
 [
     // Module HTML template.
     //
-    "text!templates/text.html"
+    "text!templates/dimensions.html"
 
     // App core modules.
     //
 ,   "config"
 ,   "cache"
-,   "model.text"
 ,   "util.math"
 
     // jQuery plugins.
     //
 ,   "plugins/jquery.tabular"
-,   "plugins/jquery.colorpicker"
+,   "plugins/jquery.slider"
+,   "plugins/jquery.circleslider"
 ],
-function( moduleHTML, config, cache, modelText, utilMath )
+function( moduleHTML, config, cache, utilMath )
 {
     var module =
         {
-            name     : "text"
+            name     : "dimensions"
         ,   enabled  : true
-        ,   options  : config.options.ui.text
+        ,   options  : config.options.ui.dimensions
         ,   snippets : {}
         }
 
     ,   $imageCreatorViewport
     ,   $imageCreatorSelection
-    ,   $imageCreatorToolbar
 
     ,   $module
     ,   $moduleTitle
     ,   $textSize
     ,   $textRotate
-    ,   $buttonTextAdd
 
     // The curent layer that is being edited.
     //
@@ -66,17 +64,13 @@ function( moduleHTML, config, cache, modelText, utilMath )
         //
         $imageCreatorViewport  = $( ".imageCreatorViewport" );
         $imageCreatorSelection = $( ".imageCreatorSelection" );
-        $imageCreatorToolbar   = $( ".imageCreatorToolbar" );
 
         // Get module DOM elements.
         //
-        $module           = $( ".imageCreatorUIText" );
+        $module           = $( ".imageCreatorUIDimensions" );
         $moduleTitle      = $module.find( ".moduleTitle" );
-        $textColor        = $module.find( ".textColor" );
-        $buttonTextAdd    = $( ".buttonTextAdd" );
-        $buttonTextWeight = $module.find( ".buttonTextWeight" );
-        $buttonTextStyle  = $module.find( ".buttonTextStyle" );
-        $selectTextFont   = $module.find( ".selectTextFont" );
+        $textSize         = $module.find( ".dimensionsScale" );
+        $textRotate       = $module.find( ".dimensionsRotate" );
 
         // Set module title.
         //
@@ -90,23 +84,20 @@ function( moduleHTML, config, cache, modelText, utilMath )
         ,   "tabs"  : "a"
         ,   "pages" : ".moduleTab"
         });
-        $textColor.colorPicker();
+        $textSize.slider();
+        $textRotate.circleSlider();
 
         // Listen to global app events.
         //
         $.subscribe( "layerSelect", textSelect );
         $.subscribe( "layerVisibility", textSelect );
+        $.subscribe( "selectionScale", dimensionsScale );
+        $.subscribe( "selectionRotate", dimensionsRotate );
 
         // Listen to UI module events.
         //
-        $textColor.bind( "colorUpdate", textColor );
-
-        // Set module input / button events.
-        //
-        $buttonTextAdd.click( textAdd );
-        $buttonTextWeight.click( textWeight );
-        $buttonTextStyle.click( textStyle );
-        $selectTextFont.change( textFont );
+        $textSize.bind( "onDrag", dimensionsScale );
+        $textRotate.bind( "onDrag", dimensionsRotate );
     };
 
     /**
@@ -127,7 +118,7 @@ function( moduleHTML, config, cache, modelText, utilMath )
 
         // Enable module if layer is of the correct type and is visible.
         //
-        module.enabled = layer.visible && layer.type === "text" || false;
+        module.enabled = layer.visible || false;
         $module.toggleClass( "moduleDisabled", ! module.enabled );
 
         if( module.enabled )
@@ -136,66 +127,42 @@ function( moduleHTML, config, cache, modelText, utilMath )
 
             // Set the UI to match the selected layers properties.
             //
-            $textColor.trigger( "setColor", [ layerCurrent.color ] );
-            $buttonTextWeight.toggleClass( "active", layerCurrent.weight );
-            $buttonTextStyle.toggleClass( "active", layerCurrent.style );
-            $selectTextFont.val( layerCurrent.font );
+            $textRotate.trigger( "setPosition", [ Math.round( layerCurrent.rotation.degrees ) ] );
+            $textSize.trigger( "setScale", [ module.options.scale[ layerCurrent.type ] ] );
+            $textSize.trigger( "setPosition", [ layerCurrent.fontSize || layerCurrent.scale ] );
         }
     }
 
-    function textAdd()
+    function dimensionsRotate( event, rotation, setUI )
     {
-        var text  = module.options.defaultText
-        ,   layer =
-            {
-                text : text.slice( 0, utilMath.getRandomInt( 10, text.length ) )
-            }
-        ;
+        if( setUI )
+        {
+            $textRotate.trigger( "setPosition", [ rotation.degrees ] );
 
-        cache.setLayerActive( new modelText( layer ) );
+            return false;
+        }
 
-        return false;
-    }
-
-    function textStyle( event, style )
-    {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setStyle( ! layerCurrent.style );
-
-            $buttonTextStyle.toggleClass( "active", layerCurrent.style );
+            layerCurrent.setRotate( rotation );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }
     }
 
-    function textWeight( event, weight )
+    function dimensionsScale( event, scale, setUI )
     {
-        if( module.enabled && layerCurrent && layerCurrent.visible )
+        if( setUI )
         {
-            layerCurrent.setWeight( ! layerCurrent.weight );
+            $textSize.trigger( "setScale", [ module.options.scale[ layerCurrent.type ] ] );
+            $textSize.trigger( "setPosition", [ scale ] );
 
-            $buttonTextWeight.toggleClass( "active", layerCurrent.weight );
-
-            $.publish( "layerUpdate", [ layerCurrent ] );
+            return false;
         }
-    }
 
-    function textFont( event )
-    {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setFont( this.value );
-
-            $.publish( "layerUpdate", [ layerCurrent ] );
-        }
-    }
-
-    function textColor( event, color )
-    {
-        if( module.enabled && layerCurrent && layerCurrent.visible )
-        {
-            layerCurrent.setColor( color );
+            layerCurrent.setScale( scale );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }

@@ -1,25 +1,25 @@
 /*global module:false*/
-module.exports = function(grunt) 
+module.exports = function(grunt)
 {
     grunt.initConfig(
     {
         pkg  : grunt.file.readJSON( "package.json" )
 
-    ,   meta : 
+    ,   meta :
         {
-            banner : 
-            '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' + 
-            '<%= grunt.template.today("yyyy-mm-dd") %>\n ' + 
-            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n *\\n " : "" %>' + 
-            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %> <<%= pkg.author.email %>>;\n' + 
+            banner :
+            '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+            '<%= grunt.template.today("yyyy-mm-dd") %>\n ' +
+            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n *\\n " : "" %>' +
+            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %> <<%= pkg.author.email %>>;\n' +
             ' * Licensed under the <%= _.pluck(pkg.licenses, "type").join(", ") %> license */\n\n'
         }
-        
+
     //  Remove old build.
     //
-    ,   clean : 
+    ,   clean :
         {
-            dist : 
+            dist :
             {
                 src : [ "dist" ]
             }
@@ -27,11 +27,11 @@ module.exports = function(grunt)
 
     //  Create Documentation.
     //
-    ,   jsdoc : 
+    ,   jsdoc :
         {
-            dist : 
+            dist :
             {
-                src : 
+                src :
                 [
                     "src/core/**/*.js"
                 ,   "src/lib/*.js"
@@ -42,11 +42,11 @@ module.exports = function(grunt)
 
     //  Copy the images and the index to the dist location.
     //
-    ,   copy : 
+    ,   copy :
         {
-            dist : 
+            dist :
             {
-                files : 
+                files :
                 [
                     { expand: true, cwd: "src", src: "images/**/*", dest: "dist/src" }
                 ,   { expand: true, cwd: "src", src: "temp/*",      dest: "dist/src" }
@@ -57,29 +57,29 @@ module.exports = function(grunt)
 
     //  Validate javascript files with jsHint.
     //
-    ,   jshint : 
+    ,   jshint :
         {
-            options : 
+            options :
             {
                 "laxcomma" : true
             ,   "laxbreak" : false
             }
-        ,   all : 
-            [ 
-                "src/lib/*.js" 
+        ,   all :
+            [
+                "src/lib/*.js"
             ,   "src/core/**/*.js"
             ]
         }
 
     //  Optimize require modules and insert almond.
     //
-    ,   requirejs : 
+    ,   requirejs :
         {
-            dist : 
+            dist :
             {
-                options : 
+                options :
                 {
-                    include : 
+                    include :
                     [
                         "ui.image"
                     ,   "ui.text"
@@ -90,14 +90,14 @@ module.exports = function(grunt)
                     ,   "engine.canvas"
                     ,   "engine.vml"
                     ]
-                ,   paths : 
+                ,   paths :
                     {
                         "lazyRequire" : "../lib/require/lazyRequire"
                     ,   "plugins"     : "../lib"
                     ,   "templates"   : "../templates"
                     ,   "text"        : "../lib/require/text"
                     }
-                ,   replaceRequireScript : 
+                ,   replaceRequireScript :
                     [
                         {
                             files      : [ "dist/src/index.html" ]
@@ -111,17 +111,18 @@ module.exports = function(grunt)
                 ,   out     : "dist/src/jquery.imageCreator.js"
                 ,   wrap    : true
                 ,   almond  : true
+                ,   optimize: "uglify2"
                 }
             }
         }
 
     //  Concat the css together.
     //
-    ,   concat : 
+    ,   concat :
         {
-            dist : 
+            dist :
             {
-                src : 
+                src :
                 [
                     "src/css/base.css"
                 ,   "src/css/buttons.css"
@@ -140,13 +141,13 @@ module.exports = function(grunt)
 
     //  Minify the css.
     //
-    ,   cssmin : 
+    ,   cssmin :
         {
             options :
             {
                 banner : "<%= meta.banner %>"
             }
-        ,   dist : 
+        ,   dist :
             {
                 src  : "dist/src/css/imageCreator.css"
             ,   dest : "dist/src/css/imageCreator.css"
@@ -155,16 +156,16 @@ module.exports = function(grunt)
 
     //  Replace image file paths in css and correct css path in the index.
     //
-    ,   "string-replace" : 
+    ,   "string-replace" :
         {
-            dist : 
+            dist :
             {
-                files : 
+                files :
                 {
                     "dist/src/imageCreator.css" : "dist/src/imageCreator.css"
                 }
 
-            ,   options : 
+            ,   options :
                 {
                     replacements :
                     [
@@ -176,14 +177,14 @@ module.exports = function(grunt)
                 }
             }
         }
-    
+
     // Make a zipfile.
     //
-    ,   compress : 
+    ,   compress :
         {
-            dist : 
+            dist :
             {
-                options : 
+                options :
                 {
                     archive: "dist/<%= pkg.name %>-<%= pkg.version %>.zip"
                 }
@@ -193,23 +194,23 @@ module.exports = function(grunt)
             ,   dest    : "."
             }
         }
-    
+
     //  Watch for changes in js core and lib files and runs jshint if it finds any.
     //
-    ,   watch : 
+    ,   watch :
         {
-            javascript : 
+            javascript :
             {
-                files : 
-                [ 
-                    "src/lib/*.js" 
+                files :
+                [
+                    "src/lib/*.js"
                 ,   "src/core/**/*.js"
                 ]
-            ,   tasks : 
+            ,   tasks :
                 [
                     "jshint"
                 ]
-            ,   options : 
+            ,   options :
                 {
                     interrupt: true
                 }
@@ -221,15 +222,15 @@ module.exports = function(grunt)
     //  Load all the task modules we need.
     //
     grunt.loadNpmTasks( "grunt-css" );
-    grunt.loadNpmTasks( "grunt-jsdoc" );    
-    grunt.loadNpmTasks( "grunt-requirejs" ); 
-    grunt.loadNpmTasks( "grunt-contrib-copy" );       
+    grunt.loadNpmTasks( "grunt-jsdoc" );
+    grunt.loadNpmTasks( "grunt-requirejs" );
+    grunt.loadNpmTasks( "grunt-contrib-copy" );
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     grunt.loadNpmTasks( "grunt-contrib-watch" );
-    grunt.loadNpmTasks( "grunt-contrib-jshint" );    
-    grunt.loadNpmTasks( "grunt-contrib-concat" );  
+    grunt.loadNpmTasks( "grunt-contrib-jshint" );
+    grunt.loadNpmTasks( "grunt-contrib-concat" );
     grunt.loadNpmTasks( "grunt-string-replace" );
-    grunt.loadNpmTasks( "grunt-contrib-compress" );  
+    grunt.loadNpmTasks( "grunt-contrib-compress" );
 
     //  Define the default build task.
     //

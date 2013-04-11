@@ -12,10 +12,11 @@ define(
     "config"
 ,   "cache"
 ,   "util.math"
+,   "util.detect"
 ],
-function( config, cache, utilMath )
+function( config, cache, utilMath, utilDetect )
 {
-    var module = 
+    var module =
         {
             options : config.options.ui.selection
         }
@@ -25,34 +26,24 @@ function( config, cache, utilMath )
     ,   $imageCreatorSelection
     ,   $imageCreatorSelectionTextEdit
 
-    ,   mouse = 
-        {
-            x : 0
-        ,   y : 0
-        }
-    ,   pinch = 
-        { 
-            scale  : 1
-        ,   rotate : 0
-        } 
     ,   shiftKeyEnabled = false
-    ,   editing = false
+    ,   editing         = false
     ;
 
     module.initialize = function()
     {
         // Get basic app DOM elements.
         //
-        $imageCreatorViewport  = $( ".imageCreatorViewport" );
-        $imageCreatorSelection = $( ".imageCreatorSelection" );
+        $imageCreatorViewport          = $( ".imageCreatorViewport" );
+        $imageCreatorCanvas            = $( ".imageCreatorCanvas" );
+        $imageCreatorSelection         = $( ".imageCreatorSelection" );
         $imageCreatorSelectionTextEdit = $( ".imageCreatorSelectionTextEdit" );
 
         // Listen for global app events.
         //
-        $.subscribe( "layerUpdate", selectionPosition );
-        $.subscribe( "layerSelect", selectionPosition );
-        $.subscribe( "layerVisibility", selectionVisibility );  
-        $.subscribe( "layerEdit", selectionSetEditing );
+        $.subscribe( "layerUpdate", selectionUpdate );
+        $.subscribe( "layerSelect", selectionUpdate );
+        $.subscribe( "layerVisibility", selectionVisibility );
 
         // Set selection viewport events
         //
@@ -61,13 +52,9 @@ function( config, cache, utilMath )
         ,   drag_min_distance : 0
         });
 
-        $imageCreatorViewport.bind( "dragstart", selectionDragStart );
-        $imageCreatorViewport.bind( "drag", selectionDrag );
-        $imageCreatorViewport.bind( "dragend", selectionDragEnd );
-        $imageCreatorViewport.bind( "transformstart", selectionPinchStart );
-        $imageCreatorViewport.bind( "transform", selectionPinch );
-        $imageCreatorViewport.bind( "transformend", selectionPinchEnd );
-        $imageCreatorViewport.bind( "tap", selectionSetEditing );
+        $imageCreatorViewport.bind( "dragstart", selectionPosition );
+        $imageCreatorViewport.bind( "transformstart", selectionPinch );
+        $imageCreatorViewport.bind( "tap", selectionTap );
         $imageCreatorViewport.bind( "mousedown mousemove", function( event )
         {
             if( ! editing ) event.preventDefault();
@@ -83,7 +70,9 @@ function( config, cache, utilMath )
 
         $imageCreatorSelectionTextEdit.bind( "change, keyup", selectionSetText );
 
-        selectionCreate();
+        // Only create grips if we have mouse events.
+        //
+        if( ! utilDetect.NO_MOUSEEVENTS ) selectionCreate();
     };
 
     function selectionCreate()
@@ -95,8 +84,9 @@ function( config, cache, utilMath )
         $.each( module.options.grips, function( gripIndex, grip )
         {
             var $gripClone = $grip.clone();
-            
+
             $gripClone.addClass( "grip" + grip );
+            $gripClone.data( "grip", grip );
 
             $gripClone.find( ".gripScale" ).css( "cursor", grip.toLowerCase() + "-resize" );
 
@@ -104,8 +94,8 @@ function( config, cache, utilMath )
         });
     }
 
-    function selectionPosition( event, layer )
-    {    
+    function selectionUpdate( event, layer )
+    {
         if( event.type === "layerSelect" )
         {
             selectionDisableEditing( event );
@@ -127,107 +117,97 @@ function( config, cache, utilMath )
                 ,   "height"     : layer.sizeCurrent.height
                 ,   "left"       : layer.position.x
                 ,   "top"        : layer.position.y
-                ,   "color"      : layer.color
                 ,   "display"    : "block"
                 ,   "lineHeight" : Math.floor( layer.fontSize * layer.lineHeight ) + "px"
                 ,   "fontSize"   : layer.fontSize
                 ,   "fontFamily" : layer.font
-                ,   "-webkit-transform" : 'rotate(' + layer.rotation.degrees + 'deg )'
-                });  
+                ,   "transform"  : "rotate(" + layer.rotation.degrees + "deg )"
+                });
             }
         }
 
         $imageCreatorSelection.toggle( layer && layer.visible && ! layer.locked );
     }
 
-    function selectionSetEditing( event, state )
+    function selectionKeyDown( event )
     {
-        var layer = cache.getLayerActive();
-
-        if( state )
+        if( event.shiftKey )
         {
-            selectionEnableEditing( event, layer );
-        }
-        else
-        {
-            selectionDisableEditing( event );
+            shiftKeyEnabled = true;
         }
     }
 
-    function selectionDisableEditing( event, layer )
+    function selectionKeyUp( event )
     {
-        if( editing && event.target !== $imageCreatorSelectionTextEdit[0] )
-        {
-            editing = false;
-
-            $imageCreatorSelection.removeClass( "editing" );
-            $imageCreatorSelectionTextEdit.hide();
-
-            $.publish( "layerEdit.engine" );
-        }
-    }
-
-    function selectionEnableEditing( event, layer, state )
-    {
-        if( layer.type === "text" )
-        {
-            editing = true;
-
-            $imageCreatorSelectionTextEdit.val( layer.text );
-
-            $imageCreatorSelection.addClass( "editing" );
-
-            selectionPosition( event, layer );
-
-            $imageCreatorSelectionTextEdit.focus();
-        }
-    }
-
-    function selectionSetText()
-    {
-        var layerCurrent = cache.getLayerActive();
-
-        layerCurrent.setText( this.value );
-
-        $.publish( "layerUpdate", [ layerCurrent ] );       
+        shiftKeyEnabled = false;
     }
 
     function selectionVisibility( event, layer )
-    { 
+    {
         if( layer.selected && ! layer.locked )
         {
             $imageCreatorSelection.toggle( layer.visible );
-            $imageCreatorSelectionTextEdit.toggle( layer.visible );
+            $imageCreatorSelectionTextEdit.toggle( editing && layer.visible );
         }
     }
 
     function selectionScale( event )
     {
-        var layerCurrent = cache.getLayerActive()
-        ,   gripPositionStart = 
+        var layerCurrent    = cache.getLayerActive()
+        ,   layerScaleStart = layerCurrent.fontSize || layerCurrent.scale
+        ,   gripName        = $( event.target ).parent().data( "grip" )
+        ,   scaleSliceY     = 2 / ( layerCurrent.sizeRotated.height / layerScaleStart )
+        ,   scaleSliceX     = 2 / ( layerCurrent.sizeRotated.width  / layerScaleStart )
+        ,   mouse =
             {
-                x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width() / 2 )
-            ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
+                x : event.pageX
+            ,   y : event.pageY
             }
-        ,   distance = 0
+        ,   deltaScale = 0
         ;
 
         $( "body" ).addClass( "noSelect" );
 
         $( document ).bind( "mousemove.selection", function( event )
         {
-            var gripPositionNow = 
-                {
-                    x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width() / 2 )
-                ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
-                }
-            ,   distanceNow   = utilMath.getDistance( gripPositionStart, gripPositionNow )
-            ,   distanceDelta = ( distanceNow - distance ) / 200
+            var quantifierY = scaleSliceY * Math.abs( event.pageY - mouse.y )
+            ,   quantifierX = scaleSliceX * Math.abs( event.pageX - mouse.x )
             ;
 
-            $imageCreatorSelection.trigger( "onScale", [ layerCurrent.scale + distanceDelta, true ] );
+            if( gripName === "S" )
+            {
+                deltaScale = event.pageY > mouse.y ? ( deltaScale + quantifierY ) : ( deltaScale - quantifierY );
+            }
 
-            distance = distanceNow;
+            if( gripName === "N" )
+            {
+                deltaScale = event.pageY > mouse.y ? ( deltaScale - quantifierY ) : ( deltaScale + quantifierY );
+            }
+
+            if( gripName === "E" )
+            {
+                deltaScale = event.pageX > mouse.x ? ( deltaScale + quantifierX ) : ( deltaScale - quantifierX );
+            }
+
+            if( gripName === "W" )
+            {
+                deltaScale = event.pageX > mouse.x ? ( deltaScale - quantifierX ) : ( deltaScale + quantifierX );
+            }
+
+            if( layerCurrent.setFontSize )
+            {
+                layerCurrent.setFontSize( layerScaleStart + deltaScale );
+            }
+            else
+            {
+                layerCurrent.setScale( layerScaleStart + deltaScale );
+            }
+
+            mouse.x = event.pageX;
+            mouse.y = event.pageY;
+
+            $.publish( "layerUpdate", [ layerCurrent ] );
+            $.publish( "selectionScale", [ layerCurrent.fontSize || layerCurrent.scale, true ] );
         });
 
         $( document ).bind( "mouseup.selection", function( event )
@@ -241,31 +221,20 @@ function( config, cache, utilMath )
         return false;
     }
 
-    function selectionKeyDown( event ) 
-    {
-        if( event.shiftKey ) 
-        {
-            shiftKeyEnabled = true;
-        }
-    }
-
-    function selectionKeyUp( event ) 
-    {
-        shiftKeyEnabled = false;
-    }
-
     function selectionRotate( event )
     {
         event.preventDefault();
 
-        var layerRotationStart      = cache.getLayerActive().rotation.radians
-        ,   gripPositionCenterStart = 
+        var layerCurrent            = cache.getLayerActive()
+        ,   layerRotationStart      = layerCurrent.rotation.radians
+        ,   selectionOffset         = $imageCreatorSelection.offset()
+        ,   gripPositionCenterStart =
             {
-                x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width()  / 2 )
-            ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
+                x : event.pageX - selectionOffset.left - ( layerCurrent.sizeRotated.width  / 2 )
+            ,   y : event.pageY - selectionOffset.top  - ( layerCurrent.sizeRotated.height / 2 )
             }
         ,   gripOffsetRadians = utilMath.sanitizeRadians( Math.atan2( gripPositionCenterStart.x, -gripPositionCenterStart.y ) )
-        ,   slice = Math.PI * 2 / module.options.grips.length;
+        ,   slice             = Math.PI * 2 / module.options.grips.length;
         ;
 
         $( "html" ).addClass( "noSelect cursorRotate" );
@@ -274,10 +243,10 @@ function( config, cache, utilMath )
         {
             event.preventDefault();
 
-            var gripPositionCenter = 
+            var gripPositionCenter =
             {
-                x : event.pageX - $imageCreatorSelection.offset().left - ( $imageCreatorSelection.width() / 2 )
-            ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( $imageCreatorSelection.height() / 2 )
+                x : event.pageX - $imageCreatorSelection.offset().left - ( layerCurrent.sizeRotated.width  / 2 )
+            ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( layerCurrent.sizeRotated.height / 2 )
             }
             ,   radians = utilMath.sanitizeRadians( layerRotationStart + utilMath.sanitizeRadians( Math.atan2( gripPositionCenter.x, -gripPositionCenter.y ) ) - gripOffsetRadians )
             ;
@@ -287,15 +256,16 @@ function( config, cache, utilMath )
                 radians = Math.round( radians * 1000 / ( slice * 1000 ) ) * slice;
             }
 
-            var rotation = 
+            layerCurrent.setRotate(
             {
                 radians : radians
-            ,   degrees : Math.round( utilMath.toDegrees( radians ) )
+            ,   degrees : utilMath.toDegrees( radians )
             ,   sin     : Math.sin( radians )
             ,   cos     : Math.cos( radians )
-            };
+            } );
 
-            $imageCreatorSelection.trigger( "onRotate", [ rotation, true ] );
+            $.publish( "layerUpdate", [ layerCurrent, true ] );
+            $.publish( "selectionRotate", [ layerCurrent.rotation, true ] );
         });
 
         $( document ).bind( "mouseup.selection", function( event )
@@ -309,77 +279,174 @@ function( config, cache, utilMath )
         return false;
     }
 
-    function selectionDragStart( event )
-    {
-        event.preventDefault();
-
-        mouse.x = event.gesture && event.gesture.deltaX || 0;
-        mouse.y = event.gesture && event.gesture.deltaY || 0;
-
-        $( "html" ).addClass( "noSelect" );
-
-        event.gesture && event.gesture.preventDefault();
-    }
-
-    function selectionDrag( event )
-    {
-        var delta = 
-        {
-            x : event.gesture && event.gesture.deltaX - mouse.x
-        ,   y : event.gesture && event.gesture.deltaY - mouse.y
-        };
-
-        // temp fix until my hammer issue gets resolves
-        //
-        delta.x = isNaN(delta.x) ? 0 : delta.x;
-        delta.y = isNaN(delta.y) ? 0 : delta.y;
-
-        $( "html" ).addClass( "cursorGrabbing" );
-
-        if( ! editing )
-        {
-            $.publish( "viewportMove", [ delta ] );
-        }
-
-        mouse.x = event.gesture && event.gesture.deltaX || 0;
-        mouse.y = event.gesture && event.gesture.deltaY || 0;  
-    }
-
-    function selectionDragEnd( event )
-    {
-        $( "html" ).removeClass( "noSelect cursorGrabbing" );
-    }
-
-    function selectionPinchStart( event )
+    function selectionPosition( event )
     {
         event.gesture.preventDefault();
 
-        pinch.scale  = event.gesture.scale;
-        pinch.rotate = event.gesture.rotation; 
+        var layerCurrent = cache.getLayerActive()
+        ,   mouse =
+            {
+                x : event.gesture.deltaX
+            ,   y : event.gesture.deltaY
+            }
+        ;
+
+        $( "html" ).addClass( "noSelect cursorGrabbing" );
+
+        $( document ).bind( "drag.selection", function( event )
+        {
+            if( ! editing && layerCurrent && layerCurrent.visible )
+            {
+                layerCurrent.setPosition({
+                    x : event.gesture.deltaX - mouse.x
+                ,   y : event.gesture.deltaY - mouse.y
+                });
+
+                $.publish( "layerUpdate", [ layerCurrent, true ] );
+            }
+
+            mouse.x = event.gesture.deltaX;
+            mouse.y = event.gesture.deltaY;
+        });
+
+        $( document ).bind( "dragend.selection", function( event )
+        {
+            $( document ).unbind( ".selection" );
+            $( "html" ).removeClass( "noSelect cursorGrabbing" );
+
+            return false;
+        });
     }
 
     function selectionPinch( event )
     {
         event.gesture.preventDefault();
 
-        var delta = 
-        {
-            scale  : event.gesture.scale    - pinch.scale
-        ,   rotate : event.gesture.rotation - pinch.rotate
-        }
+        var layerCurrent      = cache.getLayerActive()
+        ,   layerRadiansStart = layerCurrent.rotation.radians
+        ,   layerScaleStart   = layerCurrent.fontSize || layerCurrent.scale
+        ,   pinch             =
+            {
+                scale  : event.gesture.scale
+            ,   rotate : event.gesture.rotation
+            }
+        ;
 
-        if( ! editing )
+        $( document ).bind( "transform.selection", function( event )
         {
-            $.publish( "viewportPinch", [ delta ] );
-        }
-        
-        pinch.scale  = event.gesture.scale;
-        pinch.rotate = event.gesture.rotation;
+            event.gesture.preventDefault();
+
+            var radians  = utilMath.sanitizeRadians( layerRadiansStart + utilMath.toRadians( event.gesture.rotation - pinch.rotate ) )
+            ,   rotation =
+                {
+                    radians : radians
+                ,   degrees : utilMath.toDegrees( radians )
+                ,   sin     : Math.sin( radians )
+                ,   cos     : Math.cos( radians )
+                }
+            ,   scale = 0;
+            ;
+
+            if( "text" === layerCurrent.type )
+            {
+                scale = layerScaleStart + ( ( event.gesture.scale - pinch.scale ) * 10 );
+            }
+            else
+            {
+                scale = ( layerScaleStart + ( ( event.gesture.scale - pinch.scale ) / 2 ) ).toFixed( 2 );
+            }
+
+            if( ! editing && layerCurrent && layerCurrent.visible )
+            {
+                layerCurrent.setRotate( rotation );
+                layerCurrent.setScale( scale );
+
+                $.publish( "layerUpdate", [ layerCurrent ] );
+                $.publish( "selectionRotate", [ layerCurrent.rotation, true ] );
+                $.publish( "selectionScale", [ layerCurrent.scale, true ] );
+            }
+
+            pinch.scale  = event.gesture.scale;
+            pinch.rotate = event.gesture.rotation;
+        });
+
+        $( document ).bind( "transformend.selection", function( event )
+        {
+            $( document ).unbind( ".selection" );
+
+            return false;
+        });
     }
 
-    function selectionPinchEnd( event )
+    function selectionTap( event )
     {
+        var layerActive = cache.getLayerActive()
+        ,   offset      = $imageCreatorViewport.offset()
+        ,   mouse       =
+            {
+                x : event.gesture.center.pageX - offset.left
+            ,   y : event.gesture.center.pageY - offset.top
+            }
+        ,   layerFound  = false
+        ;
 
+        $.each( cache.getLayers(), function( index, layer )
+        {
+            if( utilMath.isPointInPath( mouse, layer.sizeCurrent, layer.position, layer.rotation.radians ) )
+            {
+                if( layerActive.id === layer.id && layerActive.editable )
+                {
+                    selectionEnableEditing( event, layerActive );
+                }
+                else
+                {
+                    cache.setLayerActiveByID( layer.id );
+                }
+
+                layerFound = true;
+            }
+        });
+
+        if( ! layerFound && editing )
+        {
+            selectionDisableEditing();
+        }
+    }
+
+    function selectionDisableEditing( event )
+    {
+        if( editing )
+        {
+            editing = false;
+
+            $imageCreatorSelection.removeClass( "editing" );
+            $imageCreatorSelectionTextEdit.hide();
+        }
+    }
+
+    function selectionEnableEditing( event, layerActive )
+    {
+        if( ! editing )
+        {
+            editing = true;
+
+            $imageCreatorSelectionTextEdit.val( layerActive.text );
+
+            $imageCreatorSelection.addClass( "editing" );
+
+            selectionUpdate( event, layerActive );
+
+            $imageCreatorSelectionTextEdit.focus();
+        }
+    }
+
+    function selectionSetText()
+    {
+        var layerCurrent = cache.getLayerActive();
+
+        layerCurrent.setText( this.value );
+
+        $.publish( "layerUpdate", [ layerCurrent ] );
     }
 
     return module;

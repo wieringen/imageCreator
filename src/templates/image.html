@@ -1,16 +1,48 @@
-<div class="imageCreatorTool imageCreatorToolImage moduleDisabled">
+<div class="imageCreatorTool imageCreatorUIImage moduleDisabled">
     <h2 class="moduleTitle"></h2>
 
     <ul class="moduleMenu">
-        <li><a class="tabActive" href="#">Library</a></li>
-        <li><a href="#">Filters</a></li>
-        <li><a href="#">Dimensions</a></li>
+        <li><a href="#" class="tabActive">Image</a></li>    
     </ul>
 
     <div class="moduleBody">
 
         <div class="moduleTab tabActive">
-        
+            <div class="moduleSub imageFilters">
+                <h3>Fillters</h3>
+                <label>
+                    <select class="selectFilter">
+                        <option value="none">None</option>
+                        <option class="selectFilterItem" value=""></option>
+                    </select>
+                </label>
+            </div>
+            <div class="moduleSub imageFilterStrength">
+                <h3>Filter strength</h3>
+                <div class="track">
+                    <div class="thumb"></div>
+                </div>
+                <div class="indicator">100%</div>
+            </div>
+        </div>
+
+        <div class="moduleTab">
+
+            <div class="moduleSub imageCreate">
+                <h3>Add image</h3>
+
+                <p>Select the image you want to upload from your files. And push "Upload image".</p>
+
+                <form method="post" enctype="multipart/form-data" action="temp/upload.processor.php" class="formImageUpload" target="iframeImageUpload">
+                    <input type="file" class="inputImageUpload" name="inputImageUpload" />
+                    <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
+                </form>
+
+                <iframe id="iframeImageUpload" name="iframeImageUpload"></iframe>
+
+                <div class="btn buttonImageUpload">Upload image</div>
+            </div>
+
             <div class="moduleSub imageDecorations">
                 <h3>Clipart</h3>
                 <ul class="imageDecorationsList">
@@ -38,61 +70,5 @@
             </div>
 
         </div>
-
-        <div class="moduleTab">
-            <div class="moduleSub imageFilters">
-                <h3>Fillters</h3>
-                <label>
-                    <select class="selectFilter">
-                        <option value="none">None</option>
-                        <option class="selectFilterItem" value=""></option>
-                    </select>
-                </label>
-            </div>
-            <div class="moduleSub imageFilterStrength">
-                <h3>Filter strength</h3>
-                <div class="track">
-                    <div class="thumb"></div>
-                </div>
-                <div class="indicator">100%</div>
-            </div>
-        </div>
-
-        <div class="moduleTab">
-            <div class="moduleSub imageZoom">
-                <h3>Scale</h3>
-                <div class="track">
-                    <div class="thumb"></div>
-                </div>
-                <div class="indicator">100%</div>
-            </div>
-
-            <div class="moduleSub imageRotate">
-                <h3>Rotate</h3>
-                <div class="track">
-                    <div class="thumb"></div>
-                    <div class="degrees">0&deg;</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="moduleTab">
-            <div class="moduleSub imageCreate">
-                <h3>Add image</h3>
-
-                <p>Select the image you want to upload from your files. And push "Upload image".</p>
-
-                <form method="post" enctype="multipart/form-data" action="temp/upload.processor.php" class="formImageUpload" target="iframeImageUpload">
-                    <input type="file" class="inputImageUpload" name="inputImageUpload" />
-                    <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
-                </form>
-
-                <iframe id="iframeImageUpload" name="iframeImageUpload"></iframe>
-
-                <div class="btn buttonImageUpload">Upload image</div>
-            </div>
-        </div>
-
-        <div class="btn buttonImageAdd">Add new image</div>
     </div>
 </div>

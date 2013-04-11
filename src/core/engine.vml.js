@@ -54,7 +54,7 @@ function( config, cache )
 
         // Create a selection rectangle to put around selected layers.
         //
-        var vmlSelect = $( "<rvml:rect id='vmlSelect' strokecolor='#666' strokeweight='1px'><rvml:stroke dashstyle='dash'></rvml:stroke></rvml:rect>" )[0];
+        var vmlSelect = $( "<rvml:rect id='vmlSelect' strokecolor='#000000' strokeweight='1px'><rvml:stroke dashstyle='dash'></rvml:stroke></rvml:rect>" )[0];
         $imageCreatorCanvas.html( vmlSelect );
 
         // Remove other engines that may be listening.
@@ -65,15 +65,9 @@ function( config, cache )
         //
         $.subscribe( "layerUpdate.engine", vmlLayerCheck );
         $.subscribe( "layerSelect.engine", vmlLayerCheck );
-        $.subscribe( "layerEdit.engine", vmlLayerEdit );
         $.subscribe( "layerVisibility.engine", vmlLayerVisibility );
         $.subscribe( "layerRemove.engine", vmlLayerRemove );
         $.subscribe( "layersRedraw.engine", vmlBuildLayers );
-
-        // Set UI events.
-        //
-        $imageCreatorCanvas.delegate( "p, img", "tap", vmlLayerTapSelect );
-        $( vmlSelect ).bind( "click", vmlLayerTapEdit );
 
         // Do we have any layers allready?
         //
@@ -137,8 +131,8 @@ function( config, cache )
 
         // Append new layer to DOM and reappend the selection layer so its always on top.
         //   
-        $imageCreatorCanvas.append( vmlLayerCurrent );
         $imageCreatorCanvas.append( vmlSelect );
+        $imageCreatorCanvas.append( vmlLayerCurrent );
     }
 
     function vmlLayerUpdate( event, layer, partial )
@@ -151,14 +145,8 @@ function( config, cache )
         {
             var htmlParagraphCurrent = $( vmlLayerCurrent ).find( "p" )[0];
 
-            var buildTextString = "";
 
-            $.each( layer.textLines, function( index, line )
-            {
-                buildTextString += line + "<br/>";
-            });
-
-            htmlParagraphCurrent.innerHTML        = buildTextString;
+            htmlParagraphCurrent.innerText        = layer.text;
             htmlParagraphCurrent.style.color      = layer.color; 
             htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";
             htmlParagraphCurrent.style.fontFamily = layer.font;
@@ -238,39 +226,6 @@ function( config, cache )
     function vmlLayerRemove( event, layerID )
     {
         $( "#" + layerID + module.name ).remove();
-    }
-
-    function vmlLayerEdit( event )
-    {
-        var $layerEditing = $( svgContainer ).find( ".editing" );
-
-        if( $layerEditing.length > 0 )
-        {
-            $layerEditing.attr( "class", "" );
-        }
-        else
-        {
-            $( "#" + cache.getLayerActive().id + module.name ).attr( "class", "editing" );
-        }
-    }
-
-    function vmlLayerTapEdit( event )
-    {
-        var layerActive = cache.getLayerActive();
-
-        if( layerActive.editable )
-        {
-            $.publish( "layerEdit", [ true ] );
-        }
-
-        return false;
-    }
-
-    function vmlLayerTapSelect( event )
-    {
-        var layer = this.nodeName === "P" ? this.parentNode : this;
-
-        cache.setLayerActiveByID( layer.id.replace( module.name, "" ) );
     }
 
     // http://balzerg.blogspot.co.il/2012/08/analytical-fix-for-ie-rotation-origin.html

@@ -26,20 +26,22 @@ function()
     module.measureText = function( object ) 
     {
         var measureDiv = document.createElement( "measureDiv" );
+        measureDiv.className = "imageCreatorMeasureText"
 
         document.body.appendChild(measureDiv);
 
         measureDiv.style.fontSize   = object.fontSize + "px";
         measureDiv.style.fontFamily = object.font;
         measureDiv.style.fontWeight = object.weight ? "bold" : "normal";
-        measureDiv.style.position   = "absolute";
-        measureDiv.style.left       = "0px";
-        measureDiv.style.top        = "0px";
-        measureDiv.style.top        = "0px";
-        measureDiv.style.visibility = "hidden";
-        measureDiv.style.whiteSpace = "pre";
-        
-        measureDiv.innerHTML = object.text;
+
+        if( window.attachEvent && !window.addEventListener )
+        {
+            measureDiv.innerText = object.text;
+        }   
+        else
+        { 
+            $( measureDiv ).text( object.text );
+        }
 
         var textWidth = measureDiv.clientWidth + 10;
 

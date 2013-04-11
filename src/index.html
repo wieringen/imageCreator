@@ -10,8 +10,8 @@
         <link rel="stylesheet" type="text/css" href="css/imageCreator.css" />
         <style>
         /* Just some styles to create a basic laout example.  */
-        body { margin: 20px 20px 0 20px; }
-        .imageCreatorViewport { float: left;  margin: 0 0 20px; }
+        body { background-color: #F5F5F5; margin: 20px 20px 0 20px; }
+        .imageCreator { float: left;  margin: 0 0 20px; }
         .justASimpleWrapper { float: left; padding: 0 0 0 20px; }
         .justASimpleWrapperLeft { float: left; padding: 0 20px 0 0; }
         .imageCreatorTool { margin: 0 0 20px; }
@@ -24,26 +24,35 @@
     <body>
 
         <div class="justASimpleWrapperLeft">
-            <div class="imageCreatorToolImage"></div>
-            <div class="imageCreatorToolText"></div>
+            <div class="imageCreatorUIDimensions"></div>
+            <div class="imageCreatorUIImage"></div>
+            <div class="imageCreatorUIText"></div>
         </div>
 
-        <div class="imageCreatorViewport">
-            
-            <div class="imageCreatorCanvas"></div>
-     
-            <div class="imageCreatorSelection"></div>
-            <textarea class="imageCreatorSelectionTextEdit" wrap="soft" spellcheck="false"></textarea>
+        <div class="imageCreator">
+            <div class="imageCreatorToolbar">
+                <a href="#" class="buttonTextAdd"></a>
+                <a href="#" class="buttonImageAdd"></a>
+            </div>
 
-            <div class="imageCreatorMessage">
-                <div class="imageCreatorMessageInner"></div>
-                <div class="imageCreatorMessageClose">X</div>
-            </div>    
+            <div class="imageCreatorViewport">
+                
+                <div class="imageCreatorCanvas"></div>
+                
+                <div class="imageCreatorSelection"></div>
+
+                <textarea class="imageCreatorSelectionTextEdit" wrap="soft" spellcheck="false"></textarea>
+
+                <div class="imageCreatorMessage">
+                    <div class="imageCreatorMessageInner"></div>
+                    <div class="imageCreatorMessageClose">X</div>
+                </div>
+            </div>
         </div>
 
         <div class="justASimpleWrapper">
-            <div class="imageCreatorToolInfo"></div>
-            <div class="imageCreatorToolLayers"></div>
+            <div class="imageCreatorUIInfo"></div>
+            <div class="imageCreatorUILayers"></div>
         </div>
 
 

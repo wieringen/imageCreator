@@ -1,6 +1,6 @@
-/** 
+/**
  * Image tool Class
- * 
+ *
  * @name Image
  * @class Image
  * @constructor
@@ -23,7 +23,7 @@ define(
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.slider"
 ,   "plugins/jquery.circleSlider"
-,   "plugins/jquery.dropArea"    
+,   "plugins/jquery.dropArea"
 ],
 function( moduleHTML, config, cache, modelImage )
 {
@@ -37,15 +37,14 @@ function( moduleHTML, config, cache, modelImage )
         }
 
     ,   $imageCreatorViewport
+    ,   $imageCreatorSelection
+
     ,   $module
     ,   $moduleTitle
-    ,   $imageCreatorSelection   
-    ,   $imageZoom
-    ,   $imageRotate
     ,   $buttonImageUpload
     ,   $buttonImageAdd
     ,   $imageDecorationsList
-    ,   $imageBackgroundsList 
+    ,   $imageBackgroundsList
     ,   $selectFilter
 
     ,   layerCurrent = false
@@ -69,17 +68,16 @@ function( moduleHTML, config, cache, modelImage )
         //
         $imageCreatorViewport  = $( ".imageCreatorViewport" );
         $imageCreatorSelection = $( ".imageCreatorSelection" );
+        $imageCreatorToolbar   = $( ".imageCreatorToolbar" );
 
         // Get module DOM elements.
         //
-        $module               = $( ".imageCreatorToolImage" );
+        $module               = $( ".imageCreatorUIImage" );
         $moduleTitle          = $module.find( ".moduleTitle" );
-        $imageZoom            = $module.find( ".imageZoom" );
-        $imageRotate          = $module.find( ".imageRotate" ); 
         $imageFilterStrength  = $module.find( ".imageFilterStrength" );
-        $buttonImageUpload    = $module.find( ".buttonImageUpload" ); 
-        $buttonImageAdd       = $module.find( ".buttonImageAdd" ); 
-        $imageDecorationsList = $module.find( ".imageDecorationsList" ); 
+        $buttonImageUpload    = $module.find( ".buttonImageUpload" );
+        $buttonImageAdd       = $( ".buttonImageAdd" );
+        $imageDecorationsList = $module.find( ".imageDecorationsList" );
         $imageBackgroundsList = $module.find( ".imageBackgroundsList" );
         $selectFilter         = $module.find( ".selectFilter" );
 
@@ -94,26 +92,13 @@ function( moduleHTML, config, cache, modelImage )
             "menu"     : ".moduleMenu"
         ,   "tabs"     : "a"
         ,   "pages"    : ".moduleTab"
-        ,   "callback" : function()
-            {
-                $buttonImageAdd.show();
-            }
         });
-        $imageZoom.slider( 
-        { 
-            "start"     : 100
-        ,   "scale"     : module.options.zoomScale
-        ,   "downScale" : module.options.downScale
-        ,   "unit"      : "%"
-        });
-        $imageFilterStrength.slider( 
-        { 
+        $imageFilterStrength.slider(
+        {
             "start"     : 100
         ,   "scale"     : [ 0, 100 ]
         ,   "unit"      : "%"
         });
-
-        $imageRotate.circleSlider();
         $imageCreatorViewport.dropArea();
 
         // Get snippets.
@@ -125,42 +110,33 @@ function( moduleHTML, config, cache, modelImage )
         $.each( module.filters, function( filterKey, filter )
         {
             var $filterClone = module.snippets.$filterSnippet.clone();
-            
+
             $filterClone.attr( "value", filterKey );
             $filterClone.text( filter.name );
 
             $selectFilter.append( $filterClone );
-        }); 
+        });
 
         // Listen to global app events.
         //
-        $.subscribe( "viewportPinch", imagePinch );        
-        $.subscribe( "viewportMove", imagePosition );
         $.subscribe( "layerSelect", imageSelect );
         $.subscribe( "layerVisibility", imageSelect );
         $.subscribe( "fileUpload", imageAdd );
 
-        // Listen to selection events.
-        //        
-        $imageCreatorSelection.bind( "onRotate", imageRotate );
-        $imageCreatorSelection.bind( "onScale", imageScale );
-
         // Listen to UI module events.
-        //    
-        $imageZoom.bind( "onDrag", imageScale );
-        $imageRotate.bind( "onDrag", imageRotate );
+        //
         $imageFilterStrength.bind( "onDrag", imageFilterStrength );
 
         // Set Button events.
-        //       
-        $selectFilter.change( imageFilter ); 
+        //
+        $selectFilter.change( imageFilter );
         $imageDecorationsList.delegate( "img", "tap", imageAdd );
         $imageBackgroundsList.delegate( "img", "tap", backgroundAdd );
-        $buttonImageUpload.bind( "click", imageUpload );         
+        $buttonImageUpload.bind( "click", imageUpload );
         $buttonImageAdd.click( function()
         {
-            $module.trigger( "setTab", [ 3 ] );
-            $buttonImageAdd.hide();
+            $module.removeClass( "moduleDisabled" );
+            $module.trigger( "setTab", [ 1 ] );
 
             return false;
         });
@@ -180,21 +156,19 @@ function( moduleHTML, config, cache, modelImage )
         //
         module.enabled = layer.visible && layer.type === "image" || false;
 
-        $module.toggleClass( "moduleDisabled", ! module.enabled ); 
-        $module.toggleClass( "moduleLocked", ! layer.locked ); 
+        $module.toggleClass( "moduleDisabled", ! module.enabled );
+        $module.toggleClass( "moduleLocked", ! layer.locked );
 
         if( module.enabled )
         {
             layerCurrent = layer;
-            
+
             // Set the UI to match the selected layers properties.
             //
             if( ! layer.locked )
             {
-                $module.trigger( "setTab", [ 2 ] );
+                $module.trigger( "setTab", [ 0 ] );
             }
-            $imageRotate.trigger( "setPosition", [ layerCurrent.rotation.degrees ] );
-            $imageZoom.trigger( "setPosition", [ layerCurrent.scale ] );        
             $imageFilterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
             $selectFilter.val( layerCurrent.filter.name.toLowerCase() );
         }
@@ -228,15 +202,15 @@ function( moduleHTML, config, cache, modelImage )
 
     function backgroundAdd( url )
     {
-        var layer = 
+        var layer =
         {
             locked    : true
         ,   imageType : "background"
-        ,   position  : 
+        ,   position  :
             {
                 x : 0
             ,   y : 0
-            } 
+            }
         ,   scale : 1
         ,   src : typeof url === "string" ? url : this.src
         };
@@ -246,15 +220,15 @@ function( moduleHTML, config, cache, modelImage )
             cache.setLayerActive( instance );
         });
 
-        return false;        
+        return false;
     }
 
     function imageAdd( url )
     {
-        var layer = 
+        var layer =
         {
             src   : typeof url === "string" ? url : this.src
-        ,   scale : 100 / module.options.downScale           
+        ,   scale : 0.3335
         };
 
         modelImage.fromObject( layer, function( instance )
@@ -262,58 +236,9 @@ function( moduleHTML, config, cache, modelImage )
             cache.setLayerActive( instance );
         });
 
-        return false;        
+        return false;
     }
 
-    function imagePinch( event, delta )
-    {
-        if( module.enabled && layerCurrent && layerCurrent.visible )
-        {
-            var deltaScale    = ( layerCurrent.scale + ( delta.scale / 2 ) ).toFixed( 2 )
-            ,   radians       = utils.sanitizeRadians( layerCurrent.rotation.radians + utils.toRadians( delta.rotate ) )
-            ,   deltaRotation = 
-                {
-                    radians : radians
-                ,   degrees : Math.round( utils.toDegrees( radians ) )
-                ,   sin     : Math.sin( radians )
-                ,   cos     : Math.cos( radians )
-                }
-            ;
-
-            imageZoom( event, deltaScale, true );
-            imageScale( event, deltaRotation, true );
-        }
-    }
-
-    function imageRotate( event, rotation, setUI )
-    {
-        if( module.enabled && layerCurrent && layerCurrent.visible )
-        {
-            layerCurrent.setRotate( rotation );
-            
-            if( setUI )
-            {
-                $imageRotate.trigger( "setPosition", [ rotation.degrees ] );
-            }
-
-            $.publish( "layerUpdate", [ layerCurrent ] ); 
-        }
-    }
-
-    function imageScale( event, scale, setUI )
-    {
-        if( module.enabled && layerCurrent && layerCurrent.visible )
-        {
-            layerCurrent.setScale( scale );
-
-            if( setUI )
-            {
-                $imageZoom.trigger( "setPosition", [ scale ] );
-            }
-
-            $.publish( "layerUpdate", [ layerCurrent ] ); 
-        }
-    }
 
     function imageFilter( event )
     {
@@ -323,7 +248,7 @@ function( moduleHTML, config, cache, modelImage )
 
             $imageFilterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
 
-            $.publish( "layerUpdate", [ layerCurrent ] ); 
+            $.publish( "layerUpdate", [ layerCurrent ] );
         }
     }
 
@@ -333,17 +258,7 @@ function( moduleHTML, config, cache, modelImage )
         {
             layerCurrent.setFilterStrength( strength );
 
-            $.publish( "layerUpdate", [ layerCurrent ] ); 
-        }    
-    }
-
-    function imagePosition( event, delta )
-    {
-        if( module.enabled && layerCurrent && layerCurrent.visible )
-        {
-            layerCurrent.setPosition( delta );
-
-            $.publish( "layerUpdate", [ layerCurrent, true ] ); 
+            $.publish( "layerUpdate", [ layerCurrent ] );
         }
     }
 
