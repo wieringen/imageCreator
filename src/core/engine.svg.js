@@ -272,7 +272,7 @@ function( config, cache )
         //
         if( event.type !== "layerUpdate" )
         {
-            svgSelect.setAttribute( "visibility", layer.visible ? "visible" : "hidden" );
+            svgSelect.setAttribute( "visibility", layer.visible && layer.selected ? "visible" : "hidden" );
 
             // When the layer is a image set the selection to match the image its real size so we can reuse the image projection matrix.
             // Text layers dont need this because text is not scaled.

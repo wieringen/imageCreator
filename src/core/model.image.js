@@ -126,18 +126,27 @@ function( config, utilMath, utilClass, modelLayer )
 
     module.model.fromObject = function( object, callback )
     {
-        var img = document.createElement( "img" );
+        var deferred = $.Deferred()
+        ,   img      = document.createElement( "img" )
+        ;
 
         img.onload = function()
         {
+            var model = new module.model( img, object );
+
+            deferred.resolve( model );
+
             if (callback)
             {
-                callback( new module.model(img, object) );
+                callback( model );
             }
+
             img = img.onload = null;
         };
 
         img.src = object.src;
+
+        return deferred.promise();
     };
 
     return module.model;

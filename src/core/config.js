@@ -171,5 +171,7 @@ function( utilDetect )
         module.engine = engineName || "";
     };
 
+    module.initialize();
+
     return module;
 });

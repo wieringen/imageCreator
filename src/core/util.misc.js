@@ -51,5 +51,12 @@ function()
         return textWidth;
     };
 
+    module.whenAll = function(arr)
+    {
+        return $.when.apply($, arr).pipe(function() {
+            return Array.prototype.slice.call(arguments);
+        });
+    };
+
     return module;
 });

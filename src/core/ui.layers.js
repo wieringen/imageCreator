@@ -113,6 +113,7 @@ function( moduleHTML, config, cache )
         $.subscribe( "layerSelect", layerCheck );
         $.subscribe( "layerRemove", layerRemove );
         $.subscribe( "layerVisibility", layerVisibility );
+        $.subscribe( "layersRedraw", buildLayers );
 
         // Set Button events.
         //
@@ -133,7 +134,18 @@ function( moduleHTML, config, cache )
 
             cache.storeLayers();
         });
+
+        // Do we have any layers allready?
+        //
+        buildLayers();
     };
+
+    function buildLayers()
+    {
+        $layerContainer.find( ".objectLayer" ).remove();
+
+        $.each( cache.getLayers(), layerCheck );
+    }
 
     function layerCheck( event, layer )
     {

@@ -14,10 +14,11 @@ define(
     "config"
 ,   "model.text"
 ,   "model.image"
+,   "util.misc"
 
 ,   "plugins/jquery.storage"
 ],
-function( config, modelText, modelImage )
+function( config, modelText, modelImage, utilMisc )
 {
     var module = {}
 
@@ -39,7 +40,10 @@ function( config, modelText, modelImage )
 
     module.loadLayers = function()
     {
-        var layersStored = $.Storage.get( keyLayers );
+        var layersStored    = $.Storage.get( keyLayers )
+        ,   promises        = []
+        ,   deferred        = null;
+        ;
 
         if( layersStored )
         {
@@ -49,18 +53,23 @@ function( config, modelText, modelImage )
             {
                 if( layersStored[ layerIndex ].type === "image" )
                 {
-                    modelImage.fromObject( layersStored[ layerIndex ], function( instance )
-                    {
-                         layers.unshift( instance );
-                    });
+                    promises.unshift( modelImage.fromObject( layersStored[ layerIndex ] ) );
                 }
 
                 if( layersStored[ layerIndex ].type === "text" )
                 {
-                    console.log( layersStored[ layerIndex ]  );
-                    layers.unshift( new modelText( layersStored[ layerIndex ] ) );
+                    deferred = ( new $.Deferred() ).resolve( new modelText( layersStored[ layerIndex ] ) );
+
+                    promises.unshift( deferred );
                 }
             }
+
+            utilMisc.whenAll( promises ).done(function( models )
+            {
+                 layers = models;
+
+                 $.publish( "layersRedraw" );
+            });
         }
     };
 

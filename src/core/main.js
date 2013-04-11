@@ -41,10 +41,6 @@ function( config, cache, lazyRequire )
 
     $( document ).ready( function()
     {
-        // Initialize config.
-        //
-        config.initialize();
-
         // Initialize cache.
         //
         cache.initialize();
