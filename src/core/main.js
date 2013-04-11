@@ -45,6 +45,10 @@ function( config, cache, lazyRequire )
         //
         config.initialize();
 
+        // Initialize cache.
+        //
+        cache.initialize();
+
         // Listen for global app events.
         //
         $.subscribe( "setMessage", setMessage );
@@ -64,10 +68,6 @@ function( config, cache, lazyRequire )
         {
             return loadEngine( false, engineName );
         });
-
-        // Initialize cache.
-        //
-        cache.initialize();
 
         // Setup notifications events.
         //
