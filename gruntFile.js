@@ -85,6 +85,7 @@ module.exports = function(grunt)
                     ,   "ui.text"
                     ,   "ui.info"
                     ,   "ui.layers"
+                    ,   "ui.dimensions"
                     ,   "ui.selection"
                     ,   "engine.svg"
                     ,   "engine.canvas"
