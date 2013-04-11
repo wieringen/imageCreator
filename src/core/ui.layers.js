@@ -95,7 +95,7 @@ function( moduleHTML, config, cache )
         {
             var engine = module.engines.types[ engineName ];
 
-            if( engine.support() )
+            if( engine.support )
             {
                 var $engineClone = module.snippets.$engineSnippet.clone();
 
