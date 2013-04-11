@@ -132,6 +132,7 @@ module.exports = function(grunt)
                 ,   "src/css/ui.text.css"
                 ,   "src/css/ui.info.css"
                 ,   "src/css/ui.layers.css"
+                ,   "src/css/ui.dimensions.css"
                 ,   "src/css/ui.selection.css"
                 ]
 
