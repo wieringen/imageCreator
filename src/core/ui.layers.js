@@ -217,12 +217,11 @@ function( moduleHTML, config, cache )
 
     function layerVisibilityById( event )
     {
-        var $layerToToggle = $( this ).parent()
-        ,   layerID        = $layerToToggle.attr( "id" ).replace( "objectLayer", "" )
-        ,   layer          = cache.getLayerById( layerID )
+        var layerID = $( this ).parent().attr( "id" ).replace( "objectLayer", "" )
+        ,   layer   = cache.getLayerById( layerID )
         ;
 
-        layer.set( "visible", ! $layerToToggle.hasClass( "hide" ) );
+        layer.set( "visible", ! layer.visible );
 
         $.publish( "layerVisibility", [ layer ] );
 
@@ -231,7 +230,7 @@ function( moduleHTML, config, cache )
 
     function layerVisibility( event, layer )
     {
-        $layerToToggle.toggleClass( "hide", layer.visibility );
+        $( "#objectLayer" + layer.id ).toggleClass( "hide", layer.visibility );
 
         return false;
     }
