@@ -141,7 +141,14 @@ function( config, utilMath, utilClass, modelLayer )
                 callback( model );
             }
 
-            img = img.onload = null;
+            img = img.onload = img.onerror = null;
+        };
+
+        img.onerror = function()
+        {
+            deferred.resolve();
+
+            img = img.onload = img.onerror = null;
         };
 
         img.src = object.src;
