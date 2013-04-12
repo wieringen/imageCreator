@@ -62,12 +62,7 @@ function( config, modelText, modelImage, utilMisc )
                 }
             }
 
-            utilMisc.whenAll( promises ).done(function( models )
-            {
-                 layers = models;
-
-                 $.publish( "layersRedraw" );
-            });
+            utilMisc.whenAll( promises ).done( module.setLayers );
         }
     };
 
@@ -97,10 +92,9 @@ function( config, modelText, modelImage, utilMisc )
 
     module.setLayers = function( data )
     {
-        if ( $.isPlainObject( data ) )
-        {
-            layers = data;
-        }
+        layers = data;
+
+        $.publish( "layersRedraw" );
 
         return layers;
     };
