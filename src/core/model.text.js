@@ -153,6 +153,5 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
         return deferred.promise();
     };
 
-
     return module.model;
 } );
