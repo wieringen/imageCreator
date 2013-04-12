@@ -28,7 +28,7 @@ function()
 
     module.HAS_SVG            = !!document.createElementNS && !!document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGRect
 
-    module.HAS_FOREIGN_OBJECT = "function" === typeof SVGForeignObjectElement
+    module.HAS_FOREIGN_OBJECT = "function" === typeof SVGForeignObjectElement;
 
     module.HAS_CANVAS         = !!document.createElement( "canvas" ).getContext;
 
