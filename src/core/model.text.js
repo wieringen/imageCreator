@@ -137,5 +137,22 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
         }
     });
 
+    module.model.fromObject = function( object, callback )
+    {
+        var deferred = $.Deferred()
+        ,   model    = new module.model( object );
+        ;
+
+        deferred.resolve( model );
+
+        if( callback )
+        {
+            callback( model );
+        }
+
+        return deferred.promise();
+    };
+
+
     return module.model;
 } );

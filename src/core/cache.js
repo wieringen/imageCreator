@@ -58,9 +58,7 @@ function( config, modelText, modelImage, utilMisc )
 
                 if( layersStored[ layerIndex ].type === "text" )
                 {
-                    deferred = ( new $.Deferred() ).resolve( new modelText( layersStored[ layerIndex ] ) );
-
-                    promises.unshift( deferred );
+                    promises.unshift( modelText.fromObject( layersStored[ layerIndex ] ) );
                 }
             }
 
