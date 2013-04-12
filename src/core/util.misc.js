@@ -53,8 +53,12 @@ function()
 
     module.whenAll = function(arr)
     {
-        return $.when.apply($, arr).pipe(function() {
-            return Array.prototype.slice.call(arguments);
+        return $.when.apply($, arr).pipe(function()
+        {
+            return $.grep( Array.prototype.slice.call(arguments), function(value)
+            {
+                return(value);
+            });
         });
     };
 
