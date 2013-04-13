@@ -185,6 +185,7 @@ function( config, cache )
         var svgLayerCurrent = $( "#" + layer.id + module.name )[0]
         ,   svgLayerFilterColorMatrix
         ,   svgLayerFilterComposite
+        ,   domFragment
         ;
 
         // Set type specific attributes.
@@ -195,6 +196,17 @@ function( config, cache )
 
             svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
             svgLayerCurrent.setAttribute( "width", layer.sizeCurrent.width );
+
+            $( svgLayerCurrent ).css(
+            {
+                fill       : layer.color
+            ,   fontSize   : layer.fontSize
+            ,   fontFamily : layer.font
+            ,   fontWeight : layer.weight ? "bold" : "normal"
+            ,   fontStyle  : layer.style ? "italic" : "normal"
+            });
+
+            domFragment = document.createDocumentFragment();
 
             $.each( layer.textLines, function( index, line )
             {
@@ -211,17 +223,11 @@ function( config, cache )
                 tspannode.setAttribute( "dy", index * Math.floor( layer.fontSize * layer.lineHeight )  + "px" );
 
                 tspannode.textContent = line;
-                svgLayerCurrent.appendChild(tspannode);
+
+                domFragment.appendChild(tspannode);
             });
 
-            $( svgLayerCurrent ).css(
-            {
-                fill       : layer.color
-            ,   fontSize   : layer.fontSize
-            ,   fontFamily : layer.font
-            ,   fontWeight : layer.weight ? "bold" : "normal"
-            ,   fontStyle  : layer.style ? "italic" : "normal"
-            });
+            svgLayerCurrent.appendChild(domFragment);
         }
 
         if( "image" === layer.type && ! partial )
