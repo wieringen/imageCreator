@@ -99,6 +99,30 @@ function( config, modelText, modelImage, utilMisc )
         return layers;
     };
 
+    module.setLayer = function( layer )
+    {
+        if( layer.plane === "background" )
+        {
+            for( var layerIndex = layers.length; layerIndex--; )
+            {
+                if( layers[ layerIndex ].plane === "background" )
+                {
+                    module.removeLayer( layers[ layerIndex ] );
+                }
+            }
+
+            layers.unshift( layer );
+
+            $.publish( "layersRedraw" );
+        }
+        else
+        {
+            layers.push( layer );
+        }
+
+        return layer;
+    };
+
     module.setLayerActive = function( layer )
     {
         var isNewLayer = true;
@@ -119,7 +143,8 @@ function( config, modelText, modelImage, utilMisc )
 
             if( isNewLayer )
             {
-                layers.push( layer );
+                module.setLayer( layer );
+
                 layerActive = layer;
             }
 

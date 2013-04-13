@@ -27,6 +27,7 @@ function( config, utilMath, utilClass, utilMisc )
         id              : ""
     ,   name            : ""
     ,   type            : ""
+    ,   plane           : "layer"
 
     ,   visible         : true
     ,   locked          : false
@@ -74,6 +75,7 @@ function( config, utilMath, utilClass, utilMisc )
             {
                 id              : this.id
             ,   name            : this.name
+            ,   plane           : this.plane
 
             ,   locked          : this.locked
 

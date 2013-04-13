@@ -205,7 +205,7 @@ function( moduleHTML, config, cache, modelImage )
         var layer =
         {
             locked    : true
-        ,   imageType : "background"
+        ,   plane     : "background"
         ,   position  :
             {
                 x : 0

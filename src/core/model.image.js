@@ -22,8 +22,7 @@ function( config, utilMath, utilClass, modelLayer )
 
     module.model = utilClass.createClass( modelLayer,
     {
-        imageType : "default"
-    ,   type      : "image"
+        type      : "image"
     ,   sizeReal :
         {
             width  : 0
