@@ -92,7 +92,10 @@ function( config, modelText, modelImage, utilMisc )
 
     module.setLayers = function( data )
     {
-        layers = data;
+        for( var layerIndex = data.length; layerIndex--; )
+        {
+            module.setLayer( data[ layerIndex ] );
+        }
 
         $.publish( "layersRedraw" );
 
