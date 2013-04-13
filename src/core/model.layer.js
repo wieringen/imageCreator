@@ -27,7 +27,7 @@ function( config, utilMath, utilClass, utilMisc )
         id              : ""
     ,   name            : ""
     ,   type            : ""
-    ,   plane           : "layer"
+    ,   plane           : "baseline"
 
     ,   visible         : true
     ,   locked          : false
