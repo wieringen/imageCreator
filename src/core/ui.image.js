@@ -29,7 +29,7 @@ function( moduleHTML, config, cache, modelImage )
 {
     var module =
         {
-            name     : "image.ui"
+            name     : "image"
         ,   enabled  : true
         ,   options  : config.options.ui.image
         ,   filters  : config.options.filters.color
