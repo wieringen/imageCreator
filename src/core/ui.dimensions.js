@@ -118,7 +118,8 @@ function( moduleHTML, config, cache, utilMath )
 
         // Enable module if layer is of the correct type and is visible.
         //
-        module.enabled = layer.visible || false;
+        module.enabled = ! layer.locked && layer.visible || false;
+
         $module.toggleClass( "moduleDisabled", ! module.enabled );
 
         if( module.enabled )
