@@ -174,14 +174,13 @@ function( config, cache, utilMath, utilDetect )
             ,   quantifierX = scaleSliceX * Math.abs( event.pageX - mouse.x )
             ;
 
-            if( gripName === "S" )
-            {
-                deltaScale = event.pageY > mouse.y ? ( deltaScale + quantifierY ) : ( deltaScale - quantifierY );
-            }
-
             if( gripName === "N" )
             {
                 deltaScale = event.pageY > mouse.y ? ( deltaScale - quantifierY ) : ( deltaScale + quantifierY );
+            }
+
+            if( gripName === "NE" )
+            {
             }
 
             if( gripName === "E" )
@@ -189,9 +188,29 @@ function( config, cache, utilMath, utilDetect )
                 deltaScale = event.pageX > mouse.x ? ( deltaScale + quantifierX ) : ( deltaScale - quantifierX );
             }
 
+            if( gripName === "SE" )
+            {
+
+            }
+
+            if( gripName === "S" )
+            {
+                deltaScale = event.pageY > mouse.y ? ( deltaScale + quantifierY ) : ( deltaScale - quantifierY );
+            }
+
+            if( gripName === "SW" )
+            {
+
+            }
+
             if( gripName === "W" )
             {
                 deltaScale = event.pageX > mouse.x ? ( deltaScale - quantifierX ) : ( deltaScale + quantifierX );
+            }
+
+            if( gripName === "NW" )
+            {
+
             }
 
             if( layerCurrent.setFontSize )
@@ -385,18 +404,21 @@ function( config, cache, utilMath, utilDetect )
 
         $.each( cache.getLayers(), function( index, layer )
         {
-            if( utilMath.isPointInPath( mouse, layer.sizeCurrent, layer.position, layer.rotation.radians ) )
+            if( layer.plane === "baseline" )
             {
-                if( layerActive.id === layer.id && layerActive.editable )
+                if( utilMath.isPointInPath( mouse, layer.sizeCurrent, layer.position, layer.rotation.radians ) )
                 {
-                    selectionEnableEditing( event, layerActive );
-                }
-                else
-                {
-                    cache.setLayerActiveByID( layer.id );
-                }
+                    if( layerActive.id === layer.id && layerActive.editable )
+                    {
+                        selectionEnableEditing( event, layerActive );
+                    }
+                    else
+                    {
+                        cache.setLayerActiveByID( layer.id );
+                    }
 
-                layerFound = true;
+                    layerFound = true;
+                }
             }
         });
 
