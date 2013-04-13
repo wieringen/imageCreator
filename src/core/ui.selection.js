@@ -325,18 +325,13 @@ function( config, cache, utilMath, utilDetect )
         var layerCurrent      = cache.getLayerActive()
         ,   layerRadiansStart = layerCurrent.rotation.radians
         ,   layerScaleStart   = layerCurrent.fontSize || layerCurrent.scale
-        ,   pinch             =
-            {
-                scale  : event.gesture.scale
-            ,   rotate : event.gesture.rotation
-            }
+        ,   deltaScale        = event.gesture.scale
+        ,   multiplierScale   = layerCurrent.fontSize ? 20 : 0.75
         ;
 
         $( document ).bind( "transform.selection", function( event )
         {
-            event.gesture.preventDefault();
-
-            var radians  = utilMath.sanitizeRadians( layerRadiansStart + utilMath.toRadians( event.gesture.rotation - pinch.rotate ) )
+            var radians  = utilMath.sanitizeRadians( layerRadiansStart + utilMath.toRadians( event.gesture.rotation ) )
             ,   rotation =
                 {
                     radians : radians
@@ -344,30 +339,28 @@ function( config, cache, utilMath, utilDetect )
                 ,   sin     : Math.sin( radians )
                 ,   cos     : Math.cos( radians )
                 }
-            ,   scale = 0;
+            ,   scale = layerScaleStart + ( ( event.gesture.scale - deltaScale ) * multiplierScale );
             ;
-
-            if( "text" === layerCurrent.type )
-            {
-                scale = layerScaleStart + ( ( event.gesture.scale - pinch.scale ) * 10 );
-            }
-            else
-            {
-                scale = ( layerScaleStart + ( ( event.gesture.scale - pinch.scale ) / 2 ) ).toFixed( 2 );
-            }
 
             if( ! editing && layerCurrent && layerCurrent.visible )
             {
                 layerCurrent.setRotate( rotation );
-                layerCurrent.setScale( scale );
+
+                if( layerCurrent.setFontSize )
+                {
+                    layerCurrent.setFontSize( scale);
+                }
+                else
+                {
+                    layerCurrent.setScale(scale);
+                }
 
                 $.publish( "layerUpdate", [ layerCurrent ] );
                 $.publish( "selectionRotate", [ layerCurrent.rotation, true ] );
-                $.publish( "selectionScale", [ layerCurrent.scale, true ] );
+                $.publish( "selectionScale", [ layerCurrent.fontSize || layerCurrent.scale, true ] );
             }
 
-            pinch.scale  = event.gesture.scale;
-            pinch.rotate = event.gesture.rotation;
+            return false;
         });
 
         $( document ).bind( "transformend.selection", function( event )
