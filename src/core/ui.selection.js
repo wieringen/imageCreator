@@ -54,7 +54,7 @@ function( config, cache, utilMath, utilDetect )
 
         $imageCreatorViewport.bind( "dragstart", selectionPosition );
         $imageCreatorViewport.bind( "transformstart", selectionPinch );
-        $imageCreatorViewport.bind( "tap", selectionTap );
+        $imageCreatorCanvas.bind( "tap", selectionTap );
         $imageCreatorViewport.bind( "mousedown mousemove", function( event )
         {
             if( ! editing ) event.preventDefault();
@@ -418,6 +418,8 @@ function( config, cache, utilMath, utilDetect )
                     }
 
                     layerFound = true;
+
+                    return false;
                 }
             }
         });
