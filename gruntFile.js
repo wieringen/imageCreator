@@ -27,16 +27,19 @@ module.exports = function(grunt)
 
     //  Create Documentation.
     //
-    ,   jsdoc :
+    ,   yuidoc :
         {
-            dist :
+            compile:
             {
-                src :
-                [
-                    "src/core/**/*.js"
-                ,   "src/lib/*.js"
-                ]
-            ,   dest : "doc"
+                name :        "<%= pkg.name %>"
+            ,   description : "<%= pkg.description %>"
+            ,   version :     "<%= pkg.version %>"
+            ,   url :         "<%= pkg.homepage %>"
+            ,   options:
+                {
+                    paths  : "src/core/"
+                ,   outdir : "docs/"
+                }
             }
         }
 
@@ -223,7 +226,6 @@ module.exports = function(grunt)
 
     //  Load all the task modules we need.
     //
-    grunt.loadNpmTasks( "grunt-contrib" );
     grunt.loadNpmTasks( "grunt-requirejs" );
     grunt.loadNpmTasks( "grunt-contrib-copy" );
     grunt.loadNpmTasks( "grunt-contrib-clean" );
@@ -231,12 +233,13 @@ module.exports = function(grunt)
     grunt.loadNpmTasks( "grunt-contrib-cssmin" );
     grunt.loadNpmTasks( "grunt-contrib-jshint" );
     grunt.loadNpmTasks( "grunt-contrib-concat" );
+    grunt.loadNpmTasks( "grunt-contrib-yuidoc" );
     grunt.loadNpmTasks( "grunt-string-replace" );
     grunt.loadNpmTasks( "grunt-contrib-compress" );
 
     //  Define the default build task.
     //
-    grunt.registerTask( "default", [ "clean:dist", "copy:dist", "concat:dist", "cssmin:dist", "requirejs:dist", "compress:dist" ] );
+    grunt.registerTask( "default", [ "clean:dist", "yuidoc", "copy:dist", "concat:dist", "cssmin:dist", "requirejs:dist", "compress:dist" ] );
 
     //  Check yourself before you wreck yourself.
     //
