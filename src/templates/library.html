@@ -1,0 +1,34 @@
+<div class="imageCreatorTool imageCreatorUILibrary moduleDisabled">
+    <h2 class="moduleTitle"></h2>
+
+    <ul class="moduleMenu">
+        <li><a href="#" class="tabActive">Library</a></li>
+        <li><a href="#">Upload</a></li>
+    </ul>
+
+    <div class="moduleBody">
+
+        <div class="moduleTab tabActive">
+            <div class="moduleSub libraryList">
+                <ul class="imageDecorationsList">
+                </ul>
+            </div>
+        </div>
+
+        <div class="moduleTab">
+            <div class="moduleSub libraryUpload">
+                <p>Select the image you want to upload from your files. And push "Upload image".</p>
+
+                <form method="post" enctype="multipart/form-data" action="temp/upload.processor.php" class="libraryUploadForm" target="libraryUploadButton">
+                    <input type="file" class="libraryUploadInput" name="libraryUploadInput" />
+                    <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
+                </form>
+
+                <iframe id="libraryUploadFrame" name="libraryUploadFrame"></iframe>
+
+                <div class="btn libraryUploadSubmit">Upload image</div>
+            </div>
+        </div>
+
+    </div>
+</div>
