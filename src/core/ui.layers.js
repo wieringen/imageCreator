@@ -8,16 +8,16 @@
  */
 define(
 [
-    // Module HTML template
+    // Template
     //
     "text!templates/layers.html"
 
-    // App core modules
+    // Core
     //
 ,   "config"
 ,   "cache"
 
-    // jQuery plugins
+    // Libraries.
     //
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.sortable"
@@ -32,8 +32,8 @@ function( moduleHTML, config, cache )
         }
 
     ,   $imageCreatorViewport
+
     ,   $module
-    ,   $moduleTitle
     ,   $layerContainer
     ,   $selectRenderEngine
     ,   $inputConstrainLayers
@@ -42,38 +42,26 @@ function( moduleHTML, config, cache )
     ,   $emptyMessage
     ;
 
-    /**
-      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
-      *
-      * @name module#initialize
-      * @function
-      *
-      */
     module.initialize = function()
     {
         // Append module HTML.
         //
         $( module.options.target ).replaceWith( moduleHTML );
 
-        // Get basic app DOM elements.
+        // Get main DOM elements.
         //
         $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
-        $module               = $( ".imageCreatorUILayers" );
-        $moduleTitle          = $module.find( ".moduleTitle" );
+        $module               = $( module.options.target );
         $layerContainer       = $module.find( ".layerContainer" );
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
         $inputConstrainLayers = $module.find( ".inputConstrainLayers" );
         $buttonImageSave      = $( ".buttonImageSave" );
         $emptyMessage         = $module.find( ".emptyMessage" );
 
-        // Set module title.
-        //
-        $moduleTitle.text( module.options.title );
-
-        // Initialize module UI.
+        // Initialize module ui.
         //
         $module.tabular(
         {
@@ -82,15 +70,38 @@ function( moduleHTML, config, cache )
         ,   "pages" : ".moduleTab"
         });
 
-        // Get snippets.
+        // Listen for module ui events.
+        //
+        $layerContainer.delegate( ".objectLayer", "tap", layerSelectByID );
+        $layerContainer.delegate( ".objectToggle", "tap", layerVisibilityById );
+        $layerContainer.delegate( ".objectRemove", "tap", layerRemoveByID );
+        $selectRenderEngine.change( optionRenderEngineSelect );
+
+        // Listen for global events.
+        //
+        $.subscribe( "layerSelect", layerCheck );
+        $.subscribe( "layerRemove", layerRemove );
+        $.subscribe( "layerVisibility", layerVisibility );
+        $.subscribe( "layersRedraw", layersRedraw );
+
+        // Get module snippets.
         //
         module.snippets.$objectLayerSnippet = $module.find( ".objectLayer" ).remove();
         module.snippets.$engineSnippet      = $module.find( ".selectRenderEngineItem" ).remove();
 
-        // Set inputs to match module options.
+        // Populate the module user interface.
         //
-        $inputConstrainLayers.attr( "checked", config.options.viewport.constrainLayers );
-/*
+        populateUI();
+
+        // Do we have any layers allready?
+        //
+        layersRedraw();
+    };
+
+    function populateUI()
+    {
+        // Add all the supported engines.
+        //
         $.each( module.engines.order, function( engineIndex, engineName )
         {
             var engine = module.engines.types[ engineName ];
@@ -101,46 +112,15 @@ function( moduleHTML, config, cache )
 
                 $engineClone.attr( "value", engineName );
                 $engineClone.text( engineName );
-                $engineClone.attr( "selected", engineName === config.engine.name );
+                //$engineClone.attr( "selected", engineName === config.engine.name );
                 $engineClone.data( "engine", engineName );
 
                 $selectRenderEngine.append( $engineClone );
             }
         });
-*/
-        // Listen to global app events.
-        //
-        $.subscribe( "layerSelect", layerCheck );
-        $.subscribe( "layerRemove", layerRemove );
-        $.subscribe( "layerVisibility", layerVisibility );
-        $.subscribe( "layersRedraw", buildLayers );
+    }
 
-        // Set Button events.
-        //
-        $layerContainer.delegate( ".objectLayer", "tap", layerSelectByID );
-        $layerContainer.delegate( ".objectToggle", "tap", layerVisibilityById );
-        $layerContainer.delegate( ".objectRemove", "tap", layerRemoveByID );
-
-        $selectRenderEngine.change( optionRenderEngineSelect );
-        $inputConstrainLayers.change( optionConstrainLayersToggle );
-
-        $( "body" ).delegate( ".buttonImageSave", "click", function()
-        {
-            $imageCreatorViewport.trigger( "setMessage", [ {
-                "message" : "I'm sorry... This is just a frontend demo there is no connection with any backend or server."
-            ,   "status"  : "error"
-            ,   "fade"    : false
-            }]);
-
-            cache.storeLayers();
-        });
-
-        // Do we have any layers allready?
-        //
-        buildLayers();
-    };
-
-    function buildLayers()
+    function layersRedraw()
     {
         $layerContainer.find( ".objectLayer" ).remove();
 
@@ -238,20 +218,6 @@ function( moduleHTML, config, cache )
     function optionRenderEngineSelect( event )
     {
         $.publish( "loadEngine", $( this ).find( ":selected" ).data( "engine" ) );
-    }
-
-    function optionConstrainLayersToggle( event )
-    {
-        config.setOptions(
-        {
-            toolbar :
-            {
-                layers :
-                {
-                    constrainLayers : $inputConstrainLayers.is( ":checked" )
-                }
-            }
-        });
     }
 
     return module;

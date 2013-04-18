@@ -8,16 +8,16 @@
  */
 define(
 [
-    // Module HTML template.
+    // Template.
     //
     "text!templates/filters.html"
 
-    // App core modules.
+    // Core.
     //
 ,   "config"
 ,   "cache"
 
-    // jQuery plugins.
+    // Libraries.
     //
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.slider"
@@ -34,8 +34,8 @@ function( moduleHTML, config, cache )
     ,   $imageCreatorViewport
 
     ,   $module
-    ,   $filterStrength
-    ,   $filterTypesList
+    ,   $filtersStrength
+    ,   $filtersTypesList
 
     ,   layerCurrent = false
     ;
@@ -46,17 +46,17 @@ function( moduleHTML, config, cache )
         //
         $( module.options.target ).replaceWith( moduleHTML );
 
-        // Get basic app DOM elements.
+        // Get main DOM elements.
         //
-        $imageCreatorViewport  = $( ".imageCreatorViewport" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
         $module          = $( module.options.target );
-        $filterStrength  = $module.find( ".filterStrength" );
-        $filterTypesList = $module.find( ".filterTypesList" );
+        $filtersStrength = $module.find( ".filtersStrength" );
+        $filtersTypeList = $module.find( ".filtersTypeList" );
 
-        // Initialize module UI.
+        // Initialize module ui.
         //
         $module.tabular(
         {
@@ -64,29 +64,44 @@ function( moduleHTML, config, cache )
         ,   "tabs"  : "a"
         ,   "pages" : ".moduleTab"
         });
-        $filterStrength.slider(
+        $filtersStrength.slider(
         {
             "start" : 100
         ,   "scale" : [ 0, 100 ]
         ,   "unit"  : "%"
         });
 
-        // Get snippets.
+        // Listen for module ui events.
         //
-        module.snippets.$filterTypeSnippet = $module.find( ".filterType" ).remove();
+        $filtersStrength.bind( "onDrag", filtersStrength );
+        $filtersTypeList.change( filtersType );
 
-        // Listen to global app events.
+        // Listen for global events.
         //
         $.subscribe( "layerSelect", layerSelect );
         $.subscribe( "layerVisibility", layerSelect );
 
-        // Listen to UI module events.
+        // Get snippets.
         //
-        $filterStrength.bind( "onDrag", filterStrength );
-        $filterTypesList.change( filterType );
+        module.snippets.$filterTypeSnippet = $module.find( ".filterType" ).remove();
 
-        filtersCreate();
+        // Populate the module ui.
+        //
+        populateUI();
     };
+
+    function populateUI()
+    {
+        $.each( module.options.types, function( filterKey, filter )
+        {
+            var $filterTypeClone = module.snippets.$filterTypeSnippet.clone();
+
+            $filterTypeClone.attr( "value", filterKey );
+            $filterTypeClone.text( filter.name );
+
+            $filtersTypeList.append( $filterTypeClone );
+        });
+    }
 
     function layerSelect( event, layer )
     {
@@ -110,37 +125,24 @@ function( moduleHTML, config, cache )
 
             // Set the UI to match the selected layers properties.
             //
-            $filterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
-            $filterTypesList.val( layerCurrent.filter.name.toLowerCase() );
+            $filtersStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
+            $filtersTypeList.val( layerCurrent.filter.name.toLowerCase() );
         }
     }
 
-    function filtersCreate()
-    {
-        $.each( module.options.types, function( filterKey, filter )
-        {
-            var $filterTypeClone = module.snippets.$filterTypeSnippet.clone();
-
-            $filterTypeClone.attr( "value", filterKey );
-            $filterTypeClone.text( filter.name );
-
-            $filterTypesList.append( $filterTypeClone );
-        });
-    }
-
-    function filterType( event )
+    function filtersType( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
             layerCurrent.setFilter( module.options.types[ this.value ] );
 
-            $filterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
+            $filtersStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }
     }
 
-    function filterStrength( event, strength )
+    function filtersStrength( event, strength )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {

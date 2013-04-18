@@ -8,18 +8,18 @@
  */
 define(
 [
-    // Module HTML template.
+    // Template.
     //
     "text!templates/text.html"
 
-    // App core modules.
+    // Core.
     //
 ,   "config"
 ,   "cache"
 ,   "model.text"
 ,   "util.math"
 
-    // jQuery plugins.
+    // Libraries.
     //
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.colorpicker"
@@ -28,34 +28,24 @@ function( moduleHTML, config, cache, modelText, utilMath )
 {
     var module =
         {
-            name     : "text"
-        ,   enabled  : true
+            enabled  : true
         ,   options  : config.options.ui.text
         ,   snippets : {}
         }
 
     ,   $imageCreatorViewport
-    ,   $imageCreatorSelection
-    ,   $imageCreatorToolbar
 
     ,   $module
-    ,   $moduleTitle
-    ,   $textSize
-    ,   $textRotate
-    ,   $buttonTextAdd
+    ,   $textColor
+    ,   $textWeightBtn
+    ,   $textStyleBtn
+    ,   $textFontSelect
 
     // The curent layer that is being edited.
     //
     ,   layerCurrent = false
     ;
 
-    /**
-      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
-      *
-      * @name module#initialize
-      * @function
-      *
-      */
     module.initialize = function()
     {
         // Append module HTML.
@@ -64,25 +54,17 @@ function( moduleHTML, config, cache, modelText, utilMath )
 
         // Get basic app DOM elements.
         //
-        $imageCreatorViewport  = $( ".imageCreatorViewport" );
-        $imageCreatorSelection = $( ".imageCreatorSelection" );
-        $imageCreatorToolbar   = $( ".imageCreatorToolbar" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
-        $module           = $( ".imageCreatorUIText" );
-        $moduleTitle      = $module.find( ".moduleTitle" );
-        $textColor        = $module.find( ".textColor" );
-        $buttonTextAdd    = $( ".buttonTextAdd" );
-        $buttonTextWeight = $module.find( ".buttonTextWeight" );
-        $buttonTextStyle  = $module.find( ".buttonTextStyle" );
-        $selectTextFont   = $module.find( ".selectTextFont" );
+        $module         = $( module.options.target );
+        $textColor      = $module.find( ".textColor" );
+        $textWeightBtn  = $module.find( ".textWeightBtn" );
+        $textStyleBtn   = $module.find( ".textStyleBtn" );
+        $textFontSelect = $module.find( ".textFontSelect" );
 
-        // Set module title.
-        //
-        $moduleTitle.text( module.options.title );
-
-        // Initialize module UI.
+        // Initialize module user interface.
         //
         $module.tabular(
         {
@@ -92,31 +74,20 @@ function( moduleHTML, config, cache, modelText, utilMath )
         });
         $textColor.colorPicker();
 
-        // Listen to global app events.
-        //
-        $.subscribe( "layerSelect", textSelect );
-        $.subscribe( "layerVisibility", textSelect );
-
-        // Listen to UI module events.
+        // Listen for UI module events.
         //
         $textColor.bind( "colorUpdate", textColor );
+        $textWeightBtn.click( textWeight );
+        $textStyleBtn.click( textStyle );
+        $textFontSelect.change( textFont );
 
-        // Set module input / button events.
+        // Listen for global events.
         //
-        $buttonTextAdd.click( textAdd );
-        $buttonTextWeight.click( textWeight );
-        $buttonTextStyle.click( textStyle );
-        $selectTextFont.change( textFont );
+        $.subscribe( "layerSelect", layerSelect );
+        $.subscribe( "layerVisibility", layerSelect );
     };
 
-    /**
-      * @description Function that select a certain text layer and sets or disables the modules UI.
-      *
-      * @name textSelect
-      * @function
-      *
-      */
-    function textSelect( event, layer )
+    function layerSelect( event, layer )
     {
         // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
         //
@@ -137,9 +108,9 @@ function( moduleHTML, config, cache, modelText, utilMath )
             // Set the UI to match the selected layers properties.
             //
             $textColor.trigger( "setColor", [ layerCurrent.color ] );
-            $buttonTextWeight.toggleClass( "active", layerCurrent.weight );
-            $buttonTextStyle.toggleClass( "active", layerCurrent.style );
-            $selectTextFont.val( layerCurrent.font );
+            $textWeightBtn.toggleClass( "active", layerCurrent.weight );
+            $textStyleBtn.toggleClass( "active", layerCurrent.style );
+            $textFontSelect.val( layerCurrent.font );
         }
     }
 
@@ -163,7 +134,7 @@ function( moduleHTML, config, cache, modelText, utilMath )
         {
             layerCurrent.setStyle( ! layerCurrent.style );
 
-            $buttonTextStyle.toggleClass( "active", layerCurrent.style );
+            $textStyleBtn.toggleClass( "active", layerCurrent.style );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }
@@ -175,7 +146,7 @@ function( moduleHTML, config, cache, modelText, utilMath )
         {
             layerCurrent.setWeight( ! layerCurrent.weight );
 
-            $buttonTextWeight.toggleClass( "active", layerCurrent.weight );
+            $textWeightBtn.toggleClass( "active", layerCurrent.weight );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }

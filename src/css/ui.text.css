@@ -51,7 +51,7 @@
 }
 
 /* Font family */
-.imageCreatorUIText .selectTextFont {
+.imageCreatorUIText .textFontSelect {
     width:          65%;
     float:          left;
     height:         22px;
@@ -60,14 +60,14 @@
 }
 
 /* Font weight */
-.imageCreatorUIText .buttonTextWeight {
+.imageCreatorUIText .textWeightBtn {
     float:          left;
     font-weight:    bold;
     margin:         0 5% 0 0;
 }
 
 /* Font style */
-.imageCreatorUIText .buttonTextStyle {
+.imageCreatorUIText .textStyleBtn {
     float:          left;
     margin:         0;
     font-style:     italic;

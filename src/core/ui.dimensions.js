@@ -8,17 +8,17 @@
  */
 define(
 [
-    // Module HTML template.
+    // Template.
     //
     "text!templates/dimensions.html"
 
-    // App core modules.
+    // Core.
     //
 ,   "config"
 ,   "cache"
 ,   "util.math"
 
-    // jQuery plugins.
+    // Libraries.
     //
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.slider"
@@ -28,55 +28,39 @@ function( moduleHTML, config, cache, utilMath )
 {
     var module =
         {
-            name     : "dimensions"
-        ,   enabled  : true
+            enabled  : true
         ,   options  : config.options.ui.dimensions
         ,   snippets : {}
         }
 
     ,   $imageCreatorViewport
-    ,   $imageCreatorSelection
 
     ,   $module
-    ,   $moduleTitle
-    ,   $textSize
-    ,   $textRotate
+    ,   $dimensionsScale
+    ,   $dimensionsRotate
 
     // The curent layer that is being edited.
     //
     ,   layerCurrent = false
     ;
 
-    /**
-      * @description Function that initializes the module. It will append the modules html, set the title and initializes its UI.
-      *
-      * @name module#initialize
-      * @function
-      *
-      */
     module.initialize = function()
     {
         // Append module HTML.
         //
         $( module.options.target ).replaceWith( moduleHTML );
 
-        // Get basic app DOM elements.
+        // Get main DOM elements.
         //
-        $imageCreatorViewport  = $( ".imageCreatorViewport" );
-        $imageCreatorSelection = $( ".imageCreatorSelection" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
-        $module           = $( ".imageCreatorUIDimensions" );
-        $moduleTitle      = $module.find( ".moduleTitle" );
-        $textSize         = $module.find( ".dimensionsScale" );
-        $textRotate       = $module.find( ".dimensionsRotate" );
+        $module           = $( module.options.target );
+        $dimensionsScale  = $module.find( ".dimensionsScale" );
+        $dimensionsRotate = $module.find( ".dimensionsRotate" );
 
-        // Set module title.
-        //
-        $moduleTitle.text( module.options.title );
-
-        // Initialize module UI.
+        // Initialize module ui.
         //
         $module.tabular(
         {
@@ -84,30 +68,26 @@ function( moduleHTML, config, cache, utilMath )
         ,   "tabs"  : "a"
         ,   "pages" : ".moduleTab"
         });
-        $textSize.slider();
-        $textRotate.circleSlider();
+        $dimensionsScale.slider();
+        $dimensionsRotate.circleSlider();
 
-        // Listen to global app events.
+        // Listen for module ui events.
         //
-        $.subscribe( "layerSelect", textSelect );
-        $.subscribe( "layerVisibility", textSelect );
+        $dimensionsScale.bind( "onDrag", dimensionsScale );
+        $dimensionsRotate.bind( "onDrag", dimensionsRotate );
+
+        // Listen for global events.
+        //
+        $.subscribe( "layerSelect", layerSelect );
+        $.subscribe( "layerVisibility", layerSelect );
+
+        // Listen for selection events.
+        //
         $.subscribe( "selectionScale", dimensionsScale );
         $.subscribe( "selectionRotate", dimensionsRotate );
-
-        // Listen to UI module events.
-        //
-        $textSize.bind( "onDrag", dimensionsScale );
-        $textRotate.bind( "onDrag", dimensionsRotate );
     };
 
-    /**
-      * @description Function that select a certain text layer and sets or disables the modules UI.
-      *
-      * @name textSelect
-      * @function
-      *
-      */
-    function textSelect( event, layer )
+    function layerSelect( event, layer )
     {
         // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
         //
@@ -128,9 +108,9 @@ function( moduleHTML, config, cache, utilMath )
 
             // Set the UI to match the selected layers properties.
             //
-            $textRotate.trigger( "setPosition", [ Math.round( layerCurrent.rotation.degrees ) ] );
-            $textSize.trigger( "setScale", [ module.options.scale[ layerCurrent.type ] ] );
-            $textSize.trigger( "setPosition", [ layerCurrent.fontSize || layerCurrent.scale ] );
+            $dimensionsRotate.trigger( "setPosition", [ Math.round( layerCurrent.rotation.degrees ) ] );
+            $dimensionsScale.trigger( "setScale", [ module.options.scale[ layerCurrent.type ] ] );
+            $dimensionsScale.trigger( "setPosition", [ layerCurrent.fontSize || layerCurrent.scale ] );
         }
     }
 
@@ -138,7 +118,7 @@ function( moduleHTML, config, cache, utilMath )
     {
         if( setUI )
         {
-            $textRotate.trigger( "setPosition", [ rotation.degrees ] );
+            $dimensionsRotate.trigger( "setPosition", [ rotation.degrees ] );
 
             return false;
         }
@@ -155,8 +135,8 @@ function( moduleHTML, config, cache, utilMath )
     {
         if( setUI )
         {
-            $textSize.trigger( "setScale", [ module.options.scale[ layerCurrent.type ] ] );
-            $textSize.trigger( "setPosition", [ scale ] );
+            $dimensionsScale.trigger( "setScale", [ module.options.scale[ layerCurrent.type ] ] );
+            $dimensionsScale.trigger( "setPosition", [ scale ] );
 
             return false;
         }

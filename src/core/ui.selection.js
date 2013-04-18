@@ -7,7 +7,7 @@
  */
 define(
 [
-    // App core modules
+    // Core.
     //
     "config"
 ,   "cache"
@@ -23,6 +23,7 @@ function( config, cache, utilMath, utilDetect )
 
     ,   $imageCreatorViewport
     ,   $imageCreatorCanvas
+
     ,   $imageCreatorSelection
     ,   $imageCreatorSelectionTextEdit
 
@@ -32,59 +33,62 @@ function( config, cache, utilMath, utilDetect )
 
     module.initialize = function()
     {
-        // Get basic app DOM elements.
+        // Get main DOM elements.
         //
-        $imageCreatorViewport          = $( ".imageCreatorViewport" );
-        $imageCreatorCanvas            = $( ".imageCreatorCanvas" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
+        $imageCreatorCanvas   = $( ".imageCreatorCanvas" );
+
+        // Get module DOM elements.
+        //
         $imageCreatorSelection         = $( ".imageCreatorSelection" );
         $imageCreatorSelectionTextEdit = $( ".imageCreatorSelectionTextEdit" );
 
-        // Listen for global app events.
+        // Listen to module ui events.
+        //
+        $imageCreatorSelection.on( ".gripScale", "mousedown", selectionScale );
+        $imageCreatorSelection.on( ".gripRotate", "mousedown", selectionRotate );
+        $imageCreatorSelectionTextEdit.on( "change, keyup", selectionSetText );
+        $imageCreatorViewport.on( "dragstart", selectionPosition );
+        $imageCreatorViewport.on( "transformstart", selectionPinch );
+        $imageCreatorCanvas.on( "tap", selectionTap );
+        $imageCreatorViewport.on( "mousedown mousemove", ( editing ? "" : false ) );
+
+        $( document ).on( "keydown", selectionKeyDown );
+        $( document ).on( "keyup", selectionKeyUp );
+
+        // Listen for global events.
         //
         $.subscribe( "layerUpdate", selectionUpdate );
         $.subscribe( "layerSelect", selectionUpdate );
         $.subscribe( "layerVisibility", selectionVisibility );
 
-        $imageCreatorViewport.bind( "dragstart", selectionPosition );
-        $imageCreatorViewport.bind( "transformstart", selectionPinch );
-        $imageCreatorCanvas.bind( "tap", selectionTap );
-        $imageCreatorViewport.bind( "mousedown mousemove", function( event )
-        {
-            if( ! editing ) event.preventDefault();
-        });
-
-        $( document ).bind( "keydown", selectionKeyDown );
-        $( document ).bind( "keyup", selectionKeyUp );
-
-        // Set selection grip events.
+        // Populate the module ui.
         //
-        $imageCreatorSelection.delegate( ".gripScale", "mousedown", selectionScale );
-        $imageCreatorSelection.delegate( ".gripRotate", "mousedown", selectionRotate );
-
-        $imageCreatorSelectionTextEdit.bind( "change, keyup", selectionSetText );
-
-        // Only create grips if we have mouse events.
-        //
-        if( ! utilDetect.NO_MOUSEEVENTS ) selectionCreate();
+        populateUI();
     };
 
-    function selectionCreate()
+    function populateUI()
     {
         var _self = this
         ,   $grip = $( "<div class='grip gripRotate'><div class='gripScale'></div></div>")
         ;
 
-        $.each( module.options.grips, function( gripIndex, grip )
+        // Only create grips if we have mouse events.
+        //
+        if( ! utilDetect.NO_MOUSEEVENTS )
         {
-            var $gripClone = $grip.clone();
+            $.each( module.options.grips, function( gripIndex, grip )
+            {
+                var $gripClone = $grip.clone();
 
-            $gripClone.addClass( "grip" + grip );
-            $gripClone.data( "grip", grip );
+                $gripClone.addClass( "grip" + grip );
+                $gripClone.data( "grip", grip );
 
-            $gripClone.find( ".gripScale" ).css( "cursor", grip.toLowerCase() + "-resize" );
+                $gripClone.find( ".gripScale" ).css( "cursor", grip.toLowerCase() + "-resize" );
 
-            $imageCreatorSelection.append( $gripClone );
-        });
+                $imageCreatorSelection.append( $gripClone );
+            });
+        }
     }
 
     function selectionUpdate( event, layer )

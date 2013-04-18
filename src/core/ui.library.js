@@ -8,17 +8,17 @@
  */
 define(
 [
-    // Module HTML template.
+    // Template.
     //
     "text!templates/library.html"
 
-    // App core modules.
+    // Core.
     //
 ,   "config"
 ,   "cache"
 ,   "model.image"
 
-    // jQuery plugins.
+    // Libraries.
     //
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.dropArea"
@@ -36,7 +36,6 @@ function( moduleHTML, config, cache, modelImage )
     ,   $imageCreatorViewport
 
     ,   $module
-    ,   $moduleTitle
     ,   $libraryUploadSubmit
     ,   $libraryUploadFrame
     ,   $libraryUploadForm
@@ -58,24 +57,18 @@ function( moduleHTML, config, cache, modelImage )
         //
         $( module.options.target ).replaceWith( moduleHTML );
 
-        // Get basic app DOM elements.
+        // Get main DOM elements.
         //
-        $imageCreatorViewport  = $( ".imageCreatorViewport" );
-        $imageCreatorToolbar   = $( ".imageCreatorToolbar" );
+        $imageCreatorViewport = $( ".imageCreatorViewport" );
 
         // Get module DOM elements.
         //
         $module              = $( module.options.target );
-        $moduleTitle         = $module.find( ".moduleTitle" );
         $libraryUploadSubmit = $module.find( ".libraryUploadSubmit" );
         $libraryUploadFrame  = $module.find( ".libraryUploadFrame" );
         $libraryUploadForm   = $module.find( ".libraryUploadForm" );
 
-        // Set module title.
-        //
-        $moduleTitle.text( module.options.title );
-
-        // Initialize module UI.
+        // Initialize module ui.
         //
         $module.tabular(
         {
@@ -85,24 +78,15 @@ function( moduleHTML, config, cache, modelImage )
         });
         $imageCreatorViewport.dropArea();
 
-        // Listen to global app events.
+        // Listen for module ui events.
+        //
+        $libraryUploadSubmit.bind( "click", imageUpload );
+
+        // Listen for global events.
         //
         $.subscribe( "layerSelect", layerSelect );
         $.subscribe( "layerVisibility", layerSelect );
         $.subscribe( "fileUpload", imageAdd );
-
-        // Set Button events.
-        //
-        $libraryUploadSubmit.bind( "click", imageUpload );
-        $buttonImageAdd.click( function()
-        {
-            cache.setLayerActive( false );
-
-            $module.removeClass( "moduleDisabled" );
-
-            return false;
-        });
-
     };
 
     function layerSelect( event, layer )
