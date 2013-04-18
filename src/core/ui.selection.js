@@ -45,13 +45,6 @@ function( config, cache, utilMath, utilDetect )
         $.subscribe( "layerSelect", selectionUpdate );
         $.subscribe( "layerVisibility", selectionVisibility );
 
-        // Set selection viewport events
-        //
-        $( document ).hammer({
-            scale_treshold    : 0
-        ,   drag_min_distance : 0
-        });
-
         $imageCreatorViewport.bind( "dragstart", selectionPosition );
         $imageCreatorViewport.bind( "transformstart", selectionPinch );
         $imageCreatorCanvas.bind( "tap", selectionTap );

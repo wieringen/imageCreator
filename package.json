@@ -12,16 +12,17 @@
     "url": "https://github.com/wieringen/imageCreator.git"
   },
   "devDependencies": {
-    "grunt": "~0.4.0rc7",
+    "grunt": "~0.4.1",
     "grunt-contrib-cssmin": "~0.6.0",
-    "grunt-requirejs": "~0.3.1",
-    "grunt-contrib-copy": "~0.4.0rc7",
-    "grunt-contrib-jshint": "~0.1.1rc6",
-    "grunt-contrib-concat": "~0.1.2rc6",
+    "grunt-requirejs": "~0.3.5",
+    "grunt-contrib-copy": "~0.4.2",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-contrib-concat": "~0.2.0",
     "grunt-contrib-watch": "~0.3.1",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-contrib-compress": "~0.4.6",
     "grunt-string-replace": "~0.2.3",
-    "grunt-contrib-yuidoc": "~0.4.0"
+    "grunt-contrib-yuidoc": "~0.4.0",
+    "grunt-contrib-uglify": "~0.2.0"
   }
 }

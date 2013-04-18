@@ -90,7 +90,7 @@ function( moduleHTML, config, cache )
         // Set inputs to match module options.
         //
         $inputConstrainLayers.attr( "checked", config.options.viewport.constrainLayers );
-
+/*
         $.each( module.engines.order, function( engineIndex, engineName )
         {
             var engine = module.engines.types[ engineName ];
@@ -107,7 +107,7 @@ function( moduleHTML, config, cache )
                 $selectRenderEngine.append( $engineClone );
             }
         });
-
+*/
         // Listen to global app events.
         //
         $.subscribe( "layerSelect", layerCheck );

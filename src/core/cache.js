@@ -12,13 +12,11 @@
 define(
 [
     "config"
-,   "model.text"
-,   "model.image"
 ,   "util.misc"
 
 ,   "plugins/jquery.storage"
 ],
-function( config, modelText, modelImage, utilMisc )
+function( config, utilMisc )
 {
     var module = {}
 
@@ -35,6 +33,12 @@ function( config, modelText, modelImage, utilMisc )
 
     module.initialize = function()
     {
+        // Save the state of the canvas when the app is unloaded.
+        //
+        $( window ).unload( module.storeLayers );
+
+        // Load saved cache.
+        //
         module.loadLayers();
     };
 
@@ -49,20 +53,22 @@ function( config, modelText, modelImage, utilMisc )
         {
             layersStored = $.parseJSON( layersStored );
 
-            for( var layerIndex = layersStored.length; layerIndex--; )
+            utilMisc.loadModules( config.options.models, "model", function( models )
             {
-                if( layersStored[ layerIndex ].type === "image" )
+                var modelType = "";
+
+                for( var layerIndex = layersStored.length; layerIndex--; )
                 {
-                    promises.unshift( modelImage.fromObject( layersStored[ layerIndex ] ) );
+                    modelType = layersStored[ layerIndex ].type;
+
+                    if( models[ modelType ] )
+                    {
+                        promises.unshift( models[ modelType ].fromObject( layersStored[ layerIndex ] ) );
+                    }
                 }
 
-                if( layersStored[ layerIndex ].type === "text" )
-                {
-                    promises.unshift( modelText.fromObject( layersStored[ layerIndex ] ) );
-                }
-            }
-
-            utilMisc.whenAll( promises ).done( module.setLayers );
+                utilMisc.whenAll( promises ).done( module.setLayers );
+            });
         }
     };
 

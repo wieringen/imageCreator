@@ -10,54 +10,36 @@ define(
 [
     // Module HTML template.
     //
-    "text!templates/image.html"
+    "text!templates/filters.html"
 
     // App core modules.
     //
 ,   "config"
 ,   "cache"
-,   "model.image"
 
     // jQuery plugins.
     //
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.slider"
-,   "plugins/jquery.circleSlider"
-,   "plugins/jquery.dropArea"
 ],
-function( moduleHTML, config, cache, modelImage )
+function( moduleHTML, config, cache )
 {
     var module =
         {
-            name     : "image"
-        ,   enabled  : true
-        ,   options  : config.options.ui.image
-        ,   filters  : config.options.filters.color
+            enabled  : true
+        ,   options  : config.options.ui.filters
         ,   snippets : {}
         }
 
     ,   $imageCreatorViewport
-    ,   $imageCreatorSelection
 
     ,   $module
-    ,   $moduleTitle
-    ,   $buttonImageUpload
-    ,   $buttonImageAdd
-    ,   $imageDecorationsList
-    ,   $imageBackgroundsList
-    ,   $selectFilter
+    ,   $filterStrength
+    ,   $filterTypesList
 
     ,   layerCurrent = false
     ;
 
-
-    /**
-      * Function that initializes the module. It will append the modules html, set the title and initializes its UI.
-      *
-      * @name Image#initialize
-      * @function
-      *
-      */
     module.initialize = function( options )
     {
         // Append module HTML.
@@ -67,83 +49,46 @@ function( moduleHTML, config, cache, modelImage )
         // Get basic app DOM elements.
         //
         $imageCreatorViewport  = $( ".imageCreatorViewport" );
-        $imageCreatorSelection = $( ".imageCreatorSelection" );
-        $imageCreatorToolbar   = $( ".imageCreatorToolbar" );
 
         // Get module DOM elements.
         //
-        $module               = $( ".imageCreatorUIImage" );
-        $moduleTitle          = $module.find( ".moduleTitle" );
-        $imageFilterStrength  = $module.find( ".imageFilterStrength" );
-        $buttonImageUpload    = $module.find( ".buttonImageUpload" );
-        $buttonImageAdd       = $( ".buttonImageAdd" );
-        $imageDecorationsList = $module.find( ".imageDecorationsList" );
-        $imageBackgroundsList = $module.find( ".imageBackgroundsList" );
-        $selectFilter         = $module.find( ".selectFilter" );
-
-        // Set module title.
-        //
-        $moduleTitle.text( module.options.title );
+        $module          = $( module.options.target );
+        $filterStrength  = $module.find( ".filterStrength" );
+        $filterTypesList = $module.find( ".filterTypesList" );
 
         // Initialize module UI.
         //
         $module.tabular(
         {
-            "menu"     : ".moduleMenu"
-        ,   "tabs"     : "a"
-        ,   "pages"    : ".moduleTab"
+            "menu"  : ".moduleMenu"
+        ,   "tabs"  : "a"
+        ,   "pages" : ".moduleTab"
         });
-        $imageFilterStrength.slider(
+        $filterStrength.slider(
         {
-            "start"     : 100
-        ,   "scale"     : [ 0, 100 ]
-        ,   "unit"      : "%"
+            "start" : 100
+        ,   "scale" : [ 0, 100 ]
+        ,   "unit"  : "%"
         });
-        $imageCreatorViewport.dropArea();
 
         // Get snippets.
         //
-        module.snippets.$filterSnippet = $module.find( ".selectFilterItem" ).remove();
-
-        // Generate filters.
-        //
-        $.each( module.filters, function( filterKey, filter )
-        {
-            var $filterClone = module.snippets.$filterSnippet.clone();
-
-            $filterClone.attr( "value", filterKey );
-            $filterClone.text( filter.name );
-
-            $selectFilter.append( $filterClone );
-        });
+        module.snippets.$filterTypeSnippet = $module.find( ".filterType" ).remove();
 
         // Listen to global app events.
         //
-        $.subscribe( "layerSelect", imageSelect );
-        $.subscribe( "layerVisibility", imageSelect );
-        $.subscribe( "fileUpload", imageAdd );
+        $.subscribe( "layerSelect", layerSelect );
+        $.subscribe( "layerVisibility", layerSelect );
 
         // Listen to UI module events.
         //
-        $imageFilterStrength.bind( "onDrag", imageFilterStrength );
+        $filterStrength.bind( "onDrag", filterStrength );
+        $filterTypesList.change( filterType );
 
-        // Set Button events.
-        //
-        $selectFilter.change( imageFilter );
-        $imageDecorationsList.delegate( "img", "tap", imageAdd );
-        $imageBackgroundsList.delegate( "img", "tap", backgroundAdd );
-        $buttonImageUpload.bind( "click", imageUpload );
-        $buttonImageAdd.click( function()
-        {
-            $module.removeClass( "moduleDisabled" );
-            $module.trigger( "setTab", [ 1 ] );
-
-            return false;
-        });
-
+        filtersCreate();
     };
 
-    function imageSelect( event, layer )
+    function layerSelect( event, layer )
     {
         // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
         //
@@ -152,9 +97,9 @@ function( moduleHTML, config, cache, modelImage )
             return false;
         }
 
-        // Enable module if layer is of the correct type and layer is visible.
+        // Enable module if the layer supports filters.
         //
-        module.enabled = layer.visible && layer.type === "image" || false;
+        module.enabled = layer.visible && layer.filter || false;
 
         $module.toggleClass( "moduleDisabled", ! module.enabled );
         $module.toggleClass( "moduleLocked", ! layer.locked );
@@ -165,94 +110,37 @@ function( moduleHTML, config, cache, modelImage )
 
             // Set the UI to match the selected layers properties.
             //
-            if( ! layer.locked )
-            {
-                $module.trigger( "setTab", [ 0 ] );
-            }
-            $imageFilterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
-            $selectFilter.val( layerCurrent.filter.name.toLowerCase() );
+            $filterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
+            $filterTypesList.val( layerCurrent.filter.name.toLowerCase() );
         }
     }
 
-    function imageUpload()
+    function filtersCreate()
     {
-        // Temp!!! Just used for debugging puposes.
-        //
-        $( ".formImageUpload" ).submit();
-        $( "#iframeImageUpload" ).unbind( "load" ).load( function( event )
+        $.each( module.options.types, function( filterKey, filter )
         {
-            var json = $.parseJSON( $( this ).contents().text() );
+            var $filterTypeClone = module.snippets.$filterTypeSnippet.clone();
 
-            if( json && json.code !== 200 )
-            {
-                $imageCreatorViewport.trigger( "setMessage", [ {
-                    "message" : json.message
-                ,   "status"  : "error"
-                ,   "fade"    : false
-                }]);
-            }
-            else
-            {
-                imageAdd( json.src );
-            }
+            $filterTypeClone.attr( "value", filterKey );
+            $filterTypeClone.text( filter.name );
+
+            $filterTypesList.append( $filterTypeClone );
         });
-
-        return false;
     }
 
-    function backgroundAdd( url )
-    {
-        var layer =
-        {
-            locked    : true
-        ,   plane     : "background"
-        ,   position  :
-            {
-                x : 0
-            ,   y : 0
-            }
-        ,   scale : 1
-        ,   src : typeof url === "string" ? url : this.src
-        };
-
-        modelImage.fromObject( layer, function( instance )
-        {
-            cache.setLayerActive( instance );
-        });
-
-        return false;
-    }
-
-    function imageAdd( url )
-    {
-        var layer =
-        {
-            src   : typeof url === "string" ? url : this.src
-        ,   scale : 0.3335
-        };
-
-        modelImage.fromObject( layer, function( instance )
-        {
-            cache.setLayerActive( instance );
-        });
-
-        return false;
-    }
-
-
-    function imageFilter( event )
+    function filterType( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setFilter( module.filters[ this.value ] );
+            layerCurrent.setFilter( module.options.types[ this.value ] );
 
-            $imageFilterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
+            $filterStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }
     }
 
-    function imageFilterStrength( event, strength )
+    function filterStrength( event, strength )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {

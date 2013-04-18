@@ -1,24 +1,25 @@
-<div class="imageCreatorTool imageCreatorUIImage moduleDisabled">
+<div class="imageCreatorTool imageCreatorUIFilters moduleDisabled">
     <h2 class="moduleTitle"></h2>
 
     <ul class="moduleMenu">
-        <li><a href="#" class="tabActive">Image</a></li>    
+        <li><a href="#" class="tabActive">Filters</a></li>
     </ul>
 
     <div class="moduleBody">
 
         <div class="moduleTab tabActive">
-            <div class="moduleSub imageFilters">
-                <h3>Fillters</h3>
+            <div class="moduleSub filterTypes">
+                <h3>Type</h3>
                 <label>
-                    <select class="selectFilter">
+                    <select class="filterTypesList">
                         <option value="none">None</option>
-                        <option class="selectFilterItem" value=""></option>
+                        <option class="filterType" value=""></option>
                     </select>
                 </label>
             </div>
-            <div class="moduleSub imageFilterStrength">
-                <h3>Filter strength</h3>
+
+            <div class="moduleSub filterStrength">
+                <h3>Strength</h3>
                 <div class="track">
                     <div class="thumb"></div>
                 </div>
@@ -26,49 +27,5 @@
             </div>
         </div>
 
-        <div class="moduleTab">
-
-            <div class="moduleSub imageCreate">
-                <h3>Add image</h3>
-
-                <p>Select the image you want to upload from your files. And push "Upload image".</p>
-
-                <form method="post" enctype="multipart/form-data" action="temp/upload.processor.php" class="formImageUpload" target="iframeImageUpload">
-                    <input type="file" class="inputImageUpload" name="inputImageUpload" />
-                    <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
-                </form>
-
-                <iframe id="iframeImageUpload" name="iframeImageUpload"></iframe>
-
-                <div class="btn buttonImageUpload">Upload image</div>
-            </div>
-
-            <div class="moduleSub imageDecorations">
-                <h3>Clipart</h3>
-                <ul class="imageDecorationsList">
-                    <li><img src="images/decorations/lemons.png" /></li>
-                    <li><img src="images/decorations/gift.png" /></li>
-                    <li><img src="images/decorations/approved.png" /></li>
-                    <li><img src="images/decorations/beachscene.png" /></li>
-                    <li><img src="images/decorations/ball.png" /></li>
-                    <li><img src="images/decorations/mushroom.png" /></li>
-                    <li><img src="images/decorations/mushroom2.png" /></li>                    
-                    <li><img src="images/decorations/beer.png" /></li>
-                    <li><img src="images/decorations/ship.png" /></li>
-                    <li><img src="images/decorations/crab.png" /></li>
-                    <li><img src="images/decorations/bug.png" /></li>
-                    <li><img src="images/decorations/bug2.png" /></li>
-                </ul>
-            </div>
-
-            <div class="moduleSub imageBackgrounds">
-                <h3>Backgrounds</h3>
-                <ul class="imageBackgroundsList">
-                    <li><img src="images/backgrounds/island.jpg" width="40"  /></li>
-                    <li><img src="images/backgrounds/forest.jpg" width="40"  /></li>
-                </ul>
-            </div>
-
-        </div>
     </div>
 </div>

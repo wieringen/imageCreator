@@ -62,5 +62,30 @@ function()
         });
     };
 
+    module.loadModules = function( modules, prefix, callback )
+    {
+        var urls  = []
+        ,   names = []
+        ;
+
+        $.each( modules, function( moduleName )
+        {
+            urls.push( prefix + "." + moduleName );
+            names.push( moduleName );
+        });
+
+        require( urls, function()
+        {
+            var resultSet = [];
+
+            $.each( arguments, function( index, module )
+            {
+                resultSet[ names[ index ] ] = module;
+            });
+
+            callback( resultSet );
+        });
+    }
+
     return module;
 });

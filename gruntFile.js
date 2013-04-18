@@ -84,10 +84,11 @@ module.exports = function(grunt)
                 {
                     include :
                     [
-                        "ui.image"
+                        "ui.filters"
                     ,   "ui.text"
                     ,   "ui.info"
                     ,   "ui.layers"
+                    ,   "ui.library"
                     ,   "ui.dimensions"
                     ,   "ui.selection"
                     ,   "engine.svg"
@@ -96,8 +97,7 @@ module.exports = function(grunt)
                     ]
                 ,   paths :
                     {
-                        "lazyRequire" : "../lib/require/lazyRequire"
-                    ,   "plugins"     : "../lib"
+                        "plugins"     : "../lib"
                     ,   "templates"   : "../templates"
                     ,   "text"        : "../lib/require/text"
                     }
@@ -112,10 +112,11 @@ module.exports = function(grunt)
 
                 ,   name    : "main"
                 ,   baseUrl : "src/core"
-                ,   out     : "dist/src/jquery.imageCreator.js"
+                ,   out     : "dist/src/jquery.<%= pkg.name %>.js"
                 ,   wrap    : true
                 ,   almond  : true
-                ,   optimize: "uglify2"
+                ,   optimize :  "uglify2"
+                ,   preserveLicenseComments : false
                 }
             }
         }
@@ -131,15 +132,16 @@ module.exports = function(grunt)
                     "src/css/base.css"
                 ,   "src/css/buttons.css"
                 ,   "src/css/ui.base.css"
-                ,   "src/css/ui.image.css"
+                ,   "src/css/ui.filters.css"
                 ,   "src/css/ui.text.css"
                 ,   "src/css/ui.info.css"
                 ,   "src/css/ui.layers.css"
+                ,   "src/css/ui.library.css"
                 ,   "src/css/ui.dimensions.css"
                 ,   "src/css/ui.selection.css"
                 ]
 
-            ,   dest : "dist/src/css/imageCreator.css"
+            ,   dest : "dist/src/css/<%= pkg.name %>.css"
             }
         }
 
@@ -154,8 +156,8 @@ module.exports = function(grunt)
             }
         ,   dist :
             {
-                src  : "dist/src/css/imageCreator.css"
-            ,   dest : "dist/src/css/imageCreator.css"
+                src  : "dist/src/css/<%= pkg.name %>.css"
+            ,   dest : "dist/src/css/<%= pkg.name %>.css"
             }
         }
 
@@ -167,7 +169,7 @@ module.exports = function(grunt)
             {
                 files :
                 {
-                    "dist/src/imageCreator.css" : "dist/src/imageCreator.css"
+                    "dist/src/<%= pkg.name %>.css" : "dist/src/<%= pkg.name %>.css"
                 }
 
             ,   options :

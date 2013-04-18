@@ -20,54 +20,81 @@ requirejs.config(
 
         // Require plugins
         //
-    ,   "lazyRequire" : "../lib/require/lazyRequire"
     ,   "text"        : "../lib/require/text"
     }
 });
 
 require(
 [
+    // App core modules.
+    //
     "config"
 ,   "cache"
+,   "util.misc"
 
-,   "lazyRequire"
-
+    // Libraries
+    //
 ,   "plugins/jquery.pubsub"
 ,   "plugins/jquery.hammer"
 ],
-function( config, cache, lazyRequire )
+function( config, cache, utilMisc )
 {
-    var toolbar = {};
+    var ui, engines;
 
     $( document ).ready( function()
     {
-        // Initialize cache.
+        // Initialize config and make some shorthand vars.
         //
-        cache.initialize();
+        config.initialize();
+
+        ui      = config.options.ui
+        engines = config.options.engines
+
+        // Setup the user interface.
+        //
+        utilMisc.loadModules( ui, "ui", function( modules )
+        {
+            $.each( ui, function( moduleName )
+            {
+                if( modules[ moduleName ] )
+                {
+                    modules[ moduleName ].initialize();
+                }
+            });
+        });
+
+        // Start render engine.
+        //
+        $.each( engines.order, function( index, engineName )
+        {
+            if( engines.types[ engineName ].support )
+            {
+                loadEngine( engineName, function( engine )
+                {
+                    // Fire up the engine.
+                    //
+                    engine.initialize();
+
+                    // Since the engine is now running. We can fetch and initialize our cache.
+                    //
+                    cache.initialize();
+                });
+
+                return false;
+            }
+        });
+
+        // Setup (touch) events and gestures.
+        //
+        $( document ).hammer({
+            scale_treshold    : 0
+        ,   drag_min_distance : 0
+        });
+
 
         // Listen for global app events.
         //
         $.subscribe( "setMessage", setMessage );
-        $.subscribe( "loadTool", loadTool );
-        $.subscribe( "loadEngine", loadEngine );
-
-        // Save state of canvas when we leave this page.
-        //
-        $( window ).unload( cache.storeLayers );
-
-        // Create UI.
-        //
-        $.each( config.options.ui || [], function( toolName, toolOptions )
-        {
-            loadTool( false, toolName, toolOptions );
-        });
-
-        // Load engine.
-        //
-        $.each( config.options.engines.order || [], function( engineIndex, engineName )
-        {
-            return loadEngine( false, engineName );
-        });
 
         // Setup notifications events.
         //
@@ -77,6 +104,11 @@ function( config, cache, lazyRequire )
         });
 
     } );
+
+    function loadEngine( engineName, callback )
+    {
+        require( [ "engine." + engineName ], callback );
+    }
 
     function setMessage( options )
     {
@@ -109,66 +141,6 @@ function( config, cache, lazyRequire )
             }, options.fadeTimer );
 
             $imageCreatorMessage.data( "messageTimer", messageTimer );
-        }
-    }
-
-    function loadEngine( event, engineNane )
-    {
-        var engineObject = config.options.engines.types[ engineNane ];
-
-        if( engineObject.support )
-        {
-            setMessage( {
-                "message" : "Loading " + engineNane + " engine..."
-            ,   "status"  : "loading"
-            ,   "fade"    : true
-            });
-
-            var requireOnce = lazyRequire.once();
-
-            requireOnce(
-                [
-                    "engine." + engineNane
-                ]
-            ,   function( engine )
-                {
-                    config.setEngine( engine );
-                }
-            ,   function()
-                {
-                    config.engine.initialize();
-                }
-            );
-
-            return false;
-        }
-    }
-
-    function loadTool( event, toolName, toolOptions )
-    {
-        if( config.options.ui[ toolName ] )
-        {
-            setMessage( {
-                "message" : "Loading " + toolName + " tool..."
-            ,   "status"  : "loading"
-            ,   "fade"    : true
-            });
-
-            var requireOnce = lazyRequire.once();
-
-            requireOnce(
-                [
-                    "ui." + toolName
-                ]
-            ,   function( tool )
-                {
-                    toolbar[ toolName ] = tool;
-                }
-            ,   function( tool )
-                {
-                    toolbar[ toolName ].initialize();
-                }
-            );
         }
     }
 

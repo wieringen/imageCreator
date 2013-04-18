@@ -8,6 +8,8 @@
  */
 define(
 [
+    // App core modules.
+    //
     "config"
 ,   "util.math"
 ,   "util.class"
@@ -18,7 +20,7 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
 {
     var module =
     {
-        options : config.options.layers.text
+        options : config.options.models.text
     };
 
     module.model = utilClass.createClass( modelLayer,
