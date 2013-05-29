@@ -1,0 +1,20 @@
+
+// default font sizes
+$fontSize:                      12px;
+$lineHeight:                    18px;
+
+// prefixes list to us in the prefixer mixin
+$prefixes:                      -webkit-, -moz-, -o-, -ms-, '';
+
+// colors
+$pink:                          #E60167;
+
+$blue:                          #48A9C2;
+$darkBlue:                      #97BEDB;
+$lightBlue:                     #91CAD9;
+$lighterBlue:                   #E1EBF4;
+
+$grey:                          grayscale( $pink ); //#B2B2B2
+$darkGrey:                      #777;
+$lightGrey:                     lighten( $grey, 40% );
+$lighterGrey:                   lighten( $lightGrey, 20% );

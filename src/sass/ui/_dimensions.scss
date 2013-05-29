@@ -1,0 +1,66 @@
+/*********************** UI : Dimensions ***********************/
+
+.imageCreatorUIDimensions .dimensionsScale
+{
+    .track {
+        background:     #cdcdcd;
+        height:         4px;
+        width:          140px;
+        margin:         0 0 5px;
+        border:         1px solid #aeaeae;
+        border-top:     1px solid #747474;
+        position:       relative;
+        float:          left;
+        @include border-radius( 5px );
+        @include user-select( none );
+    }
+
+    .thumb {
+        background:     transparent url(../images/text-zoom-thumb.png) no-repeat 50% 50%;
+        height:         40px;
+        width:          40px;
+        position:       absolute;
+        left:           0;
+        top:            -4px;
+        cursor:         pointer;
+        margin:         -15px 0 0 -15px;
+    }
+
+    .indicator {
+        font-size:      10px;
+        float:          left;
+        margin:         -3px 0 0 5px;
+    }
+}
+
+.imageCreatorUIDimensions .dimensionsRotate
+{
+    .track {
+        background:     transparent url(../images/text-rotate-track.png) no-repeat 0 0;
+        height:         83px;
+        width:          83px;
+        position:       relative;
+    }
+
+    .thumb {
+        background:     transparent url(../images/text-zoom-thumb.png) no-repeat 50% 50%;
+        height:         31px;
+        width:          31px;
+        position:       absolute;
+        margin:         -15px 0 0 -15px;
+        top:            8px;
+        left:           42px;
+        cursor:         pointer;
+    }
+
+    .degrees{
+        font-size:      10px;
+        position:       absolute;
+        left:           50%;
+        top:            50%;
+        width:          20px;
+        line-height:    14px;
+        text-align:     center;
+        margin:         -7px 0 0 -10px;
+    }
+}

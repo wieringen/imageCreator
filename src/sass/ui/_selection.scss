@@ -1,0 +1,136 @@
+/*********************** UI : SELECTION ***********************/
+.imageCreatorSelection
+{
+    border: 1px #ccc solid;
+    position: absolute;
+    z-index: 999;
+    display: none;
+    pointer-events: none;
+}
+
+.imageCreatorSelection.editing {
+}
+
+.imageCreatorSelection.editing .grip {
+    display: none;
+}
+
+.imageCreatorSelectionTextEdit {
+    box-shadow: none;
+    position: absolute;
+    resize: none;
+    overflow: hidden;
+    background: #ccc;
+    border: 0px solid transparent;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    cursor: text;
+    z-index: 1000;
+    zoom: 1;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Rotate */
+.imageCreatorSelection .gripN { 
+    left: 50%; 
+    top:0; 
+}
+.imageCreatorSelection .gripNE { 
+    left: 100%; 
+    top:0; 
+}
+.imageCreatorSelection .gripE { 
+    left: 100%; 
+    top: 50%;
+}
+.imageCreatorSelection .gripSE { 
+    left: 100%; 
+    top: 100%; 
+}
+.imageCreatorSelection .gripS { 
+    left: 50%; 
+    top: 100%; 
+}
+.imageCreatorSelection .gripSW { 
+    left: 0%; 
+    top: 100%; 
+}
+.imageCreatorSelection .gripW {  
+    left: 0%; 
+    top: 50%; 
+}
+.imageCreatorSelection .gripNW { 
+    left: 0%; 
+    top: 0%; 
+}
+.imageCreatorSelection .gripN,
+.imageCreatorSelection .gripNE,
+.imageCreatorSelection .gripNW {
+    margin-top: -30px;
+}
+.imageCreatorSelection .gripN,
+.imageCreatorSelection .gripS{
+    margin-left: -15px; 
+}
+.imageCreatorSelection .gripW,
+.imageCreatorSelection .gripE{
+    margin-top: -15px; 
+}
+.imageCreatorSelection .gripW,
+.imageCreatorSelection .gripSW,
+.imageCreatorSelection .gripNW {
+    margin-left: -30px;
+}
+
+.imageCreatorSelection .gripRotate {
+    width: 30px;
+    height: 30px;
+    position:  absolute;
+    pointer-events: all;
+    cursor: url('../images/cursor-rotate.cur'), auto;
+}
+
+.cursorRotate {
+    cursor: url('../images/cursor-rotate.cur'), auto !important;
+}
+
+/* Scale */
+.imageCreatorSelection .gripScale {
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    background-color: #fff;
+    border: 1px #666 solid;
+    overflow: hidden;
+    pointer-events: all;
+}
+.imageCreatorSelection .gripN  .gripScale,
+.imageCreatorSelection .gripNE .gripScale,
+.imageCreatorSelection .gripNW .gripScale{
+    bottom: -5px;
+}
+.imageCreatorSelection .gripS  .gripScale,
+.imageCreatorSelection .gripSE .gripScale,
+.imageCreatorSelection .gripSW .gripScale{
+    top: -5px;
+}
+.imageCreatorSelection .gripN .gripScale,
+.imageCreatorSelection .gripS .gripScale{
+    left: 10px;
+}
+.imageCreatorSelection .gripW .gripScale,
+.imageCreatorSelection .gripE .gripScale{
+    top: 10px;  
+}
+.imageCreatorSelection .gripW .gripScale,
+.imageCreatorSelection .gripSW .gripScale,
+.imageCreatorSelection .gripNW .gripScale{
+    right: -5px;
+}
+.imageCreatorSelection .gripNE .gripScale,
+.imageCreatorSelection .gripE  .gripScale,
+.imageCreatorSelection .gripSE .gripScale{
+    left: -5px;
+}

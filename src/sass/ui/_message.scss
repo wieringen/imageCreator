@@ -1,0 +1,40 @@
+/*********************** UI : MESSAGE ***********************/
+
+.imageCreatorUIMessage {
+    position: absolute;
+    background-color: #dbdbdb;
+    width: 100%;
+    right: 0;
+    top: 0;
+    display: none;
+
+    .imageCreatorMessageInner {
+        font: 10px Arial, Helvetica, sans-serif;
+        padding: 20px;
+    }
+
+    .imageCreatorMessageClose {
+        display: none;
+        width: 20px;
+        height: 20px;
+        background-color: #8d8d8d;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font: 10px/20px Arial, Helvetica, sans-serif;
+        text-align: center;
+        cursor: pointer;
+    }
+}
+
+.imageCreatorUIMessage.loading {
+    background: #dbdbdb url(../images/loader.gif) no-repeat 10px 50%;
+
+    .imageCreatorMessageInner {
+        padding: 0 10px 0 55px;
+    }
+}
+
+.imageCreatorUIMessage.error .imageCreatorMessageClose {
+    display: block;
+}
