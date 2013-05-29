@@ -22,11 +22,6 @@ function( utilDetect )
             {
                 width  : 500
             ,   height : 625
-            ,   constrainLayers : true
-            ,   regions :
-                {
-
-                }
             }
 
         // Render engines
@@ -54,6 +49,8 @@ function( utilDetect )
                     ,   support : utilDetect.HAS_CANVAS
                     }
                 }
+            ,   selectionColor : "#000000"
+            ,   selectionDash  : 5
             }
 
         // Models
@@ -65,6 +62,7 @@ function( utilDetect )
                     lineHeight : 1.25
                 ,   fontSize   : 14
                 ,   font       : "Arial"
+                ,   color      : "#000000"
                 }
             ,   image :
                 {
@@ -77,8 +75,12 @@ function( utilDetect )
             {
                 info :
                 {
-                    title  : "Info"
-                ,   target : ".imageCreatorUIInfo"
+                    target : ".imageCreatorUIInfo"
+                }
+
+            ,   message :
+                {
+                    target : ".imageCreatorUIMessage"
                 }
 
             ,   dimensions :
@@ -93,20 +95,17 @@ function( utilDetect )
 
             ,   library :
                 {
-                    title  : "Library"
-                ,   target : ".imageCreatorUILibrary"
+                    target : ".imageCreatorUILibrary"
                 }
 
             ,   layers :
                 {
-                    title  : "Layers"
-                ,   target : ".imageCreatorUILayers"
+                    target : ".imageCreatorUILayers"
                 }
 
             ,   filters :
                 {
-                    title  : "Filters"
-                ,   target : ".imageCreatorUIFilters"
+                    target : ".imageCreatorUIFilters"
                 ,   types  :
                     {
                         color :
@@ -142,15 +141,16 @@ function( utilDetect )
 
             ,   text :
                 {
-                    title       : "Text"
-                ,   target      : ".imageCreatorUIText"
+                    target      : ".imageCreatorUIText"
                 ,   defaultText : "Lorem ipsum dolor sit amet.\nConsectetur adipiscing elit. Proin malesuada.\nLigula in blandit rutrum, libero ipsum luctus augue, diam sagittis dui.\nVivamus fermentum urna sit amet libero volutpat ac consectetur purus placerat."
                 }
 
             ,   selection :
                 {
-                    offset : 2
-                ,   grips  : [ "N", "NE", "E", "SE", "S", "SW", "W", "NW" ]
+                    target  : ".imageCreatorViewport"
+                ,   offset  : 2
+                ,   grips   : [ "N", "NE", "E", "SE", "S", "SW", "W", "NW" ]
+                ,   bbColor : "#000000"
                 }
             }
         }

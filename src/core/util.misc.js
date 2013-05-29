@@ -21,12 +21,12 @@ function()
                 destination[properties[i]] = source[properties[i]];
             }
         }
-    }
+    };
 
     module.measureText = function( object )
     {
         var measureDiv = document.createElement( "measureDiv" );
-        measureDiv.className = "imageCreatorMeasureText"
+        measureDiv.className = "imageCreatorMeasureText";
 
         document.body.appendChild(measureDiv);
 
@@ -85,7 +85,7 @@ function()
 
             callback( resultSet );
         });
-    }
+    };
 
     return module;
 });

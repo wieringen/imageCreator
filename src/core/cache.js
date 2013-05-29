@@ -22,12 +22,23 @@ function( config, utilMisc )
 
     // Cache keys
     //
-    ,   keyLayers      = "ImageCreatorLayers"
-    ,   keyLayerActive = "ImageCreatorLayerActive"
+    ,   keyProject = "ImageCreatorProject"
 
     // Private cache variables
     //
-    ,   layers      = []
+    ,   project =
+        {
+            views :
+            {
+                front :
+                {
+                    layers : []
+                }
+            }
+        }
+    ,   layers = []
+
+    ,   viewActive  = false
     ,   layerActive = false
     ;
 
@@ -35,65 +46,90 @@ function( config, utilMisc )
     {
         // Save the state of the canvas when the app is unloaded.
         //
-        $( window ).unload( module.storeLayers );
+        $( window ).unload( module.storeProject );
 
         // Load saved cache.
         //
-        module.loadLayers();
+        module.loadProject();
     };
 
-    module.loadLayers = function()
+    module.loadProject = function( data, viewName )
     {
-        var layersStored    = $.Storage.get( keyLayers )
-        ,   promises        = []
-        ,   deferred        = null;
-        ;
+        project = data || $.parseJSON( $.Storage.get( keyProject ) );
 
-        if( layersStored )
-        {
-            layersStored = $.parseJSON( layersStored );
-
-            utilMisc.loadModules( config.options.models, "model", function( models )
-            {
-                var modelType = "";
-
-                for( var layerIndex = layersStored.length; layerIndex--; )
-                {
-                    modelType = layersStored[ layerIndex ].type;
-
-                    if( models[ modelType ] )
-                    {
-                        promises.unshift( models[ modelType ].fromObject( layersStored[ layerIndex ] ) );
-                    }
-                }
-
-                utilMisc.whenAll( promises ).done( module.setLayers );
-            });
-        }
+        module.setViewActive( viewName || "front" );
     };
 
-    module.storeLayers = function()
+    module.storeProject = function()
     {
         var layersToSave = [];
 
+        // Loop to all the layers of this view and turn them into objects.
+        //
         for( var layerIndex = layers.length; layerIndex--; )
         {
             layersToSave.push( layers[ layerIndex ].toObject() );
         }
 
-        $.Storage.set( keyLayers, JSON.stringify( layersToSave ) );
+        viewActive.layers = layersToSave;
+
+        $.Storage.set( keyProject, JSON.stringify( project ) );
     };
 
-    module.clearLayers = function()
+    module.getProject = function()
     {
-        layers = [];
+        return project;
+    };
 
-        $.Storage.remove( keyLayers );
+    module.setViewActive = function( viewName )
+    {
+        if( project && project.views && project.views[ viewName ] )
+        {
+            viewActive = project.views[ viewName ];
+
+            module.loadLayers( viewActive.layers );
+        }
+    };
+
+    module.getViewActive = function()
+    {
+        return viewActive;
     };
 
     module.getLayers = function()
     {
         return layers;
+    };
+
+    module.loadLayers = function( data )
+    {
+        var promises = [];
+
+        if( data )
+        {
+            // Get all the models classes we have.
+            //
+            utilMisc.loadModules( config.options.models, "model", function( models )
+            {
+                var modelType = "";
+
+                for( var layerIndex = data.length; layerIndex--; )
+                {
+                    modelType = data[ layerIndex ].type;
+
+                    // Convert our layer object to a layer model.
+                    //
+                    if( models[ modelType ] )
+                    {
+                        promises.unshift( models[ modelType ].fromObject( data[ layerIndex ] ) );
+                    }
+                }
+
+                // When all promises are resolved set them in the cache
+                //
+                utilMisc.whenAll( promises ).done( module.setLayers );
+            });
+        }
     };
 
     module.setLayers = function( data )
@@ -112,6 +148,8 @@ function( config, utilMisc )
     {
         if( layer.plane === "background" )
         {
+            // We only want 1 background layer so remove all others.
+            //
             for( var layerIndex = layers.length; layerIndex--; )
             {
                 if( layers[ layerIndex ].plane === "background" )
@@ -140,8 +178,12 @@ function( config, utilMisc )
         {
             for( var layerIndex = layers.length; layerIndex--; )
             {
+                // Unset all the selected flags in all cached layers
+                //
                 layers[ layerIndex ].set( "selected", false );
 
+                // If the layer already is present in our cache reference it.
+                //
                 if( layers[ layerIndex ].id === layer.id )
                 {
                     layerActive = layers[ layerIndex ];
@@ -150,6 +192,8 @@ function( config, utilMisc )
                 }
             }
 
+            // If the layer is new first add it to our cache then reference it.
+            //
             if( isNewLayer )
             {
                 module.setLayer( layer );

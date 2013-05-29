@@ -11,7 +11,7 @@ define(
     // App core modules.
     //
     "config"
-,   "util.math"
+,   "cs!util.math"
 ,   "util.class"
 ,   "util.misc"
 ],

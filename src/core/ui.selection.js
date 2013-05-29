@@ -7,14 +7,18 @@
  */
 define(
 [
+    // Template.
+    //
+    "text!templates/selection.html"
+
     // Core.
     //
-    "config"
+,   "config"
 ,   "cache"
-,   "util.math"
+,   "cs!util.math"
 ,   "util.detect"
 ],
-function( config, cache, utilMath, utilDetect )
+function( moduleHTML, config, cache, utilMath, utilDetect )
 {
     var module =
         {
@@ -33,6 +37,10 @@ function( config, cache, utilMath, utilDetect )
 
     module.initialize = function()
     {
+        // Append module HTML.
+        //
+        $( module.options.target ).append( moduleHTML );
+
         // Get main DOM elements.
         //
         $imageCreatorViewport = $( ".imageCreatorViewport" );
@@ -43,18 +51,21 @@ function( config, cache, utilMath, utilDetect )
         $imageCreatorSelection         = $( ".imageCreatorSelection" );
         $imageCreatorSelectionTextEdit = $( ".imageCreatorSelectionTextEdit" );
 
-        // Listen to module ui events.
+        // Listen to module UI events.
         //
-        $imageCreatorSelection.on( ".gripScale", "mousedown", selectionScale );
-        $imageCreatorSelection.on( ".gripRotate", "mousedown", selectionRotate );
-        $imageCreatorSelectionTextEdit.on( "change, keyup", selectionSetText );
-        $imageCreatorViewport.on( "dragstart", selectionPosition );
-        $imageCreatorViewport.on( "transformstart", selectionPinch );
-        $imageCreatorCanvas.on( "tap", selectionTap );
-        $imageCreatorViewport.on( "mousedown mousemove", ( editing ? "" : false ) );
+        $imageCreatorViewport.bind( "dragstart", selectionPosition );
+        $imageCreatorViewport.bind( "transformstart", selectionPinch );
+        $imageCreatorCanvas.bind( "tap", selectionTap );
+        $imageCreatorSelection.delegate( ".gripScale", "mousedown", selectionScale );
+        $imageCreatorSelection.delegate( ".gripRotate", "mousedown", selectionRotate );
+        $imageCreatorSelectionTextEdit.bind( "change, keyup", selectionSetText );
+        $imageCreatorViewport.bind( "mousedown mousemove", function( event )
+        {
+            if( ! editing ) event.preventDefault();
+        });
 
-        $( document ).on( "keydown", selectionKeyDown );
-        $( document ).on( "keyup", selectionKeyUp );
+        $( document ).bind( "keydown", selectionKeyDown );
+        $( document ).bind( "keyup", selectionKeyUp );
 
         // Listen for global events.
         //
@@ -62,7 +73,7 @@ function( config, cache, utilMath, utilDetect )
         $.subscribe( "layerSelect", selectionUpdate );
         $.subscribe( "layerVisibility", selectionVisibility );
 
-        // Populate the module ui.
+        // Populate the module UI.
         //
         populateUI();
     };

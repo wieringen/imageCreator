@@ -36,8 +36,6 @@ function( moduleHTML, config, cache )
     ,   $module
     ,   $layerContainer
     ,   $selectRenderEngine
-    ,   $inputConstrainLayers
-    ,   $inputAutoSelectLayer
     ,   $buttonImageSave
     ,   $emptyMessage
     ;
@@ -57,11 +55,10 @@ function( moduleHTML, config, cache )
         $module               = $( module.options.target );
         $layerContainer       = $module.find( ".layerContainer" );
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
-        $inputConstrainLayers = $module.find( ".inputConstrainLayers" );
         $buttonImageSave      = $( ".buttonImageSave" );
         $emptyMessage         = $module.find( ".emptyMessage" );
 
-        // Initialize module ui.
+        // Initialize module UI.
         //
         $module.tabular(
         {
@@ -70,12 +67,22 @@ function( moduleHTML, config, cache )
         ,   "pages" : ".moduleTab"
         });
 
-        // Listen for module ui events.
+        // Listen for module UI events.
         //
         $layerContainer.delegate( ".objectLayer", "tap", layerSelectByID );
         $layerContainer.delegate( ".objectToggle", "tap", layerVisibilityById );
         $layerContainer.delegate( ".objectRemove", "tap", layerRemoveByID );
         $selectRenderEngine.change( optionRenderEngineSelect );
+        $buttonImageSave.bind( "tap", function()
+        {
+            cache.storeProject();
+
+            $.publish( "message", {
+                "message" : JSON.stringify( cache.getProject() )
+            ,   "status"  : "error"
+            ,   "fade"    : false
+            } );
+        });
 
         // Listen for global events.
         //
@@ -89,7 +96,7 @@ function( moduleHTML, config, cache )
         module.snippets.$objectLayerSnippet = $module.find( ".objectLayer" ).remove();
         module.snippets.$engineSnippet      = $module.find( ".selectRenderEngineItem" ).remove();
 
-        // Populate the module user interface.
+        // Populate the module UI.
         //
         populateUI();
 

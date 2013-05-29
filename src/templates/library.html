@@ -9,8 +9,29 @@
     <div class="moduleBody">
 
         <div class="moduleTab tabActive">
-            <div class="moduleSub libraryList">
+            <div class="moduleSub imageDecorations">
+                <h3>Clipart</h3>
                 <ul class="imageDecorationsList">
+                    <li><img src="images/decorations/lemons.png" /></li>
+                    <li><img src="images/decorations/gift.png" /></li>
+                    <li><img src="images/decorations/approved.png" /></li>
+                    <li><img src="images/decorations/beachscene.png" /></li>
+                    <li><img src="images/decorations/ball.png" /></li>
+                    <li><img src="images/decorations/mushroom.png" /></li>
+                    <li><img src="images/decorations/mushroom2.png" /></li>
+                    <li><img src="images/decorations/beer.png" /></li>
+                    <li><img src="images/decorations/ship.png" /></li>
+                    <li><img src="images/decorations/crab.png" /></li>
+                    <li><img src="images/decorations/bug.png" /></li>
+                    <li><img src="images/decorations/bug2.png" /></li>
+                </ul>
+            </div>
+
+            <div class="moduleSub imageBackgrounds">
+                <h3>Backgrounds</h3>
+                <ul class="imageBackgroundsList">
+                    <li><img src="images/backgrounds/island.jpg" width="40"  /></li>
+                    <li><img src="images/backgrounds/forest.jpg" width="40"  /></li>
                 </ul>
             </div>
         </div>
@@ -19,7 +40,7 @@
             <div class="moduleSub libraryUpload">
                 <p>Select the image you want to upload from your files. And push "Upload image".</p>
 
-                <form method="post" enctype="multipart/form-data" action="temp/upload.processor.php" class="libraryUploadForm" target="libraryUploadButton">
+                <form method="post" enctype="multipart/form-data" action="temp/upload.processor.php" class="libraryUploadForm" target="libraryUploadFrame">
                     <input type="file" class="libraryUploadInput" name="libraryUploadInput" />
                     <input type="hidden" name="MAX_FILE_SIZE" value="3000" />
                 </form>

@@ -56,7 +56,7 @@ function( moduleHTML, config, cache )
         $filtersStrength = $module.find( ".filtersStrength" );
         $filtersTypeList = $module.find( ".filtersTypeList" );
 
-        // Initialize module ui.
+        // Initialize module UI.
         //
         $module.tabular(
         {
@@ -71,7 +71,7 @@ function( moduleHTML, config, cache )
         ,   "unit"  : "%"
         });
 
-        // Listen for module ui events.
+        // Listen for module UI events.
         //
         $filtersStrength.bind( "onDrag", filtersStrength );
         $filtersTypeList.change( filtersType );
@@ -92,7 +92,7 @@ function( moduleHTML, config, cache )
 
     function populateUI()
     {
-        $.each( module.options.types, function( filterKey, filter )
+        $.each( module.options.types.color, function( filterKey, filter )
         {
             var $filterTypeClone = module.snippets.$filterTypeSnippet.clone();
 
@@ -134,7 +134,7 @@ function( moduleHTML, config, cache )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setFilter( module.options.types[ this.value ] );
+            layerCurrent.setFilter( module.options.types.color[ this.value ] );
 
             $filtersStrength.trigger( "setPosition", [ layerCurrent.filter.strength * 100 ] );
 

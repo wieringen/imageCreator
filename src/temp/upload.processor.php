@@ -1,4 +1,4 @@
-<?php  
+<?php
 
 // filename: upload.processor.php
 
@@ -11,30 +11,30 @@ $directory_self = str_replace(basename($_SERVER['PHP_SELF']), '', $_SERVER['PHP_
 $uploadsDirectory = $_SERVER['DOCUMENT_ROOT'] . $directory_self . 'uploads/';
 
 // name of the fieldname used for the file in the HTML form
-$fieldname = 'inputImageUpload';
+$fieldname = 'libraryUploadInput';
 
 // Now let's deal with the upload
 
 // possible PHP upload errors
-$errors = array(1 => 'Error uploading image: php.ini max file size exceeded', 
-                2 => 'Error uploading image: Html form max file size exceeded', 
-                3 => 'Error uploading image: File upload was only partial', 
+$errors = array(1 => 'Error uploading image: php.ini max file size exceeded',
+                2 => 'Error uploading image: Html form max file size exceeded',
+                3 => 'Error uploading image: File upload was only partial',
                 4 => 'Error uploading image: No file was attached');
 
-// check for PHP's built-in uploading errors 
-($_FILES[$fieldname]['error'] == 0) 
-    or error( $errors[$_FILES[$fieldname]['error']] ); 
+// check for PHP's built-in uploading errors
+($_FILES[$fieldname]['error'] == 0)
+    or error( $errors[$_FILES[$fieldname]['error']] );
 
 // check that the file we are working on really was an HTTP upload
 @is_uploaded_file($_FILES[$fieldname]['tmp_name'])
 	or error('Error uploading image: Not an HTTP upload');
-	
-// validation... since this is an image upload script we 
+
+// validation... since this is an image upload script we
 // should run a check to make sure the upload is an image
 @getimagesize($_FILES[$fieldname]['tmp_name'])
 	or error('Error uploading image: Only image uploads are allowed');
-	
-// make a unique filename for the uploaded file and check it is 
+
+// make a unique filename for the uploaded file and check it is
 // not taken... if it is keep trying until we find a vacant one
 $now = time();
 while(file_exists($uploadFilename = $uploadsDirectory.$now.'-'.$_FILES[$fieldname]['name']))

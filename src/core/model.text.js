@@ -11,7 +11,7 @@ define(
     // App core modules.
     //
     "config"
-,   "util.math"
+,   "cs!util.math"
 ,   "util.class"
 ,   "util.misc"
 ,   "model.layer"
@@ -25,16 +25,16 @@ function( config, utilMath, utilClass, utilMisc, modelLayer )
 
     module.model = utilClass.createClass( modelLayer,
     {
-        type            : "text"
-    ,   text            : ""
-    ,   textLines       : []
-    ,   color           : "#000000"
-    ,   fontSize        : module.options.fontSize
-    ,   lineHeight      : module.options.lineHeight
-    ,   font            : module.options.font
-    ,   weight          : false
-    ,   style           : false
-    ,   editable        : true
+        type       : "text"
+    ,   text       : ""
+    ,   textLines  : []
+    ,   color      : module.options.color
+    ,   fontSize   : module.options.fontSize
+    ,   lineHeight : module.options.lineHeight
+    ,   font       : module.options.font
+    ,   weight     : false
+    ,   style      : false
+    ,   editable   : true
 
     ,   initialize : function( options )
         {

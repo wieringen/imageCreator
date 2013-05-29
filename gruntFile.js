@@ -1,6 +1,7 @@
 /*global module:false*/
 module.exports = function(grunt)
 {
+
     grunt.initConfig(
     {
         pkg  : grunt.file.readJSON( "package.json" )
@@ -43,6 +44,19 @@ module.exports = function(grunt)
             }
         }
 
+    //  Preprocess the sass files.
+    //
+    ,   compass :
+        {
+            dist :
+            {
+                options :
+                {
+                     config : "config.rb"
+                }
+            }
+        }
+
     //  Copy the images and the index to the dist location.
     //
     ,   copy :
@@ -51,9 +65,10 @@ module.exports = function(grunt)
             {
                 files :
                 [
-                    { expand: true, cwd: "src", src: "images/**/*", dest: "dist/src" }
-                ,   { expand: true, cwd: "src", src: "temp/*",      dest: "dist/src" }
-                ,   { expand: true, cwd: "src", src: "index.html",  dest: "dist/src" }
+                    { expand: true, cwd: "src", src: "images/**/*",    dest: "dist/src" }
+                ,   { expand: true, cwd: "src", src: "temp/*",         dest: "dist/src" }
+                ,   { src: "src/css/style.css", dest: "dist/src/jquery.<%= pkg.name %>.css" }
+                ,   { expand: true, cwd: "src", src: "index.html",     dest: "dist/src" }
                 ]
             }
         }
@@ -64,8 +79,7 @@ module.exports = function(grunt)
         {
             options :
             {
-                "laxcomma" : true
-            ,   "laxbreak" : false
+                jshintrc : ".jshintrc"
             }
         ,   all :
             [
@@ -91,6 +105,7 @@ module.exports = function(grunt)
                     ,   "ui.library"
                     ,   "ui.dimensions"
                     ,   "ui.selection"
+                    ,   "ui.message"
                     ,   "engine.svg"
                     ,   "engine.canvas"
                     ,   "engine.vml"
@@ -100,7 +115,15 @@ module.exports = function(grunt)
                         "plugins"     : "../lib"
                     ,   "templates"   : "../templates"
                     ,   "text"        : "../lib/require/text"
+                    ,   "cs"          : "../lib/require/cs"
+                    ,   "coffee-script" : "../lib/require/coffee-script"
                     }
+                ,   stubModules :
+                    [
+                        "cs"
+                    ,   "text"
+                    ,   "coffee-script"
+                    ]
                 ,   replaceRequireScript :
                     [
                         {
@@ -115,51 +138,32 @@ module.exports = function(grunt)
                 ,   out     : "dist/src/jquery.<%= pkg.name %>.js"
                 ,   wrap    : true
                 ,   almond  : true
-                ,   optimize :  "uglify2"
-                ,   preserveLicenseComments : false
+                ,   optimize: "none"
                 }
             }
         }
 
-    //  Concat the css together.
+    // Minify the javascript.
     //
-    ,   concat :
+    ,   uglify :
         {
             dist :
             {
-                src :
-                [
-                    "src/css/base.css"
-                ,   "src/css/buttons.css"
-                ,   "src/css/ui.base.css"
-                ,   "src/css/ui.filters.css"
-                ,   "src/css/ui.text.css"
-                ,   "src/css/ui.info.css"
-                ,   "src/css/ui.layers.css"
-                ,   "src/css/ui.library.css"
-                ,   "src/css/ui.dimensions.css"
-                ,   "src/css/ui.selection.css"
-                ]
-
-            ,   dest : "dist/src/css/<%= pkg.name %>.css"
+                options :
+                {
+                    banner   : "<%= meta.banner %>"
+                ,   beautify : false
+                }
+            ,   files :
+                {
+                    "dist/src/jquery.<%= pkg.name %>.min.js" :
+                    [
+                        "dist/src/jquery.<%= pkg.name %>.js"
+                    ]
+                }
             }
         }
 
-
-    //  Minify the css.
-    //
-    ,   cssmin :
-        {
-            options :
-            {
-                banner : "<%= meta.banner %>"
-            }
-        ,   dist :
-            {
-                src  : "dist/src/css/<%= pkg.name %>.css"
-            ,   dest : "dist/src/css/<%= pkg.name %>.css"
-            }
-        }
 
     //  Replace image file paths in css and correct css path in the index.
     //
@@ -169,7 +173,7 @@ module.exports = function(grunt)
             {
                 files :
                 {
-                    "dist/src/<%= pkg.name %>.css" : "dist/src/<%= pkg.name %>.css"
+                    "dist/src/jquery.<%= pkg.name %>.css" : "dist/src/jquery.<%= pkg.name %>.css"
                 }
 
             ,   options :
@@ -222,6 +226,24 @@ module.exports = function(grunt)
                     interrupt: true
                 }
             }
+
+        //  Watch for changes in sass files and run compass if it finds any.
+        //
+        ,   compass :
+            {
+                files :
+                [
+                    "src/sass/**/*.scss"
+                ]
+            ,   tasks :
+                [
+                    "compass:dist"
+                ]
+            ,   options :
+                {
+                    interrupt: false
+                }
+            }
         }
     });
 
@@ -230,20 +252,27 @@ module.exports = function(grunt)
     //
     grunt.loadNpmTasks( "grunt-requirejs" );
     grunt.loadNpmTasks( "grunt-contrib-copy" );
+    grunt.loadNpmTasks( "grunt-contrib-compass" );
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     grunt.loadNpmTasks( "grunt-contrib-watch" );
-    grunt.loadNpmTasks( "grunt-contrib-cssmin" );
     grunt.loadNpmTasks( "grunt-contrib-jshint" );
-    grunt.loadNpmTasks( "grunt-contrib-concat" );
+    grunt.loadNpmTasks( "grunt-contrib-uglify" );
     grunt.loadNpmTasks( "grunt-contrib-yuidoc" );
     grunt.loadNpmTasks( "grunt-string-replace" );
     grunt.loadNpmTasks( "grunt-contrib-compress" );
 
     //  Define the default build task.
     //
-    grunt.registerTask( "default", [ "clean:dist", "yuidoc", "copy:dist", "concat:dist", "cssmin:dist", "requirejs:dist", "compress:dist" ] );
-
-    //  Check yourself before you wreck yourself.
-    //
-    grunt.registerTask( "sherlock", [ "watch:javascript" ] );
+    grunt.registerTask(
+        "default"
+    ,   [
+            "clean:dist"
+        ,   "yuidoc"
+        ,   "compass:dist"
+        ,   "copy:dist"
+        ,   "requirejs:dist"
+        ,   "uglify:dist"
+        ,   "compress:dist"
+        ]
+    );
 };

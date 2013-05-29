@@ -17,7 +17,7 @@ define(
 ,   "config"
 ,   "cache"
 ,   "model.text"
-,   "util.math"
+,   "cs!util.math"
 
     // Libraries.
     //
@@ -64,7 +64,7 @@ function( moduleHTML, config, cache, modelText, utilMath )
         $textStyleBtn   = $module.find( ".textStyleBtn" );
         $textFontSelect = $module.find( ".textFontSelect" );
 
-        // Initialize module user interface.
+        // Initialize module UI.
         //
         $module.tabular(
         {
@@ -74,7 +74,7 @@ function( moduleHTML, config, cache, modelText, utilMath )
         });
         $textColor.colorPicker();
 
-        // Listen for UI module events.
+        // Listen for module UI events.
         //
         $textColor.bind( "colorUpdate", textColor );
         $textWeightBtn.click( textWeight );
@@ -85,6 +85,10 @@ function( moduleHTML, config, cache, modelText, utilMath )
         //
         $.subscribe( "layerSelect", layerSelect );
         $.subscribe( "layerVisibility", layerSelect );
+
+        // temp
+        //
+        $( ".buttonTextAdd" ).click( textAdd );
     };
 
     function layerSelect( event, layer )

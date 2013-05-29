@@ -1,5 +1,8 @@
 .DS_Store
 dist/
+node_modules/
+src/css/
+docs/
+.sass-cache/
 *.sublime-project
 *.sublime-workspace
-node_modules/

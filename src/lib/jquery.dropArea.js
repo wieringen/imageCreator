@@ -11,8 +11,8 @@ function()
 {
     var pluginName = "dropArea"
     ,   defaults   =
-        { 
-    
+        {
+
         }
     ;
 
@@ -26,8 +26,8 @@ function()
         this.init();
     }
 
-    Plugin.prototype = 
-    {   
+    Plugin.prototype =
+    {
         $dropArea : null,
 
         init: function()
@@ -41,12 +41,12 @@ function()
 
             this.createDropArea();
             this.setEvents();
-        }, 
- 
+        },
+
         createDropArea: function()
         {
             var _self = this;
-            
+
             this.$dropArea = $( "<div class='dropArea'></div>");
             this.$dropArea.text( "Drop your image here" );
 
@@ -58,66 +58,42 @@ function()
             var _self = this;
 
             document.ondragover = function()
-            { 
+            {
                 _self.$dropArea.show();
-                return false; 
+                return false;
             };
-            
+
             document.ondragend = function()
             {
-                _self.$dropArea.hide();                
-                return false; 
+                _self.$dropArea.hide();
+                return false;
             };
-            
+
             this.element.ondrop = function (e)
             {
                 e.preventDefault();
 
                 var files = e.dataTransfer.files;
 
-                _self.$dropArea.hide(); 
-                
+                _self.$dropArea.hide();
+
                 if( files.length > 0 )
                 {
                     var file = files[0];
 
-                    if( typeof FileReader !== "undefined" && file.type.indexOf("image") != -1 ) 
+                    if( typeof FileReader !== "undefined" && file.type.indexOf("image") != -1 )
                     {
                         var reader = new FileReader();
-                        
-                        reader.onload = function(event) 
+
+                        reader.onload = function(event)
                         {
-                            $( _self.element ).trigger( "fileUpload", [ event.target.result ] );
+                            _self.options.callback && _self.options.callback( event.target.result );
                         };
 
                         reader.readAsDataURL( file );
                     }
                 }
             };
-        },
-
-        uploadFile : function( evt ) 
-        {
-            var _self = this
-            ,  files  = evt.dataTransfer.files;
-
-            if ( files.length > 0 )
-             {
-                var file = files[0];
-
-                if ( typeof FileReader !== "undefined" && file.type.indexOf("image") != -1 ) 
-                {
-                    var reader = new FileReader();
-
-                    reader.onload = function(event) 
-                    {
-                        $( _self.element ).trigger( "fileUpload", [ event ] );
-                    };
-
-                    reader.readAsDataURL(file);
-                }
-            }
-            return false;
         }
     };
 

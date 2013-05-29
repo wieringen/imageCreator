@@ -16,7 +16,7 @@ define(
     //
 ,   "config"
 ,   "cache"
-,   "util.math"
+,   "cs!util.math"
 
     // Libraries.
     //
@@ -143,7 +143,14 @@ function( moduleHTML, config, cache, utilMath )
 
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setScale( scale );
+            if( layerCurrent.setFontSize )
+            {
+                layerCurrent.setFontSize( scale );
+            }
+            else
+            {
+                layerCurrent.setScale( scale );
+            }
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }

@@ -11,7 +11,7 @@ define(
     // App core modules.
     //
     "config"
-,   "util.math"
+,   "cs!util.math"
 ,   "util.class"
 ,   "model.layer"
 ],
@@ -24,7 +24,7 @@ function( config, utilMath, utilClass, modelLayer )
 
     module.model = utilClass.createClass( modelLayer,
     {
-        type      : "image"
+        type     : "image"
     ,   sizeReal :
         {
             width  : 0
@@ -42,7 +42,7 @@ function( config, utilMath, utilClass, modelLayer )
         {
             options || ( options = { } );
 
-            this.callSuper("initialize", options);
+            this.callSuper( "initialize", options );
 
             this.image = element;
             this.name  = this.src.substring( this.src.lastIndexOf("/") + 1 );

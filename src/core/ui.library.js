@@ -43,14 +43,6 @@ function( moduleHTML, config, cache, modelImage )
     ,   layerCurrent = false
     ;
 
-
-    /**
-      * Function that initializes the module. It will append the modules html, set the title and initializes its UI.
-      *
-      * @name Image#initialize
-      * @function
-      *
-      */
     module.initialize = function( options )
     {
         // Append module HTML.
@@ -65,10 +57,10 @@ function( moduleHTML, config, cache, modelImage )
         //
         $module              = $( module.options.target );
         $libraryUploadSubmit = $module.find( ".libraryUploadSubmit" );
-        $libraryUploadFrame  = $module.find( ".libraryUploadFrame" );
+        $libraryUploadFrame  = $module.find( "#libraryUploadFrame" );
         $libraryUploadForm   = $module.find( ".libraryUploadForm" );
 
-        // Initialize module ui.
+        // Initialize module UI.
         //
         $module.tabular(
         {
@@ -76,9 +68,12 @@ function( moduleHTML, config, cache, modelImage )
         ,   "tabs"     : "a"
         ,   "pages"    : ".moduleTab"
         });
-        $imageCreatorViewport.dropArea();
+        $imageCreatorViewport.dropArea(
+        {
+            callback : imageAdd
+        });
 
-        // Listen for module ui events.
+        // Listen for module UI events.
         //
         $libraryUploadSubmit.bind( "click", imageUpload );
 
@@ -86,7 +81,19 @@ function( moduleHTML, config, cache, modelImage )
         //
         $.subscribe( "layerSelect", layerSelect );
         $.subscribe( "layerVisibility", layerSelect );
-        $.subscribe( "fileUpload", imageAdd );
+
+        // Temp
+        //
+        $( ".imageDecorationsList" ).delegate( "img", "tap", imageAdd );
+        $( ".imageBackgroundsList" ).delegate( "img", "tap", backgroundAdd );
+        $( ".buttonImageAdd" ).click( function()
+        {
+            cache.setLayerActive( false );
+
+            $module.removeClass( "moduleDisabled" );
+
+            return false;
+        });
     };
 
     function layerSelect( event, layer )
@@ -105,11 +112,11 @@ function( moduleHTML, config, cache, modelImage )
 
             if( json && json.code !== 200 )
             {
-                $imageCreatorViewport.trigger( "setMessage", [ {
+                $.publish( "message", {
                     "message" : json.message
                 ,   "status"  : "error"
                 ,   "fade"    : false
-                }]);
+                } );
             }
             else
             {
