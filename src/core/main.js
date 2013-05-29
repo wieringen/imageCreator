@@ -15,12 +15,14 @@ requirejs.config(
     {
         // App paths
         //
-        "plugins"     : "../lib"
-    ,   "templates"   : "../templates"
+        "plugins"   : "../lib"
+    ,   "templates" : "../templates"
 
         // Require plugins
         //
-    ,   "text"        : "../lib/require/text"
+    ,   "text"      : "../lib/require/text"
+    ,   "cs"        : "../lib/require/cs"
+    ,   "coffee-script" : "../lib/require/coffee-script"
     }
 });
 
@@ -50,7 +52,14 @@ function( config, cache, utilMisc )
         ui      = config.options.ui
         engines = config.options.engines
 
-        // Setup the user interface.
+        // Setup (touch) events and gestures.
+        //
+        $( document ).hammer({
+            scale_treshold    : 0
+        ,   drag_min_distance : 0
+        });
+
+        // Initialize the user interface.
         //
         utilMisc.loadModules( ui, "ui", function( modules )
         {
@@ -69,12 +78,8 @@ function( config, cache, utilMisc )
         {
             if( engines.types[ engineName ].support )
             {
-                loadEngine( engineName, function( engine )
+                loadEngine( false, engineName, function( engine )
                 {
-                    // Fire up the engine.
-                    //
-                    engine.initialize();
-
                     // Since the engine is now running. We can fetch and initialize our cache.
                     //
                     cache.initialize();
@@ -84,64 +89,20 @@ function( config, cache, utilMisc )
             }
         });
 
-        // Setup (touch) events and gestures.
-        //
-        $( document ).hammer({
-            scale_treshold    : 0
-        ,   drag_min_distance : 0
-        });
-
-
         // Listen for global app events.
         //
-        $.subscribe( "setMessage", setMessage );
-
-        // Setup notifications events.
-        //
-        $( ".imageCreatorMessageClose" ).bind( "tap", function()
-        {
-            $imageCreatorMessage.hide();
-        });
-
+        $.subscribe( "loadEngine", loadEngine );
     } );
 
-    function loadEngine( engineName, callback )
+    function loadEngine( event, engineName, callback )
     {
-        require( [ "engine." + engineName ], callback );
-    }
-
-    function setMessage( options )
-    {
-        var $imageCreatorMessage      = $( ".imageCreatorMessage" )
-        ,   $imageCreatorMessageInner = $( ".imageCreatorMessageInner" )
-        ,   defaults =
-            {
-                "message"   : ""
-            ,   "status"    : ""
-            ,   "fade"      : true
-            ,   "fadeTimer" : 300
-            }
-        ,   options      = $.extend( {}, defaults, options )
-        ,   messageTimer = $imageCreatorMessage.data( "messageTimer" )
-        ;
-
-        $imageCreatorMessage.removeClass( "error loading notice" );
-        $imageCreatorMessage.addClass( options.status );
-        $imageCreatorMessage.show();
-
-        $imageCreatorMessageInner.text( options.message );
-
-        if( options.fade )
+        require( [ "engine." + engineName ], function( engine )
         {
-            clearTimeout( messageTimer );
+            // Fire up the engine.
+            //
+            engine.initialize();
 
-            messageTimer = setTimeout( function()
-            {
-                $imageCreatorMessage.hide();
-            }, options.fadeTimer );
-
-            $imageCreatorMessage.data( "messageTimer", messageTimer );
-        }
+            callback && callback( engine );
+        });
     }
-
 } );
