@@ -1,8 +1,8 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description
  *
  * @namespace
- * @name info
+ * @name ui.message
  * @version 1.0
  * @author mbaijs
  */
@@ -52,9 +52,9 @@ function( moduleHTML, config )
 
         // Get module DOM elements.
         //
-        $imageCreatorMessage      = $( ".imageCreatorUIMessage" )
-        $imageCreatorMessageInner = $( ".imageCreatorMessageInner" )
-        $imageCreatorMessageClose = $( ".imageCreatorMessageClose" )
+        $imageCreatorMessage      = $( ".imageCreatorUIMessage" );
+        $imageCreatorMessageInner = $( ".imageCreatorMessageInner" );
+        $imageCreatorMessageClose = $( ".imageCreatorMessageClose" );
 
         // Listen for module UI events.
         //

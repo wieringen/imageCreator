@@ -58,23 +58,53 @@
 
 /* Font family */
 .imageCreatorUIText .textFontSelect {
-    width:          65%;
+    width:          100%;
     float:          left;
     height:         22px;
     line-height:    22px;
-    margin:         0 5% 0 0;
+    margin:         0 5% 5% 0;
 }
 
 /* Font weight */
 .imageCreatorUIText .textWeightBtn {
-    float:          left;
+    float:          right;
     font-weight:    bold;
-    margin:         0 5% 0 0;
+       width: 12px;
+    margin:         0 0 0 5%;
 }
 
 /* Font style */
 .imageCreatorUIText .textStyleBtn {
-    float:          left;
-    margin:         0;
+    float:          right;
+    font-family: "Georgia";
+       width: 12px;
+    margin:         0 0 0 5%;
     font-style:     italic;
+}
+
+.imageCreatorUIText .textAlignLeftBtn,
+.imageCreatorUIText .textAlignCenterBtn,
+.imageCreatorUIText .textAlignRightBtn {
+    float: left;
+    margin:  0 5% 0 0;
+}
+
+.imageCreatorUIText .textAlignLeftBtn span{
+    height: 20px;
+        display: block;
+        width: 12px;
+    background: transparent url(../images/icon-text-align-left.png) no-repeat 50% 50%;
+}
+.imageCreatorUIText .textAlignCenterBtn span{
+    height: 20px;
+    display: block;
+            width: 12px;
+    background: transparent url(../images/icon-text-align-center.png) no-repeat 50% 50%;
+}
+
+.imageCreatorUIText .textAlignRightBtn span{
+    height: 20px;
+    display: block;
+            width: 12px;
+    background: transparent url(../images/icon-text-align-right.png) no-repeat 50% 50%;
 }

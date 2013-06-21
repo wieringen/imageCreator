@@ -1,8 +1,8 @@
 /**
- * @description <p>A collection of reusable utility functions.</p>
+ * @description
  *
  * @namespace imageCreator
- * @name utils
+ * @name util.detect
  * @version 1.0
  * @author mbaijs
  */
@@ -26,19 +26,40 @@ function()
         return supportsVml;
     }();
 
-    module.HAS_SVG            = !!document.createElementNS && !!document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGRect
+    module.HAS_SVG = function()
+    {
+        return !!document.createElementNS && !!document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGRect;
+    }();
 
-    module.HAS_FOREIGN_OBJECT = "function" === typeof SVGForeignObjectElement;
+    module.HAS_FOREIGN_OBJECT = function()
+    {
+        return "function" === typeof SVGForeignObjectElement;
+    }();
 
-    module.HAS_CANVAS         = !!document.createElement( "canvas" ).getContext;
+    module.HAS_CANVAS = function()
+    {
+        return !!document.createElement( "canvas" ).getContext;
+    }();
 
-    module.IS_PRE_IE9         = window.attachEvent && !window.addEventListener;
+    module.IS_PRE_IE9 = function()
+    {
+        return window.attachEvent && !window.addEventListener;
+    }();
 
-    module.HAS_POINTEREVENTS  = navigator.pointerEnabled || navigator.msPointerEnabled;
+    module.HAS_POINTEREVENTS = function()
+    {
+        return navigator.pointerEnabled || navigator.msPointerEnabled;
+    }();
 
-    module.HAS_TOUCHEVENTS    = ("ontouchstart" in window);
+    module.HAS_TOUCHEVENTS = function()
+    {
+        return ("ontouchstart" in window);
+    }();
 
-    module.NO_MOUSEEVENTS     = module.HAS_TOUCHEVENTS && navigator.userAgent.match(/mobile|tablet|ip(ad|hone|od)|android/i);
+    module.NO_MOUSEEVENTS = function()
+    {
+        return module.HAS_TOUCHEVENTS && navigator.userAgent.match(/mobile|tablet|ip(ad|hone|od)|android/i);
+    }();
 
     return module;
 });

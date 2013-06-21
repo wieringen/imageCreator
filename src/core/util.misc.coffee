@@ -1,0 +1,77 @@
+ #
+ # @description
+ #
+ # @namespace imageCreator
+ # @name util.misc
+ # @version 1.0
+ # @author mbaijs
+ #
+define [], () ->
+
+    module = {}
+
+    module.populateWithProperties = ( source, destination, properties ) ->
+
+        if properties and Object.prototype.toString.call( properties ) is "[object Array]"
+
+            for property in properties
+
+                destination[ property ] = source[ property ]
+
+
+    module.measureText = ( layer ) ->
+
+        measureDiv = document.createElement "measureDiv"
+
+        measureDiv.className = "imageCreatorMeasureText"
+
+        document.body.appendChild measureDiv
+
+        measureDiv.style.fontSize   = layer.fontSize + "px";
+        measureDiv.style.fontFamily = layer.font
+        measureDiv.style.fontWeight = if layer.weight then "bold" else "normal"
+
+        if window.attachEvent and ! window.addEventListener
+            measureDiv.innerText = layer.text
+        else
+            jQuery( measureDiv ).text layer.text
+
+        textWidth = measureDiv.clientWidth + 10
+
+        document.body.removeChild measureDiv
+
+        measureDiv = null
+
+        return textWidth
+
+
+    module.whenAll = ( promises ) ->
+
+        return jQuery.when.apply( jQuery, promises ).pipe () ->
+
+            return jQuery.grep Array.prototype.slice.call( arguments ), (value) ->
+
+                return (value)
+
+
+    module.loadModules = ( modules, prefix, callback ) ->
+
+        urls  = []
+        names = []
+
+        for moduleName of modules
+
+            urls.push( prefix + "." + moduleName )
+            names.push( moduleName )
+
+        require urls, () ->
+
+            resultSet = []
+
+            for module, i in arguments
+
+                resultSet[ names[ i ] ] = module
+
+            callback resultSet
+
+    return module

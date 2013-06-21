@@ -1,8 +1,8 @@
 /**
- * @description <p>A toolbar module that keeps track of all the layers.</p>
+ * @description
  *
- * @namespace imageCreator.toolbar
- * @name layers
+ * @namespace imageCreator
+ * @name ui.layers
  * @version 1.0
  * @author mbaijs
  */
@@ -34,7 +34,7 @@ function( moduleHTML, config, cache )
     ,   $imageCreatorViewport
 
     ,   $module
-    ,   $layerContainer
+    ,   $layersContainer
     ,   $selectRenderEngine
     ,   $buttonImageSave
     ,   $emptyMessage
@@ -53,7 +53,7 @@ function( moduleHTML, config, cache )
         // Get module DOM elements.
         //
         $module               = $( module.options.target );
-        $layerContainer       = $module.find( ".layerContainer" );
+        $layersContainer      = $module.find( ".layersContainer" );
         $selectRenderEngine   = $module.find( ".selectRenderEngine" );
         $buttonImageSave      = $( ".buttonImageSave" );
         $emptyMessage         = $module.find( ".emptyMessage" );
@@ -69,9 +69,9 @@ function( moduleHTML, config, cache )
 
         // Listen for module UI events.
         //
-        $layerContainer.delegate( ".objectLayer", "tap", layerSelectByID );
-        $layerContainer.delegate( ".objectToggle", "tap", layerVisibilityById );
-        $layerContainer.delegate( ".objectRemove", "tap", layerRemoveByID );
+        $layersContainer.delegate( ".layer", "tap", layerSelectByID );
+        $layersContainer.delegate( ".layerToggle", "tap", layerVisibilityById );
+        $layersContainer.delegate( ".layerRemove", "tap", layerRemoveByID );
         $selectRenderEngine.change( optionRenderEngineSelect );
         $buttonImageSave.bind( "tap", function()
         {
@@ -93,8 +93,8 @@ function( moduleHTML, config, cache )
 
         // Get module snippets.
         //
-        module.snippets.$objectLayerSnippet = $module.find( ".objectLayer" ).remove();
-        module.snippets.$engineSnippet      = $module.find( ".selectRenderEngineItem" ).remove();
+        module.snippets.$layerSnippet  = $module.find( ".layer" ).remove();
+        module.snippets.$engineSnippet = $module.find( ".selectRenderEngineItem" ).remove();
 
         // Populate the module UI.
         //
@@ -129,14 +129,14 @@ function( moduleHTML, config, cache )
 
     function layersRedraw()
     {
-        $layerContainer.find( ".objectLayer" ).remove();
+        $layersContainer.find( ".layer" ).remove();
 
         $.each( cache.getLayers(), layerCheck );
     }
 
     function layerCheck( event, layer )
     {
-        if( layer && 0 === $( "#objectLayer" + layer.id ).length )
+        if( layer && 0 === $( "#layer" + layer.id ).length )
         {
             layerCreate( event, layer );
         }
@@ -144,31 +144,31 @@ function( moduleHTML, config, cache )
         layerSelect( event, layer );
     }
 
-    function layerCreate( event, objectLayer )
+    function layerCreate( event, layer )
     {
         $emptyMessage.hide();
 
-        $layerClone = module.snippets.$objectLayerSnippet.clone();
-        $layerClone.attr( "id", "objectLayer" + objectLayer.id );
+        $layerClone = module.snippets.$layerSnippet.clone();
+        $layerClone.attr( "id", "layer" + layer.id );
 
-        if( objectLayer.image )
+        if( layer.image )
         {
-            $layerClone.find( ".objectLayerName" ).text( objectLayer.name );
-            $layerClone.find( "img" ).attr( "src", objectLayer.image.src );
+            $layerClone.find( ".layerName" ).text( layer.name );
+            $layerClone.find( "img" ).attr( "src", layer.image.src );
         }
 
-        if( objectLayer.text )
+        if( layer.text )
         {
-            $layerClone.find( ".objectLayerName" ).text( objectLayer.text );
+            $layerClone.find( ".layerName" ).text( layer.text );
             //$layerClone.find( "img" ).attr( "src", objectLayer.image.src );
         }
 
-        $layerContainer.prepend( $layerClone );
+        $layersContainer.prepend( $layerClone );
     }
 
     function layerSelectByID( event )
     {
-        var layerID = $( this ).attr( "id" ).replace( "objectLayer", "" );
+        var layerID = $( this ).attr( "id" ).replace( "layer", "" );
 
         cache.setLayerActiveByID( layerID );
 
@@ -177,13 +177,13 @@ function( moduleHTML, config, cache )
 
     function layerSelect( event, layer )
     {
-        $layerContainer.find( ".active" ).removeClass( "active" );
-        $( "#objectLayer" + layer.id ).addClass( "active" );
+        $layersContainer.find( ".active" ).removeClass( "active" );
+        $( "#layer" + layer.id ).addClass( "active" );
     }
 
     function layerRemoveByID( event )
     {
-        var layerID = $( this ).parent().attr( "id" ).replace( "objectLayer", "" );
+        var layerID = $( this ).parent().attr( "id" ).replace( "layer", "" );
 
         cache.removeLayerByID( layerID );
 
@@ -192,11 +192,11 @@ function( moduleHTML, config, cache )
 
     function layerRemove( event, layerID )
     {
-        $( "#objectLayer" + layerID ).remove();
+        $( "#layer" + layerID ).remove();
 
         // Show empty message if we have no more layers.
         //
-        if( 0 === $layerContainer.find( ".objectLayer" ).length )
+        if( 0 === $layersContainer.find( ".layer" ).length )
         {
             $emptyMessage.show();
         }
@@ -204,7 +204,7 @@ function( moduleHTML, config, cache )
 
     function layerVisibilityById( event )
     {
-        var layerID = $( this ).parent().attr( "id" ).replace( "objectLayer", "" )
+        var layerID = $( this ).parent().attr( "id" ).replace( "layer", "" )
         ,   layer   = cache.getLayerById( layerID )
         ;
 
@@ -217,7 +217,7 @@ function( moduleHTML, config, cache )
 
     function layerVisibility( event, layer )
     {
-        $( "#objectLayer" + layer.id ).toggleClass( "hide", layer.visibility );
+        $( "#layer" + layer.id ).toggleClass( "hide", layer.visibility );
 
         return false;
     }

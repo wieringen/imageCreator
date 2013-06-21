@@ -1,8 +1,8 @@
 /**
- * @description <p>A collection of reusable utility functions. Exposed on the application context as 'utils'.</p>
+ * @description
  *
  * @namespace
- * @name info
+ * @name ui.info
  * @version 1.0
  * @author mbaijs
  */
@@ -83,8 +83,8 @@ function( moduleHTML, config )
 
             $layerRotationValue.text( layer.rotation && Math.round( layer.rotation.degrees ) || 0 );
 
-            $layerSizeWidth.text( layer.sizeCurrent && layer.sizeCurrent.width || 0 );
-            $layerSizeHeight.text( layer.sizeCurrent && layer.sizeCurrent.height || 0 );
+            $layerSizeWidth.text( layer.sizeCurrent && Math.round( layer.sizeCurrent.width ) || 0 );
+            $layerSizeHeight.text( layer.sizeCurrent && Math.round( layer.sizeCurrent.height ) || 0 );
         }
     }
 

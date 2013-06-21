@@ -26,6 +26,15 @@ module.exports = function(grunt)
             }
         }
 
+
+    ,   karma :
+        {
+            continuous :
+            {
+                configFile: "karma.conf.js"
+            }
+        }
+
     //  Create Documentation.
     //
     ,   yuidoc :
@@ -67,7 +76,7 @@ module.exports = function(grunt)
                 [
                     { expand: true, cwd: "src", src: "images/**/*",    dest: "dist/src" }
                 ,   { expand: true, cwd: "src", src: "temp/*",         dest: "dist/src" }
-                ,   { src: "src/css/style.css", dest: "dist/src/jquery.<%= pkg.name %>.css" }
+                ,   { src: "src/css/style.css", dest: "dist/src/css/style.css" }
                 ,   { expand: true, cwd: "src", src: "index.html",     dest: "dist/src" }
                 ]
             }
@@ -83,8 +92,8 @@ module.exports = function(grunt)
             }
         ,   all :
             [
-                "src/lib/*.js"
-            ,   "src/core/**/*.js"
+               // "src/lib/*.js"
+                "src/core/**/*.js"
             ]
         }
 
@@ -98,7 +107,7 @@ module.exports = function(grunt)
                 {
                     include :
                     [
-                        "ui.filters"
+                        "ui.effects"
                     ,   "ui.text"
                     ,   "ui.info"
                     ,   "ui.layers"
@@ -110,14 +119,7 @@ module.exports = function(grunt)
                     ,   "engine.canvas"
                     ,   "engine.vml"
                     ]
-                ,   paths :
-                    {
-                        "plugins"     : "../lib"
-                    ,   "templates"   : "../templates"
-                    ,   "text"        : "../lib/require/text"
-                    ,   "cs"          : "../lib/require/cs"
-                    ,   "coffee-script" : "../lib/require/coffee-script"
-                    }
+                ,   mainConfigFile : "src/core/main.js"
                 ,   stubModules :
                     [
                         "cs"
@@ -173,7 +175,7 @@ module.exports = function(grunt)
             {
                 files :
                 {
-                    "dist/src/jquery.<%= pkg.name %>.css" : "dist/src/jquery.<%= pkg.name %>.css"
+                    "dist/src/css/style.css" : "dist/src/css/style.css"
                 }
 
             ,   options :
@@ -250,6 +252,7 @@ module.exports = function(grunt)
 
     //  Load all the task modules we need.
     //
+    grunt.loadNpmTasks( "grunt-karma" );
     grunt.loadNpmTasks( "grunt-requirejs" );
     grunt.loadNpmTasks( "grunt-contrib-copy" );
     grunt.loadNpmTasks( "grunt-contrib-compass" );
@@ -267,6 +270,7 @@ module.exports = function(grunt)
         "default"
     ,   [
             "clean:dist"
+        //,   "karma:continuous"
         ,   "yuidoc"
         ,   "compass:dist"
         ,   "copy:dist"

@@ -1,11 +1,7 @@
 /**
- * @description <p>The Canvas engine implementation.</p>
- *
- * @namespace imageCreator.engine
- * @name canvas
- * @version 1.0
- * @author mbaijs
- */
+*
+* @module engine.canvas
+*/
 define(
 [
     // App core modules
@@ -73,7 +69,7 @@ function( config, cache, utilMath )
         canvasBuildLayers();
     };
 
-    function canvasBuildLayers()
+    function canvasBuildLayers( event )
     {
         var layers       = cache.getLayers()
         ,   layerCurrent = cache.getLayerActive()
@@ -91,7 +87,7 @@ function( config, cache, utilMath )
             //
             if( layer.visible )
             {
-                canvasLayerCreate( false, layer );
+                canvasLayerCreate( event, layer );
             }
         });
 
@@ -99,7 +95,7 @@ function( config, cache, utilMath )
         //
         if( layerCurrent && layerCurrent.visible )
         {
-            canvasLayerSelect( false, layerCurrent );
+            canvasLayerSelect( event, layerCurrent );
         }
     }
 
@@ -117,31 +113,39 @@ function( config, cache, utilMath )
         //
         if( "image" === layer.type )
         {
-            // Is the a filter defined for this layer? If so apply it.
+            if( event && event.type === "layerSelect" )
+            {
+                layer.setImageManipulated( null );
+            }
+
+            // Draw the image and use its real size the matrix applied above will do the scaling for us.
             //
-            if( layer.filter.matrix )
-            {
-                context.putImageData( applyFilter( context, layer ), layer.positionRotated.x, layer.positionRotated.y);
-            }
-            else
-            {
-                // Draw the image and use its real size the matrix applied above will do the scaling for us.
-                //
-                context.drawImage( layer.image, 0, 0, layer.sizeReal.width, layer.sizeReal.height );
-            }
+            context.drawImage( getImage( context, layer ), 0, 0, layer.sizeReal.width, layer.sizeReal.height );
         }
 
         if( "text" === layer.type )
         {
             context.fillStyle    = layer.color;
             context.font         = ( layer.style ? "italic" : "normal" ) + " " + ( layer.weight ? "bold" : "normal" ) + " " + layer.fontSize + "px " + layer.font;
-            context.textBaseline = "top";
+            context.textAlign    = layer.textAlign;
 
             // We have to create a seperate container for every text line.
             //
             $.each( layer.textLines, function( index, line )
             {
-                context.fillText( line, 0, index * Math.floor( layer.fontSize * layer.lineHeight ) );
+                context.fillText(
+                    // Text line
+                    //
+                    line
+
+                    // Left
+                    //
+                ,   layer.sizeCurrent.width * { "left" : 0, "center" : 0.5, "right" : 1 }[ layer.textAlign ]
+
+                    // Top
+                    //
+                ,   ( index * Math.floor( layer.fontSize * layer.lineHeight ) ) + layer.fontSize
+                );
             });
         }
 
@@ -184,24 +188,97 @@ function( config, cache, utilMath )
         context.restore();
     }
 
-    function applyFilter( context, layer )
+    function getImage( context, layer )
+    {
+        // No filter or mask defined return normal image.
+        //
+        if( ! layer.filter.matrix && layer.mask.name === "None")
+        {
+            return layer.image;
+        }
+        else
+        {
+            // Do we allready have a image processed with a filter in mem? Use that.
+            //
+            if( layer.imageManipulated )
+            {
+                return layer.imageManipulated;
+            }
+            // If we have nothing in memory create one.
+            //
+            else
+            {
+                layer.setImageManipulated( applyImageManipulations(  layer ) );
+
+                return layer.imageManipulated;
+            }
+        }
+    }
+
+    function applyImageManipulations( layer )
     {
         var copyCanvas  = document.createElement( "canvas" )
         ,   copyContext = copyCanvas.getContext( "2d" )
+        ,   canvasData
+        ,   canvasDataLength
         ;
-        copyCanvas.setAttribute( "width", canvasWidth );
-        copyCanvas.setAttribute( "height", canvasHeight );
 
-        copyContext.setTransform( layer.matrix[ 0 ], layer.matrix[ 3 ], layer.matrix[ 1 ], layer.matrix[ 4 ], layer.matrix[ 2 ], layer.matrix[ 5 ] );
+        // Set the copy canvas to reflect the layer size.
+        //
+        copyCanvas.setAttribute( "width", layer.sizeReal.width );
+        copyCanvas.setAttribute( "height", layer.sizeReal.height );
+
+        if( layer.mask.name !== "None" )
+        {
+            if( layer.selected )
+            {
+                copyContext.save();
+
+                copyContext.globalAlpha = 0.5;
+                copyContext.drawImage( layer.image, 0, 0, layer.sizeReal.width, layer.sizeReal.height );
+                copyContext.fillStyle = '#666';
+                copyContext.fillRect(0, 0, layer.sizeReal.width, layer.sizeReal.height);
+
+                copyContext.restore();
+            }
+
+            var clearCircle = function(x, y, radius)
+            {
+                copyContext.beginPath();
+                copyContext.arc(x, y, radius, 0, 2 * Math.PI, false);
+                copyContext.clip();
+                copyContext.clearRect(x - radius - 1, y - radius - 1, radius * 2 + 2, radius * 2 + 2);
+            };
+
+            var radius = layer.sizeReal.width > layer.sizeReal.height ? layer.sizeReal.height : layer.sizeReal.width;//
+
+            clearCircle( layer.sizeReal.width / 2, layer.sizeReal.height / 2, radius / 2);
+        }
+
+        // Draw the layer to the canvas
+        //
         copyContext.drawImage( layer.image, 0, 0, layer.sizeReal.width, layer.sizeReal.height );
 
-        var canvasData = copyContext.getImageData( layer.positionRotated.x, layer.positionRotated.y, layer.sizeRotated.width, layer.sizeRotated.height )
-        ,   len        = layer.sizeRotated.width * layer.sizeRotated.height * 4
-        ;
+        if( layer.filter.matrix  )
+        {
+            // Get the pixel data from the canvas
+            //
+            canvasData = copyContext.getImageData( 0, 0, layer.sizeReal.width, layer.sizeReal.height );
 
-        //processFilter(canvasData.data, layer.filter, len);
+            // We need the total length of the pixel data.
+            //
+            canvasDataLength = layer.sizeReal.width * layer.sizeReal.height * 4;
 
-        return canvasData;
+            // Add a filter to the pixel data.
+            //
+            processColorFilter( canvasData.data, layer.filter, canvasDataLength );
+
+            // Put back the processed image in the copy canvas.
+            //
+            copyContext.putImageData( canvasData, 0, 0 );
+        }
+
+        return copyCanvas;
      }
 
     function colorDistance( scale, dest, src )
@@ -209,7 +286,7 @@ function( config, cache, utilMath )
         return (scale * dest + (1 - scale) * src);
     }
 
-    function processFilter( binaryData, filter, len )
+    function processColorFilter( binaryData, filter, len )
     {
         var r, g, b
         ,   m         = filter.matrix

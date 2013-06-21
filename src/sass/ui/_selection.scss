@@ -33,37 +33,37 @@
 }
 
 /* Rotate */
-.imageCreatorSelection .gripN { 
-    left: 50%; 
-    top:0; 
+.imageCreatorSelection .gripN {
+    left: 50%;
+    top:0;
 }
-.imageCreatorSelection .gripNE { 
-    left: 100%; 
-    top:0; 
+.imageCreatorSelection .gripNE {
+    left: 100%;
+    top:0;
 }
-.imageCreatorSelection .gripE { 
-    left: 100%; 
+.imageCreatorSelection .gripE {
+    left: 100%;
     top: 50%;
 }
-.imageCreatorSelection .gripSE { 
-    left: 100%; 
-    top: 100%; 
+.imageCreatorSelection .gripSE {
+    left: 100%;
+    top: 100%;
 }
-.imageCreatorSelection .gripS { 
-    left: 50%; 
-    top: 100%; 
+.imageCreatorSelection .gripS {
+    left: 50%;
+    top: 100%;
 }
-.imageCreatorSelection .gripSW { 
-    left: 0%; 
-    top: 100%; 
+.imageCreatorSelection .gripSW {
+    left: 0%;
+    top: 100%;
 }
-.imageCreatorSelection .gripW {  
-    left: 0%; 
-    top: 50%; 
+.imageCreatorSelection .gripW {
+    left: 0%;
+    top: 50%;
 }
-.imageCreatorSelection .gripNW { 
-    left: 0%; 
-    top: 0%; 
+.imageCreatorSelection .gripNW {
+    left: 0%;
+    top: 0%;
 }
 .imageCreatorSelection .gripN,
 .imageCreatorSelection .gripNE,
@@ -72,11 +72,11 @@
 }
 .imageCreatorSelection .gripN,
 .imageCreatorSelection .gripS{
-    margin-left: -15px; 
+    margin-left: -15px;
 }
 .imageCreatorSelection .gripW,
 .imageCreatorSelection .gripE{
-    margin-top: -15px; 
+    margin-top: -15px;
 }
 .imageCreatorSelection .gripW,
 .imageCreatorSelection .gripSW,
@@ -122,7 +122,7 @@
 }
 .imageCreatorSelection .gripW .gripScale,
 .imageCreatorSelection .gripE .gripScale{
-    top: 10px;  
+    top: 10px;
 }
 .imageCreatorSelection .gripW .gripScale,
 .imageCreatorSelection .gripSW .gripScale,

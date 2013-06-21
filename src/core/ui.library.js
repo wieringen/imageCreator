@@ -1,10 +1,10 @@
 /**
- * Image tool Class
+ * @description
  *
- * @name Image
- * @class Image
- * @constructor
- *
+ * @namespace imageCreator
+ * @name ui.library
+ * @version 1.0
+ * @author mbaijs
  */
 define(
 [
@@ -16,7 +16,7 @@ define(
     //
 ,   "config"
 ,   "cache"
-,   "model.image"
+,   "cs!model.image"
 
     // Libraries.
     //

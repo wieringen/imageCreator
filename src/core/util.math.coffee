@@ -1,19 +1,18 @@
 #
-# @description A collection of reusable utility functions.
+# @description
 #
 # @namespace imageCreator
-# @name utils
+# @name util.math
 # @version 1.0
 # @author mbaijs
 #
 define [], () ->
-    ->
 
     module = {}
 
     module.sanitizeRadians = ( radians ) ->
 
-        max = 2 * Math.PI;
+        max = 2 * Math.PI
 
         return if ( radians < 0 )
         then ( max + radians )
@@ -29,8 +28,8 @@ define [], () ->
 
     module.getBoundingBox = ( sizeUnrotated, rotation ) ->
 
-        sin = Math.abs( rotation.sin )
-        cos = Math.abs( rotation.cos )
+        sin = Math.abs rotation.sin
+        cos = Math.abs rotation.cos
 
         width  : sizeUnrotated.height * sin + sizeUnrotated.width * cos
         height : sizeUnrotated.height * cos + sizeUnrotated.width * sin
@@ -114,7 +113,7 @@ define [], () ->
         x = pos2.x - pos1.x
         y = pos2.y - pos1.y
 
-        return Math.sqrt((x * x) + (y * y))
+        return Math.sqrt x * x + y * y
 
     module.getRandomInt = ( min, max ) ->
 
@@ -122,16 +121,16 @@ define [], () ->
 
     module.isPointInPath = ( mouse, size, position, radians ) ->
 
-        dx    = mouse.x - ( position.x + ( size.width / 2 ) )
-        dy    = mouse.y - ( position.y + ( size.height / 2 ) )
-        h1    = Math.sqrt( dx * dx + dy * dy )
-        currA = Math.atan2( dy, dx )
-        newA  = currA - radians
-        x2    = Math.cos(newA) * h1
-        y2    = Math.sin(newA) * h1
+        dx   = mouse.x - ( position.x + ( size.width / 2 ) )
+        dy   = mouse.y - ( position.y + ( size.height / 2 ) )
 
-        if ( x2 > -0.5 * size.width and x2 < 0.5 * size.width and y2 > -0.5 * size.height and y2 < 0.5 * size.height )
+        h1   = Math.sqrt dx * dx + dy * dy
+        newA = Math.atan2( dy, dx ) - radians
 
-            return true
+        x2   = Math.cos( newA ) * h1
+        y2   = Math.sin( newA ) * h1
+
+        return yes if -0.5 * size.width  < x2 < 0.5 * size.width and
+                      -0.5 * size.height < y2 < 0.5 * size.height
 
     return module

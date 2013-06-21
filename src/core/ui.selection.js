@@ -1,7 +1,7 @@
 /**
- * @description A element cropper plugin.
+ * @description
  *
- * @name selection
+ * @name ui.selection
  * @version 1.0
  * @author mbaijs
  */
@@ -29,10 +29,10 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
     ,   $imageCreatorCanvas
 
     ,   $imageCreatorSelection
-    ,   $imageCreatorSelectionTextEdit
 
     ,   shiftKeyEnabled = false
     ,   editing         = false
+    ,   editLock        = false
     ;
 
     module.initialize = function()
@@ -48,20 +48,18 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
 
         // Get module DOM elements.
         //
-        $imageCreatorSelection         = $( ".imageCreatorSelection" );
-        $imageCreatorSelectionTextEdit = $( ".imageCreatorSelectionTextEdit" );
+        $imageCreatorSelection = $( ".imageCreatorSelection" );
 
         // Listen to module UI events.
         //
-        $imageCreatorViewport.bind( "dragstart", selectionPosition );
-        $imageCreatorViewport.bind( "transformstart", selectionPinch );
         $imageCreatorCanvas.bind( "tap", selectionTap );
         $imageCreatorSelection.delegate( ".gripScale", "mousedown", selectionScale );
         $imageCreatorSelection.delegate( ".gripRotate", "mousedown", selectionRotate );
-        $imageCreatorSelectionTextEdit.bind( "change, keyup", selectionSetText );
+        $imageCreatorViewport.bind( "dragstart", selectionPosition );
+        $imageCreatorViewport.bind( "transformstart", selectionPinch );
         $imageCreatorViewport.bind( "mousedown mousemove", function( event )
         {
-            if( ! editing ) event.preventDefault();
+            if( ! editLock ) event.preventDefault();
         });
 
         $( document ).bind( "keydown", selectionKeyDown );
@@ -70,7 +68,8 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
         // Listen for global events.
         //
         $.subscribe( "layerUpdate", selectionUpdate );
-        $.subscribe( "layerSelect", selectionUpdate );
+        $.subscribe( "layerSelect", selectionSelect );
+        $.subscribe( "layerEdit", selectionEdit );
         $.subscribe( "layerVisibility", selectionVisibility );
 
         // Populate the module UI.
@@ -102,13 +101,14 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
         }
     }
 
+    function selectionSelect( event, layer )
+    {
+        selectionEdit( event, false );
+        selectionUpdate( event, layer );
+    }
+
     function selectionUpdate( event, layer )
     {
-        if( event.type === "layerSelect" )
-        {
-            selectionDisableEditing( event );
-        }
-
         if( layer )
         {
             $imageCreatorSelection.css({
@@ -117,24 +117,25 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
             ,   "width"   : layer.sizeRotated.width  + module.options.offset
             ,   "height"  : layer.sizeRotated.height + module.options.offset
             });
-
-            if( editing )
-            {
-                $imageCreatorSelectionTextEdit.css({
-                    "width"      : layer.sizeCurrent.width
-                ,   "height"     : layer.sizeCurrent.height
-                ,   "left"       : layer.position.x
-                ,   "top"        : layer.position.y
-                ,   "display"    : "block"
-                ,   "lineHeight" : Math.floor( layer.fontSize * layer.lineHeight ) + "px"
-                ,   "fontSize"   : layer.fontSize
-                ,   "fontFamily" : layer.font
-                ,   "transform"  : "rotate(" + layer.rotation.degrees + "deg )"
-                });
-            }
         }
 
         $imageCreatorSelection.toggle( layer && layer.visible && ! layer.locked );
+    }
+
+    function selectionEdit( event, layer )
+    {
+        $imageCreatorSelection.toggleClass( "editing", layer );
+
+        if( layer )
+        {
+            editing  = true;
+            editLock = layer.canHaveText;
+        }
+        else
+        {
+            editing = false;
+            editLock = false;
+        }
     }
 
     function selectionKeyDown( event )
@@ -155,7 +156,6 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
         if( layer.selected && ! layer.locked )
         {
             $imageCreatorSelection.toggle( layer.visible );
-            $imageCreatorSelectionTextEdit.toggle( editing && layer.visible );
         }
     }
 
@@ -176,6 +176,8 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
 
         $( "body" ).addClass( "noSelect" );
 
+        // Mehhh....
+        //
         $( document ).bind( "mousemove.selection", function( event )
         {
             var quantifierY = scaleSliceY * Math.abs( event.pageY - mouse.y )
@@ -253,7 +255,7 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
         event.preventDefault();
 
         var layerCurrent            = cache.getLayerActive()
-        ,   layerRotationStart      = layerCurrent.rotation.radians
+        ,   layerStartRadians       = layerCurrent.rotation.radians
         ,   selectionOffset         = $imageCreatorSelection.offset()
         ,   gripPositionCenterStart =
             {
@@ -261,7 +263,7 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
             ,   y : event.pageY - selectionOffset.top  - ( layerCurrent.sizeRotated.height / 2 )
             }
         ,   gripOffsetRadians = utilMath.sanitizeRadians( Math.atan2( gripPositionCenterStart.x, -gripPositionCenterStart.y ) )
-        ,   slice             = Math.PI * 2 / module.options.grips.length;
+        ,   slice             = Math.PI * 2 / module.options.grips.length
         ;
 
         $( "html" ).addClass( "noSelect cursorRotate" );
@@ -275,7 +277,8 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
                 x : event.pageX - $imageCreatorSelection.offset().left - ( layerCurrent.sizeRotated.width  / 2 )
             ,   y : event.pageY - $imageCreatorSelection.offset().top  - ( layerCurrent.sizeRotated.height / 2 )
             }
-            ,   radians = utilMath.sanitizeRadians( layerRotationStart + utilMath.sanitizeRadians( Math.atan2( gripPositionCenter.x, -gripPositionCenter.y ) ) - gripOffsetRadians )
+            ,   gripCurrentRadians = utilMath.sanitizeRadians( Math.atan2( gripPositionCenter.x, -gripPositionCenter.y ) )
+            ,   radians = utilMath.sanitizeRadians( layerStartRadians + gripCurrentRadians - gripOffsetRadians )
             ;
 
             if( shiftKeyEnabled )
@@ -322,7 +325,7 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
 
         $( document ).bind( "drag.selection", function( event )
         {
-            if( ! editing && layerCurrent && layerCurrent.visible )
+            if( ! editLock && layerCurrent && layerCurrent.visible )
             {
                 layerCurrent.setPosition({
                     x : event.gesture.deltaX - mouse.x
@@ -366,10 +369,10 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
                 ,   sin     : Math.sin( radians )
                 ,   cos     : Math.cos( radians )
                 }
-            ,   scale = layerScaleStart + ( ( event.gesture.scale - deltaScale ) * multiplierScale );
+            ,   scale = layerScaleStart + ( ( event.gesture.scale - deltaScale ) * multiplierScale )
             ;
 
-            if( ! editing && layerCurrent && layerCurrent.visible )
+            if( ! editLock && layerCurrent && layerCurrent.visible )
             {
                 layerCurrent.setRotate( rotation );
 
@@ -416,9 +419,9 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
             {
                 if( utilMath.isPointInPath( mouse, layer.sizeCurrent, layer.position, layer.rotation.radians ) )
                 {
-                    if( layerActive.id === layer.id && layerActive.editable )
+                    if( layerActive.id === layer.id )
                     {
-                        selectionEnableEditing( event, layerActive );
+                        $.publish( "layerEdit", [ layerActive ] );
                     }
                     else
                     {
@@ -426,52 +429,14 @@ function( moduleHTML, config, cache, utilMath, utilDetect )
                     }
 
                     layerFound = true;
-
-                    return false;
                 }
             }
         });
 
         if( ! layerFound && editing )
         {
-            selectionDisableEditing();
+            $.publish( "layerEdit", [ false ] );
         }
-    }
-
-    function selectionDisableEditing( event )
-    {
-        if( editing )
-        {
-            editing = false;
-
-            $imageCreatorSelection.removeClass( "editing" );
-            $imageCreatorSelectionTextEdit.hide();
-        }
-    }
-
-    function selectionEnableEditing( event, layerActive )
-    {
-        if( ! editing )
-        {
-            editing = true;
-
-            $imageCreatorSelectionTextEdit.val( layerActive.text );
-
-            $imageCreatorSelection.addClass( "editing" );
-
-            selectionUpdate( event, layerActive );
-
-            $imageCreatorSelectionTextEdit.focus();
-        }
-    }
-
-    function selectionSetText()
-    {
-        var layerCurrent = cache.getLayerActive();
-
-        layerCurrent.setText( this.value );
-
-        $.publish( "layerUpdate", [ layerCurrent ] );
     }
 
     return module;

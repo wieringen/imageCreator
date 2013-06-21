@@ -1,11 +1,8 @@
- /**
- * @description <p></p>
- *
- * @namespace imageCreator.toolbar
- * @name text
- * @version 1.0
- * @author mbaijs
- */
+/**
+*
+* @module dimensions
+*/
+
 define(
 [
     // Template.
@@ -39,7 +36,7 @@ function( moduleHTML, config, cache, utilMath )
     ,   $dimensionsScale
     ,   $dimensionsRotate
 
-    // The curent layer that is being edited.
+    // The curent layer that is selected.
     //
     ,   layerCurrent = false
     ;
@@ -79,7 +76,7 @@ function( moduleHTML, config, cache, utilMath )
         // Listen for global events.
         //
         $.subscribe( "layerSelect", layerSelect );
-        $.subscribe( "layerVisibility", layerSelect );
+        $.subscribe( "layerVisibility", layerVisibility );
 
         // Listen for selection events.
         //
@@ -87,15 +84,18 @@ function( moduleHTML, config, cache, utilMath )
         $.subscribe( "selectionRotate", dimensionsRotate );
     };
 
+    function layerVisibility( event, layer )
+    {
+        if( layer.selected )
+        {
+            // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
+            //
+            layerSelect( event, layer );
+        }
+    }
+
     function layerSelect( event, layer )
     {
-        // We only want to set the module ui state when were toggling the visibility of the currently selected layer.
-        //
-        if( event.type === "layerVisibility" && ! layer.selected )
-        {
-            return false;
-        }
-
         // Enable module if layer is of the correct type and is visible.
         //
         module.enabled = ! layer.locked && layer.visible || false;

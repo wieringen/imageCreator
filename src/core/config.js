@@ -1,10 +1,3 @@
-/**
- * @description A element cropper plugin.
- *
- * @name config
- * @version 1.0
- * @author mbaijs
- */
 define(
 [
     // App core modules.
@@ -35,18 +28,33 @@ function( utilDetect )
                     {
                         name    : "svg"
                     ,   support : utilDetect.HAS_SVG
+                    ,   features :
+                        {
+                            masking : false
+                        ,   filters : true
+                        }
                     }
 
                 ,   vml :
                     {
                         name    : "vml"
                     ,   support : utilDetect.HAS_VML
+                    ,   features :
+                        {
+                            masking : false
+                        ,   filters : false
+                        }
                     }
 
                 ,   canvas :
                     {
                         name    : "canvas"
                     ,   support : utilDetect.HAS_CANVAS
+                    ,   features :
+                        {
+                            masking : true
+                        ,   filters : true
+                        }
                     }
                 }
             ,   selectionColor : "#000000"
@@ -63,6 +71,7 @@ function( utilDetect )
                 ,   fontSize   : 14
                 ,   font       : "Arial"
                 ,   color      : "#000000"
+                ,   textAlign  : "left"
                 }
             ,   image :
                 {
@@ -103,14 +112,35 @@ function( utilDetect )
                     target : ".imageCreatorUILayers"
                 }
 
-            ,   filters :
+            ,   effects :
                 {
-                    target : ".imageCreatorUIFilters"
-                ,   types  :
+                    target : ".imageCreatorUIEffects"
+
+                ,   masks :
+                    {
+                        none :
+                        {
+                            name : "None"
+                        }
+                    ,   circle :
+                        {
+                            name : "Circle"
+                        }
+                    }
+
+                ,   filters  :
                     {
                         color :
                         {
-                            sepia :
+
+                            none :
+                            {
+                                name     : "None"
+                            ,   matrix   : false
+                            ,   strength : 1
+                            }
+
+                        ,   sepia :
                             {
                                 name : "Sepia"
                             ,   strength : 0.5
@@ -122,6 +152,20 @@ function( utilDetect )
                                 0,     0,     0,     1, 0
                                 ]
                             }
+
+                        ,   greyscale :
+                            {
+                                name : "Greyscale"
+                            ,   strength : 1
+                            ,   matrix :
+                                [
+                                0.3333, 0.3333, 0.3333, 0, 0,
+                                0.3333, 0.3333, 0.3333, 0, 0,
+                                0.3333, 0.3333, 0.3333, 0, 0,
+                                0,      0,      0,      1, 0
+                                ]
+                            }
+
                         ,   inversed :
                             {
                                 name   : "Inversed"

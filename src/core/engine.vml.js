@@ -1,11 +1,8 @@
 /**
- * @description <p>The VML engine implementation.</p>
- *
- * @namespace imageCreator.engine
- * @name vml
- * @version 1.0
- * @author mbaijs
- */
+*
+* @module engine.vml
+*/
+
 define(
 [
     // App core modules

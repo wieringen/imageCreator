@@ -1,19 +1,20 @@
 /**
- * @description <p>The SVG engine implementation.</p>
- *
- * @namespace imageCreator.engine
- * @name svg
- * @version 1.0
- * @author mbaijs
- */
+*
+* @module engine.svg
+*/
+
 define(
 [
+    // Template.
+    //
+    "text!templates/svg.html"
+
     // App core modules
     //
-    "config"
+,   "config"
 ,   "cache"
 ],
-function( config, cache )
+function( moduleHTML, config, cache )
 {
     var module =
         {
@@ -23,10 +24,13 @@ function( config, cache )
 
     ,   $imageCreatorViewport
     ,   $imageCreatorCanvas
-    ,   svgContainer
 
-    ,   svgSelect
+    ,   svgContainer
     ,   svgDefs
+    ,   svgSelect
+
+    ,   canvasWidth
+    ,   canvasHeight
     ;
 
     module.initialize = function()
@@ -36,64 +40,25 @@ function( config, cache )
         $imageCreatorViewport = $( ".imageCreatorViewport" );
         $imageCreatorCanvas   = $( ".imageCreatorCanvas" );
 
+        // Append module HTML.
+        //
+        $imageCreatorCanvas.html( moduleHTML );
+
+        // Get module DOM elements.
+        //
+        svgContainer = $imageCreatorCanvas.find( "svg" )[0];
+        svgDefs      = $imageCreatorCanvas.find( "defs" )[0];
+        svgSelect    = $imageCreatorCanvas.find( "rect" )[0];
+
         // Set the viewport's dimensions.
         //
         canvasWidth  = config.options.viewport.width;
         canvasHeight = config.options.viewport.height;
 
-        $imageCreatorViewport.css( { width : canvasWidth, height : canvasHeight } );
-
-        // Create and add SVG container.
-        //
-        svgContainer = document.createElementNS( "http://www.w3.org/2000/svg", "svg" );
-        svgContainer.setAttribute( "version", "1.2");
-        svgContainer.setAttribute( "baseProfile", "tiny" );
         svgContainer.setAttribute( "width", canvasWidth );
         svgContainer.setAttribute( "height", canvasHeight );
 
-        $imageCreatorCanvas.html( svgContainer );
-
-        // Create and add SVG Filters container.
-        //
-        svgDefs = document.createElementNS( "http://www.w3.org/2000/svg", "defs" );
-        svgContainer.appendChild( svgDefs );
-
-        // Marching ants ftw! Well in all sane browsers ie9 doesn't support this offcourse.
-        //
-        svgSelectAnimate = document.createElementNS( "http://www.w3.org/2000/svg", "animate" );
-        //svgSelectAnimate.setAttributeNS( "http://www.w3.org/1999/xlink", "href", "#svgSelect" );
-        svgSelectAnimate.setAttribute( "id", "marchingAnts" );
-        svgSelectAnimate.setAttribute( "attributeName", "stroke-dashoffset" );
-        svgSelectAnimate.setAttribute( "values", "10;0" );
-        svgSelectAnimate.setAttribute( "dur", "0.4s" );
-        svgSelectAnimate.setAttribute( "repeatCount", "indefinite" );
-        svgDefs.appendChild( svgSelectAnimate );
-
-        // Create a selection rectangle to put around selected layers.
-        //
-        svgSelect = document.createElementNS( "http://www.w3.org/2000/svg", "rect" );
-        svgSelect.setAttribute( "style", "fill: transparent; stroke-dasharray: 5,5; stroke-width: 1; stroke:#000000;" );
-
-        // IE9 Doesn't support this attribute so i will have to make a hack in this browser to stop the stroke from scaling :(
-        //
-        svgSelect.setAttribute( "vector-effect", "non-scaling-stroke" );
-        svgSelect.setAttribute( "id", "svgSelect" );
-
-        // Create filter snippet.
-        //
-        module.snippets.svgFilter = document.createElementNS( "http://www.w3.org/2000/svg", "filter" );
-        module.snippets.svgFilter.setAttribute( "color-interpolation-filters", "sRGB" );
-
-        var svgFilterMatrix    = document.createElementNS( "http://www.w3.org/2000/svg", "feColorMatrix" );
-        var svgFilterComposite = document.createElementNS( "http://www.w3.org/2000/svg", "feComposite" );
-
-        svgFilterComposite.setAttribute( "in2", "SourceGraphic" );
-        svgFilterComposite.setAttribute( "operator", "arithmetic" );
-        svgFilterComposite.setAttribute( "k2", 0 );
-        svgFilterComposite.setAttribute( "k3", 1 );
-
-        module.snippets.svgFilter.appendChild( svgFilterMatrix );
-        module.snippets.svgFilter.appendChild( svgFilterComposite );
+        $imageCreatorViewport.css( { width : canvasWidth, height : canvasHeight } );
 
         // Remove other engines that may be listening.
         //
@@ -107,6 +72,10 @@ function( config, cache )
         $.subscribe( "layerRemove.engine", svgLayerRemove );
         $.subscribe( "layersRedraw.engine", svgBuildLayers );
 
+        // Get module snippets.
+        //
+        module.snippets.svgFilter = $( svgDefs ).find( "filter" )[0];
+
         // Do we have any layers allready?
         //
         svgBuildLayers();
@@ -116,7 +85,12 @@ function( config, cache )
     {
         $( svgContainer ).find( "text, filter, image" ).remove();
 
-        $.each( cache.getLayers(), svgLayerCheck );
+        $.each( cache.getLayers(), function( index, layer)
+        {
+            var eventType = layer.selected ? "layerSelect" : "layerUpdate";
+
+            svgLayerCheck( { type : eventType }, layer );
+        });
     }
 
     function svgLayerCheck( event, layer, partial )
@@ -197,6 +171,19 @@ function( config, cache )
             svgLayerCurrent.setAttribute( "height", layer.sizeCurrent.height );
             svgLayerCurrent.setAttribute( "width", layer.sizeCurrent.width );
 
+            var textAnchorMap =
+                {
+                    "left"   : "start"
+                ,   "center" : "middle"
+                ,   "right"  : "end"
+                }
+            ,   textAlignPositionMap =
+                {
+                    "start"  : 0
+                ,   "middle" : 0.5
+                ,   "end"    : 1
+            };
+
             $( svgLayerCurrent ).css(
             {
                 fill       : layer.color
@@ -204,6 +191,7 @@ function( config, cache )
             ,   fontFamily : layer.font
             ,   fontWeight : layer.weight ? "bold" : "normal"
             ,   fontStyle  : layer.style ? "italic" : "normal"
+            ,   textAnchor : textAnchorMap[ layer.textAlign ]
             });
 
             domFragment = document.createDocumentFragment();
@@ -217,10 +205,10 @@ function( config, cache )
                 tspannode.setAttributeNS( "http://www.w3.org/XML/1998/namespace", "xml:space", "preserve" );
 
                 tspannode.setAttribute( "x", 0 );
-                tspannode.setAttribute( "y", Math.floor( layer.fontSize ) + "px" );
+                tspannode.setAttribute( "y", 0 );
 
-                tspannode.setAttribute( "dx", 0 );
-                tspannode.setAttribute( "dy", index * Math.floor( layer.fontSize * layer.lineHeight )  + "px" );
+                tspannode.setAttribute( "dx", layer.sizeCurrent.width * textAlignPositionMap[ textAnchorMap[ layer.textAlign ] ] );
+                tspannode.setAttribute( "dy", ( index * Math.floor( layer.fontSize * layer.lineHeight ) ) + layer.fontSize + "px" );
 
                 tspannode.textContent = line;
 

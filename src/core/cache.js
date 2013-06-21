@@ -1,18 +1,9 @@
-/**
- * @description The main module.
- *
- * @namespace imageCreator
- * @name controller
- * @version 1.0
- * @author mbaijs
- */
-
 // Set up the paths and inital modules for the app.
 //
 define(
 [
     "config"
-,   "util.misc"
+,   "cs!util.misc"
 
 ,   "plugins/jquery.storage"
 ],
@@ -109,7 +100,7 @@ function( config, utilMisc )
         {
             // Get all the models classes we have.
             //
-            utilMisc.loadModules( config.options.models, "model", function( models )
+            utilMisc.loadModules( config.options.models, "cs!model", function( models )
             {
                 var modelType = "";
 
@@ -216,7 +207,7 @@ function( config, utilMisc )
     module.setLayerActiveByID = function( layerID )
     {
         return module.setLayerActive( module.getLayerById( layerID ) );
-    }
+    };
 
     module.getLayerActive = function()
     {
@@ -255,7 +246,7 @@ function( config, utilMisc )
         $.publish( "layerRemove", [ layer.id ] );
 
         layer = null;
-    }
+    };
 
     module.removeLayerByID = function( layerID )
     {
@@ -267,7 +258,7 @@ function( config, utilMisc )
         }
 
         layer = null;
-    }
+    };
 
     return module;
 } );

@@ -1,11 +1,7 @@
 /**
- * @description The main module.
- *
- * @namespace imageCreator
- * @name controller
- * @version 1.0
- * @author mbaijs
- */
+*
+* @module main
+*/
 
 // Set up the paths and inital modules for the app.
 //
@@ -20,8 +16,8 @@ requirejs.config(
 
         // Require plugins
         //
-    ,   "text"      : "../lib/require/text"
-    ,   "cs"        : "../lib/require/cs"
+    ,   "text"          : "../lib/require/text"
+    ,   "cs"            : "../lib/require/cs"
     ,   "coffee-script" : "../lib/require/coffee-script"
     }
 });
@@ -32,7 +28,7 @@ require(
     //
     "config"
 ,   "cache"
-,   "util.misc"
+,   "cs!util.misc"
 
     // Libraries
     //
@@ -49,8 +45,8 @@ function( config, cache, utilMisc )
         //
         config.initialize();
 
-        ui      = config.options.ui
-        engines = config.options.engines
+        ui      = config.options.ui;
+        engines = config.options.engines;
 
         // Setup (touch) events and gestures.
         //
