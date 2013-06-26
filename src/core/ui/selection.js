@@ -14,7 +14,7 @@ define(
 ,   "config"
 ,   "cache"
 ,   "cs!util/math"
-,   "util/detect"
+,   "cs!util/detect"
 ],
 function( moduleHTML, config, cache, utilMath, utilDetect )
 {

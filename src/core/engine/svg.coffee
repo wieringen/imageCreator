@@ -255,7 +255,7 @@ define [
 
     svgLayerVisibility = ( event, layer ) ->
 
-        $( "#" + layer.id + module.name ).attr "visibility", ( if layer.visible then "visible" else "hidden" )
+        $( "#" + layer.id + module.name ).attr "visibility", if layer.visible then "visible" else "hidden"
 
         # We only want to toggle the selection layer if its around the currently selected layer.
         #

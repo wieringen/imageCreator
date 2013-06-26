@@ -21,11 +21,9 @@ define [
     #
     class Balloon extends modelLayer
 
-
     # @method fromObject
     # @static
     #
     Balloon.fromObject = ( object, callback ) ->
-
 
     return Balloon

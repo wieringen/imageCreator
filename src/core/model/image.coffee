@@ -118,6 +118,7 @@ define [
 
             @mask.name = mask.name
             @mask.src  = mask.src
+            @mask.ratio = mask.ratio
 
             @setMaskPosition 0, 0
 

@@ -8,7 +8,7 @@ define [
     "cache"
     "cs!util/math"
 
-    "../../lib/canvg/canvg"
+    "plugins/canvg/canvg"
 
 ], ( config, cache, utilMath ) ->
 
@@ -125,9 +125,8 @@ define [
         if layer.canHaveText
 
             context.fillStyle = layer.color
-            context.font      = "#{ layer.style } #{ layer.weight } #{ layer.fontSize }px #{ layer.font }"
-
             context.textAlign = layer.textAlign
+            context.font      = "#{ layer.style } #{ layer.weight } #{ layer.fontSize }px #{ layer.font }"
 
             # We have to create a seperate container for every text line.
             #
@@ -242,9 +241,9 @@ define [
             # Draw the mask to the canvas
             #
             copyContext.beginPath()
-            copyContext.drawSvg layer.mask.src, layer.mask.x, layer.mask.y, layer.mask.width, layer.mask.width
+            copyContext.drawSvg layer.mask.src, layer.mask.x, layer.mask.y, layer.mask.width, layer.mask.width / layer.mask.ratio
             copyContext.clip()
-            copyContext.clearRect layer.mask.x, layer.mask.y, layer.mask.width, layer.mask.height
+            copyContext.clearRect layer.mask.x, layer.mask.y, layer.mask.width, layer.mask.width
 
         # Draw the layer to the canvas
         #

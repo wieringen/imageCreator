@@ -122,21 +122,25 @@ function( utilDetect )
                         {
                             name : "None"
                         ,   src  : false
+                        ,   ratio : 1
                         }
                     ,   circle :
                         {
                             name : "Circle"
                         ,   src  : "images/masks/circle.svg"
+                        ,   ratio : 1
                         }
                     ,   cloud :
                         {
                             name : "Cloud"
                         ,   src  : "images/masks/cloud.svg"
+                        ,   ratio : 1.17
                         }
                     ,   star :
                         {
                             name : "Star"
                         ,   src  : "images/masks/star.svg"
+                        ,   ratio : 1.06
                         }
                     }
 
