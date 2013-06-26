@@ -3,7 +3,7 @@
 define(
 [
     "config"
-,   "cs!util.misc"
+,   "cs!util/misc"
 
 ,   "plugins/jquery.storage"
 ],
@@ -98,9 +98,9 @@ function( config, utilMisc )
 
         if( data )
         {
-            // Get all the models classes we have.
+            // Get all the models we have.
             //
-            utilMisc.loadModules( config.options.models, "cs!model", function( models )
+            utilMisc.loadModules( config.options.models, "cs!model/", function( models )
             {
                 var modelType = "";
 

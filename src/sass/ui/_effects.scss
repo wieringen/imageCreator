@@ -39,16 +39,18 @@
     }
 
     .track {
-        background:     #cdcdcd;
+        background:     #ccc;
         height:         4px;
         width:          140px;
         margin:         0 0 5px;
-        border:         1px solid #aeaeae;
-        border-top:     1px solid #747474;
         position:       relative;
         float:          left;
         @include border-radius( 5px );
         @include user-select( none );
+    }
+
+    &:hover .track {
+        background:     #2ba6cb;
     }
 
     .thumb {

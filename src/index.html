@@ -10,8 +10,7 @@
         <link rel="stylesheet" type="text/css" href="css/style.css" />
         <style>
         /* Just some styles to create a basic laout example.  */
-        body { background-color: #F5F5F5; margin: 20px 20px 0 20px; }
-        .imageCreator { float: left;  margin: 0 0 20px; }
+        body { margin: 20px 20px 0 20px; }
         .justASimpleWrapper { float: left; padding: 0 0 0 20px; }
         .justASimpleWrapperLeft { float: left; padding: 0 20px 0 0; }
         .imageCreatorTool { margin: 0 0 20px; }
@@ -32,8 +31,10 @@
 
         <div class="imageCreator">
             <div class="imageCreatorToolbar">
-                <a href="#" class="buttonTextAdd"></a>
-                <a href="#" class="buttonImageAdd"></a>
+                <a href="#" class="button small secondary buttonTextAdd"><i class="foundicon-font"></i></a>
+                <a href="#" class="button small secondary buttonImageAdd"><i class="foundicon-photo"></i></a>
+
+                <a href="#" class="button small buttonImageSave">Save</a>
             </div>
 
             <div class="imageCreatorViewport">

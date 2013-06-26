@@ -4,18 +4,23 @@
     list-style:         none;
     padding:            0;
     border:             0;
-    margin:             0 0 10px;
-    border-top:         1px solid #909090;
+    margin:             0 -10px 10px;
+
 }
 
 .imageCreatorUILayers .layer {
-    height:             28px;
-    border-bottom:      1px solid #909090;
+    height:             35px;
+    border-bottom:      1px solid #ccc;
     cursor:             pointer;
     position:           relative;
+    padding: 0 10px;
 
     &.active {
-        background-color: #b5d5ff;
+        background-color: #d5d5d5;
+    }
+
+    &:last-child {
+        border: 0;
     }
 
     .layerToggle {
@@ -24,7 +29,7 @@
         text-indent:        -9999em;
         overflow:           hidden;
         display:            block;
-        margin:             5px 3px 0;
+        margin:             9px 3px 0;
         float:              left;
         border-top:         1px solid #909090;
         border-left:        1px solid #909090;
@@ -33,14 +38,14 @@
         background:         url("../images/layers-eye.png") no-repeat 50% 50%;
     }
 
-    &.hide .layerToggle {
+    &.hideLayer .layerToggle {
         background: transparent none;
     }
 
     .layerRemove {
         position: absolute;
-        right: 0;
-        top: 3px;
+        right: 10px;
+        top: 8px;
         display: none;
     }
 
@@ -49,10 +54,10 @@
     }
 
     .layerName {
-        line-height:        28px;
+        line-height:        35px;
         text-overflow:      ellipsis;
         display:            inline-block;
-        width:              105px;
+        width:              103px;
         overflow:           hidden;
         white-space:        nowrap;
     }
@@ -60,16 +65,16 @@
     .layerThumbContainer {
         float:              left;
         width:              30px;
-        height:             20px;
+        height:             27px;
         border:             1px solid #000;
-        margin:             3px 3px 0;
+        margin:             3px 5px 0;
         background-color:   #fff;
         overflow:           hidden;
         position:           relative;
     }
 
     .layerThumbContainer img {
-        height:             20px;
+        height:             24px;
         display:            block;
         position:           absolute;
         top:                0;
@@ -77,10 +82,45 @@
     }
 }
 
-.imageCreatorUILayers .buttonImageSave {
-    width: 147px;
-}
-
 .imageCreatorUILayers .emptyMessage {
     font-size: 12px;
 }
+
+@media #{"only screen and (max-width:"#{$medium-screen}")"} {
+
+    .imageCreatorUILayers {
+        position: fixed;
+        right: -190px;
+        top: 205px;
+        height: 90%;
+
+        .moduleMenu {
+            position: absolute;
+            left: -40px;
+            top: 37px;
+
+            @include rotate(270deg);
+
+            li {
+                display: none;
+            }
+
+            li:first-child {
+                display: block;
+            }
+        }
+
+        .moduleBody {
+            border-width: 1px;
+            height: 100%;
+        }
+
+        .layer {
+            .layerToggle {
+                display: none;
+            }
+        }
+    }
+}
+
+

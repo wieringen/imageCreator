@@ -2,7 +2,7 @@ define(
 [
     // App core modules.
     //
-    "util.detect"
+    "cs!util/detect"
 ],
 function( utilDetect )
 {
@@ -13,8 +13,8 @@ function( utilDetect )
 
             viewport :
             {
-                width  : 500
-            ,   height : 625
+                width  : 700
+            ,   height : 500
             }
 
         // Render engines
@@ -121,10 +121,22 @@ function( utilDetect )
                         none :
                         {
                             name : "None"
+                        ,   src  : false
                         }
                     ,   circle :
                         {
                             name : "Circle"
+                        ,   src  : "images/masks/circle.svg"
+                        }
+                    ,   cloud :
+                        {
+                            name : "Cloud"
+                        ,   src  : "images/masks/cloud.svg"
+                        }
+                    ,   star :
+                        {
+                            name : "Star"
+                        ,   src  : "images/masks/star.svg"
                         }
                     }
 

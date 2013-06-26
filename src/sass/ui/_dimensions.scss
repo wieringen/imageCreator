@@ -3,16 +3,19 @@
 .imageCreatorUIDimensions .dimensionsScale
 {
     .track {
-        background:     #cdcdcd;
+        background:     #ccc;
         height:         4px;
         width:          140px;
         margin:         0 0 5px;
-        border:         1px solid #aeaeae;
-        border-top:     1px solid #747474;
         position:       relative;
         float:          left;
         @include border-radius( 5px );
         @include user-select( none );
+    }
+
+
+    &:hover .track {
+        background:     #2ba6cb;
     }
 
     .thumb {
@@ -42,14 +45,18 @@
         position:       relative;
     }
 
+    &:hover .track {
+        background:     transparent url(../images/text-rotate-track-hover.png) no-repeat 0 0;
+    }
+
     .thumb {
         background:     transparent url(../images/text-zoom-thumb.png) no-repeat 50% 50%;
         height:         31px;
         width:          31px;
         position:       absolute;
         margin:         -15px 0 0 -15px;
-        top:            8px;
-        left:           42px;
+        top:            5px;
+        left:           41px;
         cursor:         pointer;
     }
 

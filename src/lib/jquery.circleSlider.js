@@ -111,8 +111,8 @@ function()
 
             this.$degrees.html( Math.round( sanitizedDegrees ) + "&deg;" );
 
-            this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
-            this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 34 +42 ) );
+            this.$thumb.css(  "top", Math.round( -Math.cos( sanitizedDegrees * ( Math.PI / 180 ) ) * 36 +41 ) );
+            this.$thumb.css( "left", Math.round(  Math.sin( sanitizedDegrees * ( Math.PI / 180 ) ) * 36 +41 ) );
             this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" );
             this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );
             this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );
@@ -137,8 +137,8 @@ function()
             ,   sin     = Math.sin( radians )
             ;
             this.$degrees.html( Math.round( degrees )+ "&deg;" );
-            this.$thumb.css( "top",  Math.round( -cos * 34 +42 ) );
-            this.$thumb.css( "left", Math.round(  sin * 34 +42 ) );
+            this.$thumb.css( "top",  Math.round( -cos * 36 +41 ) );
+            this.$thumb.css( "left", Math.round(  sin * 36 +41 ) );
             this.$thumb.css( "transform",       "rotate(" + degrees + "deg)" );
             this.$thumb.css( "webkitTransform", "rotate(" + degrees + "deg)" );
             this.$thumb.css( "msTransform",     "rotate(" + degrees + "deg)" );

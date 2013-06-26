@@ -1,11 +1,23 @@
 @import "variables";
 @import "mixins";
 
+/* Compass */
 @import "compass/css3/border-radius";
 @import "compass/css3/user-interface";
+@import "compass/css3/transform";
 
+/* Foundation */
+@import "foundation/variables";
+@import "foundation/components/global";
+@import "foundation/components/buttons";
+
+/* Icons */
+@import "icons/_settings";
+@import "icons/general_foundicons";
+@import "icons/general_foundicons_ie7";
+
+/* App */
 @import "base/base";
-@import "base/buttons";
 
 @import "ui/ui";
 @import "ui/text";

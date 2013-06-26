@@ -28,7 +28,7 @@ require(
     //
     "config"
 ,   "cache"
-,   "cs!util.misc"
+,   "cs!util/misc"
 
     // Libraries
     //
@@ -57,7 +57,7 @@ function( config, cache, utilMisc )
 
         // Initialize the user interface.
         //
-        utilMisc.loadModules( ui, "ui", function( modules )
+        utilMisc.loadModules( ui, "ui/", function( modules )
         {
             $.each( ui, function( moduleName )
             {
@@ -92,7 +92,7 @@ function( config, cache, utilMisc )
 
     function loadEngine( event, engineName, callback )
     {
-        require( [ "engine." + engineName ], function( engine )
+        require( [ "engine/" + engineName ], function( engine )
         {
             // Fire up the engine.
             //

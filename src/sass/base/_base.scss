@@ -14,8 +14,15 @@
 }
 
 
+.imageCreator { float: left;  margin: 0 0 20px; }
+
 .imageCreatorToolbar {
     height: 50px;
+    width: 700px;
+}
+
+.buttonImageSave {
+    float: right;
 }
 
 .imageCreatorViewport {
@@ -24,6 +31,7 @@
     position: relative;
     box-shadow: 0px 2px 7px rgba(0,0,0,0.3);
 }
+
 
 .imageCreatorViewport p {
     margin: 0;

@@ -1,11 +1,9 @@
 /*********************** UI : TEXT ***********************/
 
 .buttonTextAdd {
-        background:     transparent url(../images/icon-text.png) no-repeat 50% 50%;
-        height: 50px;
-        width: 50px;
-        display: block;
-        float: left;
+    float: left;
+    height: 30px;
+    margin: 0 15px 0 0;
 }
 
 .imageCreatorUIText.moduleDisabled {
@@ -33,17 +31,17 @@
     }
 
     .color {
-        width:          10px;
-        height:         10px;
+        width:          12px;
+        height:         12px;
         float:          left;
-        padding:        1px;
-        border:         1px solid #8b8b8b;
+        padding: 1px;
+        border:         1px solid #ccc;
         @include border-radius( 10px );
     }
 
     .colorInner {
-        width:          10px;
-        height:         10px;
+        width:          8px;
+        height:         8px;
         @include border-radius( 10px );
     }
 }
@@ -68,43 +66,42 @@
 /* Font weight */
 .imageCreatorUIText .textWeightBtn {
     float:          right;
-    font-weight:    bold;
-       width: 12px;
-    margin:         0 0 0 5%;
+    margin:         0;
+    border-left:    0;
 }
 
 /* Font style */
 .imageCreatorUIText .textStyleBtn {
     float:          right;
-    font-family: "Georgia";
-       width: 12px;
-    margin:         0 0 0 5%;
-    font-style:     italic;
+    margin:         0;
 }
 
 .imageCreatorUIText .textAlignLeftBtn,
 .imageCreatorUIText .textAlignCenterBtn,
 .imageCreatorUIText .textAlignRightBtn {
     float: left;
-    margin:  0 5% 0 0;
+    margin:  0 0 0 0;
+}
+
+.imageCreatorUIText .textAlignCenterBtn {
+    border-width: 1px 0;
+}
+
+.imageCreatorUIText .textAlignRightBtn {
+    margin: 0;
 }
 
 .imageCreatorUIText .textAlignLeftBtn span{
-    height: 20px;
-        display: block;
-        width: 12px;
+    display: block;
     background: transparent url(../images/icon-text-align-left.png) no-repeat 50% 50%;
 }
+
 .imageCreatorUIText .textAlignCenterBtn span{
-    height: 20px;
     display: block;
-            width: 12px;
     background: transparent url(../images/icon-text-align-center.png) no-repeat 50% 50%;
 }
 
 .imageCreatorUIText .textAlignRightBtn span{
-    height: 20px;
     display: block;
-            width: 12px;
     background: transparent url(../images/icon-text-align-right.png) no-repeat 50% 50%;
 }
