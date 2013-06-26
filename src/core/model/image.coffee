@@ -27,7 +27,6 @@ define [
         # These properties will hold img or canvas objects.
         #
         image            : null
-        imageMask        : null
         imageManipulated : null
 
         sizeReal :
@@ -47,8 +46,10 @@ define [
             height : 0
             src    : ""
 
-        canHaveMask : true
-        canHaveText : false
+        canHaveMask   : true
+        canHaveFilter : true
+        canHaveText   : false
+        canHaveImage  : true
 
         constructor : ( element, options = {} ) ->
 

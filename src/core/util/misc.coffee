@@ -28,7 +28,7 @@ define [], () ->
 
         measureDiv.style.fontSize   = layer.fontSize + "px"
         measureDiv.style.fontFamily = layer.font
-        measureDiv.style.fontWeight = if layer.weight then "bold" else "normal"
+        measureDiv.style.fontWeight = layer.weight
 
         if window.attachEvent and ! window.addEventListener
             measureDiv.innerText = layer.text

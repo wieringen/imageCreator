@@ -142,7 +142,6 @@ function( config, cache )
         {
             var htmlParagraphCurrent = $( vmlLayerCurrent ).find( "p" )[0];
 
-
             htmlParagraphCurrent.innerText        = layer.text;
             htmlParagraphCurrent.style.color      = layer.color;
             htmlParagraphCurrent.style.fontSize   = layer.fontSize + "px";

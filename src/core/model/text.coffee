@@ -29,11 +29,13 @@ define [
         lineHeight : module.options.lineHeight
         font       : module.options.font
         textAlign  : module.options.textAlign
-        weight     : false
-        style      : false
+        weight     : "normal"
+        style      : "normal"
 
-        canHaveMask : false
-        canHaveText : true
+        canHaveMask   : false
+        canHaveFilter : false
+        canHaveText   : true
+        canHaveImage  : false
 
         constructor : ( options = {} ) ->
 

@@ -130,8 +130,8 @@ function( moduleHTML, config, cache, modelText, utilMath )
             // Set the UI to match the selected layers properties.
             //
             $textColor.trigger( "setColor", [ layerCurrent.color ] );
-            $textWeightBtn.toggleClass( "active", layerCurrent.weight );
-            $textStyleBtn.toggleClass( "active", layerCurrent.style );
+            $textWeightBtn.toggleClass( "active", layerCurrent.weight === "bold" );
+            $textStyleBtn.toggleClass( "active", layerCurrent.style === "italic" );
             $textFontSelect.val( layerCurrent.font );
             $textAlignBtn.removeClass( "active" );
             $textAlignBtn.filter( "[data-align=" + layerCurrent.textAlign + "]" ).addClass( "active" );
@@ -168,7 +168,7 @@ function( moduleHTML, config, cache, modelText, utilMath )
             ,   "left"       : layer.position.x
             ,   "top"        : layer.position.y
             ,   "textAlign"  : layer.textAlign
-            ,   "fontWeight" : layer.weight ? "bold" : "normal"
+            ,   "fontWeight" : layer.weight
             ,   "display"    : "block"
             ,   "lineHeight" : Math.floor( layer.fontSize * layer.lineHeight ) + "px"
             ,   "fontSize"   : layer.fontSize
@@ -192,25 +192,29 @@ function( moduleHTML, config, cache, modelText, utilMath )
         return false;
     }
 
-    function textStyle( event, style )
+    function textStyle( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setStyle( ! layerCurrent.style );
+            var isItalic = layerCurrent.style === "italic";
 
-            $textStyleBtn.toggleClass( "active", layerCurrent.style );
+            layerCurrent.setStyle( isItalic ? "normal" : "italic" );
+
+            $textStyleBtn.toggleClass( "active", ! isItalic );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }
     }
 
-    function textWeight( event, weight )
+    function textWeight( event )
     {
         if( module.enabled && layerCurrent && layerCurrent.visible )
         {
-            layerCurrent.setWeight( ! layerCurrent.weight );
+            var isBold = layerCurrent.weight === "bold";
 
-            $textWeightBtn.toggleClass( "active", layerCurrent.weight );
+            layerCurrent.setWeight( isBold ? "normal" : "bold"  );
+
+            $textWeightBtn.toggleClass( "active", ! isBold );
 
             $.publish( "layerUpdate", [ layerCurrent ] );
         }

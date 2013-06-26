@@ -92,7 +92,7 @@ function( config, cache, utilMisc )
 
     function loadEngine( event, engineName, callback )
     {
-        require( [ "engine/" + engineName ], function( engine )
+        require( [ "cs!engine/" + engineName ], function( engine )
         {
             // Fire up the engine.
             //
