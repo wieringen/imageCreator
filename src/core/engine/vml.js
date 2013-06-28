@@ -187,7 +187,7 @@ function( config, cache )
             vmlSelect.style.setAttribute( "top",  ( layer.position.y - 1 ) + "px" );
             vmlSelect.style.setAttribute( "left", ( layer.position.x - 1 ) + "px" );
 
-            // It is no longer possible to create/append a VML element outside of the DOM in >= ie8. This hack fixes that.
+            // HACK : It is no longer possible to create/append a VML element outside of the DOM in >= ie8. This hack fixes that.
             //
             if( document.all && document.querySelector )
             {

@@ -30,9 +30,12 @@ define [], () ->
         measureDiv.style.fontFamily = layer.font
         measureDiv.style.fontWeight = layer.weight
 
-        if window.attachEvent and ! window.addEventListener
+        if window.attachEvent and not window.addEventListener
+
             measureDiv.innerText = layer.text
+
         else
+
             jQuery( measureDiv ).text layer.text
 
         textWidth = measureDiv.clientWidth + 10

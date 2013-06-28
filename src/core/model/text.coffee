@@ -9,7 +9,7 @@ define [
 ,   "cs!util/misc"
 ,   "cs!model/layer"
 
-], ( config, utilMath, utilMisc, modelLayer ) ->
+], (config, utilMath, utilMisc, modelLayer) ->
 
     module =
 
@@ -37,11 +37,11 @@ define [
         canHaveText   : true
         canHaveImage  : false
 
-        constructor : ( options = {} ) ->
+        constructor : (options = {}) ->
 
             super options
 
-            @id        = options.id || "text" + new Date().getTime().toString()
+            @id        = options.id or "text" + new Date().getTime().toString()
             @layerName = @text
 
             @_initConfig options
@@ -49,46 +49,42 @@ define [
             @setLines()
             @setFontSize()
 
-        _initConfig : ( options = {} ) ->
+        _initConfig : (options = {}) ->
 
             @setOptions(options)
 
-        toObject : ( propertiesToInclude ) ->
+        toObject : (propertiesToInclude) ->
 
             return jQuery.extend super( propertiesToInclude ), {
-                type            : @type
-                text            : @text
-                textLines       : @textLines
-                color           : @color
-                fontSize        : @fontSize
-                lineHeight      : @lineHeight
-                font            : @font
-                weight          : @weight
-                style           : @style
+                type       : @type
+                text       : @text
+                textLines  : @textLines
+                color      : @color
+                fontSize   : @fontSize
+                lineHeight : @lineHeight
+                font       : @font
+                weight     : @weight
+                style      : @style
             }
 
-        setText : ( text = "" ) ->
+        setText : (text = "") ->
 
             @text = text
 
             @setLines()
             @setFontSize()
 
-        setLines : () ->
+        setLines : ->
 
             @textLines = @text.replace(/\r\n/g, "\n").split("\n")
 
-        setScale : ( scale ) ->
-
-            @setFontSize scale
-
-        setFontSize : ( fontSize = @fontSize ) ->
+        setFontSize : (fontSize = @fontSize) ->
 
             @fontSize = Math.max 10, Math.min( 99, fontSize )
 
             sizeNew =
                 width  : utilMisc.measureText @
-                height : @textLines.length * Math.floor @fontSize * @lineHeight
+                height : ( @textLines.length * Math.floor(@fontSize) ) * @lineHeight
 
             newPosition =
                 x : ( @sizeCurrent.width - sizeNew.width ) / 2
@@ -99,27 +95,27 @@ define [
 
             @setPosition newPosition
 
-        setFont : ( font ) ->
+        setFont : (font) ->
 
             @font = font
 
             @setFontSize()
 
-        setColor : ( hexColor ) ->
+        setColor : (hexColor) ->
 
             @color = hexColor
 
-        setWeight : ( weight ) ->
+        setWeight : (weight) ->
 
             @weight = weight
 
             @setFontSize()
 
-        setStyle : ( style ) ->
+        setStyle : (style) ->
 
             @style = style
 
-        setTextAlign : ( textAlign ) ->
+        setTextAlign : (textAlign) ->
 
             @textAlign = textAlign
 
@@ -127,10 +123,10 @@ define [
     # @method fromObject
     # @static
     #
-    Text.fromObject = ( object, callback ) ->
+    Text.fromObject = (object, callback) ->
 
         deferred = jQuery.Deferred()
-        model    = new Text object
+        model = new Text object
 
         deferred.resolve model
 

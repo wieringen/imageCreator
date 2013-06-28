@@ -10,7 +10,7 @@ define [
 
     "plugins/canvg/canvg"
 
-], ( config, cache, utilMath ) ->
+], (config, cache, utilMath) ->
 
     $ = jQuery
 
@@ -21,18 +21,17 @@ define [
     $imageCreatorViewport = null
     $imageCreatorCanvas   = null
 
-    canvas  = null
-    context = null
-
+    canvas       = null
+    context      = null
     canvasWidth  = null
     canvasHeight = null
 
-    module.initialize = () ->
+    module.initialize = ->
 
         # Get basic app DOM elements.
         #
-        $imageCreatorViewport = $( ".imageCreatorViewport" )
-        $imageCreatorCanvas   = $( ".imageCreatorCanvas" )
+        $imageCreatorViewport = $(".imageCreatorViewport")
+        $imageCreatorCanvas   = $(".imageCreatorCanvas")
 
         # Set the viewport's dimensions.
         #
@@ -114,7 +113,9 @@ define [
             #
             if event and event.type is "layerSelect"
 
-                layer.setImageManipulated null
+                if layer.canHaveMask or layer.canHaveFilter
+
+                    layer.setImageManipulated null
 
             # Draw the image and use its real size the matrix applied above will do the scaling for us.
             #
@@ -126,7 +127,7 @@ define [
 
             context.fillStyle = layer.color
             context.textAlign = layer.textAlign
-            context.font      = "#{ layer.style } #{ layer.weight } #{ layer.fontSize }px #{ layer.font }"
+            context.font      = "#{layer.style} #{layer.weight} #{layer.fontSize}px #{layer.font}"
 
             # We have to create a seperate container for every text line.
             #
@@ -139,11 +140,11 @@ define [
 
                     # Left
                     #
-                ,   layer.sizeCurrent.width * { "left" : 0, "center" : 0.5, "right" : 1 }[ layer.textAlign ]
+                ,   layer.sizeCurrent.width * {"left" : 0, "center" : 0.5, "right" : 1}[ layer.textAlign ]
 
                     # Top
                     #
-                ,   ( index * Math.floor( layer.fontSize * layer.lineHeight ) ) + layer.fontSize
+                ,   index * Math.floor(layer.fontSize * layer.lineHeight) + layer.fontSize
                 )
 
         # Restore the state of the canvas to the saved state.
@@ -192,7 +193,7 @@ define [
 
         # No filter or mask defined return normal image.
         #
-        if ! layer.filter.matrix and ! layer.mask.src
+        if ! ( layer.filter and layer.filter.matrix ) and ! ( layer.mask and layer.mask.src )
 
             return layer.image
         else

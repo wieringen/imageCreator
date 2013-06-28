@@ -21,8 +21,8 @@ define [
     #
     class Image extends modelLayer
 
-        type             : "image"
-        src              : ""
+        type : "image"
+        src  : ""
 
         # These properties will hold img or canvas objects.
         #
@@ -51,7 +51,7 @@ define [
         canHaveText   : false
         canHaveImage  : true
 
-        constructor : ( element, options = {} ) ->
+        constructor : (element, options = {}) ->
 
             super options
 
@@ -62,9 +62,9 @@ define [
                 width  : @image.width
                 height : @image.height
 
-            @id = options.id || "image" + new Date().getTime().toString()
+            @id = options.id or "image" + new Date().getTime().toString()
 
-            if ! options.sizeCurrent
+            if not options.sizeCurrent
 
                 @sizeCurrent =
                     width  : @sizeReal.width
@@ -74,11 +74,11 @@ define [
 
             @setScale()
 
-        _initConfig : ( options = {} ) ->
+        _initConfig : (options = {}) ->
 
             @setOptions options
 
-        toObject : ( propertiesToInclude ) ->
+        toObject : (propertiesToInclude) ->
 
             return jQuery.extend super( propertiesToInclude ), {
                 src       : @src
@@ -89,7 +89,7 @@ define [
                 mask      : @mask
             }
 
-        setScale : ( scale = @scale ) ->
+        setScale : (scale = @scale) ->
 
             @scale = Math.max 0.1, Math.min( 1, scale )
 
@@ -106,39 +106,39 @@ define [
 
             @setPosition newPosition
 
-        setFilter : ( filter ) ->
+        setFilter : (filter) ->
 
-            @filter = filter || {
+            @filter = filter or {
                 name     : "None"
                 matrix   : false
                 strength : 1
             }
 
-        setMask : ( mask = {} ) ->
+        setMask : (mask = {}) ->
 
-            @mask.name = mask.name
-            @mask.src  = mask.src
+            @mask.name  = mask.name
+            @mask.src   = mask.src
             @mask.ratio = mask.ratio
 
             @setMaskPosition 0, 0
 
             @setMaskSize @sizeReal.width, @sizeReal.height
 
-        setMaskPosition : ( x, y ) ->
+        setMaskPosition : (x, y) ->
 
             @mask.x = x
             @mask.y = y
 
-        setMaskSize : ( width, height ) ->
+        setMaskSize : (width, height) ->
 
             @mask.width  = width
             @mask.height = height
 
-        setFilterStrength : ( strength ) ->
+        setFilterStrength : (strength) ->
 
             @filter.strength = strength / 100
 
-        setImageManipulated : ( image ) ->
+        setImageManipulated : (image) ->
 
             @imageManipulated = image
 
@@ -146,12 +146,11 @@ define [
     # @method fromObject
     # @static
     #
-    Image.fromObject = ( object, callback ) ->
+    Image.fromObject = (object, callback) ->
 
         deferred = jQuery.Deferred()
-        img      = document.createElement "img"
 
-        img.onload = () ->
+        onload = (img) ->
 
             model = new Image img, object
 
@@ -159,15 +158,11 @@ define [
 
             if callback then callback model
 
-            img = img.onload = img.onerror = null
-
-        img.onerror = () ->
+        onerror = ->
 
             deferred.resolve()
 
-            img = img.onload = img.onerror = null
-
-        img.src = object.src
+        utilMisc.getImageFromURL object.src, onload, onerror
 
         return deferred.promise()
 

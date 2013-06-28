@@ -76,6 +76,14 @@ function( utilDetect )
             ,   image :
                 {
                 }
+            ,   balloon :
+                {
+                    lineHeight : 1.25
+                ,   fontSize   : 14
+                ,   font       : "Arial"
+                ,   color      : "#000000"
+                ,   textAlign  : "left"
+                }
             }
 
         // User interface
@@ -99,6 +107,7 @@ function( utilDetect )
                     {
                         text  : { start : 14,  reduce : 1,   min : 10, max : 99,  unit : "px" }
                     ,   image : { start : 100, reduce : 300, min : 30, max : 300, unit : "%"  }
+                    ,   balloon : { start : 100, reduce : 300, min : 30, max : 300, unit : "%"  }
                     }
                 }
 

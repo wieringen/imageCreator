@@ -57,7 +57,7 @@ function( config, cache, utilMisc )
 
         // Initialize the user interface.
         //
-        utilMisc.loadModules( ui, "ui/", function( modules )
+        utilMisc.loadModules( ui, "cs!ui/", function( modules )
         {
             $.each( ui, function( moduleName )
             {

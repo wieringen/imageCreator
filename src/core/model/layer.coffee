@@ -108,7 +108,7 @@ define [
                 rotation        : @rotation
                 matrix          : @matrix
 
-            utilMisc.populateWithProperties @, ownProperties, propertiesToInclude
+            utilMisc.populateWithProperties this, ownProperties, propertiesToInclude
 
             return ownProperties
 
@@ -120,7 +120,7 @@ define [
 
             @[key] = value
 
-            return @
+            return this
 
         set : (key, value) ->
 
@@ -140,16 +140,16 @@ define [
 
                     @_set key, value
 
-            return @
+            return this
 
-        setRotate : ( rotation ) ->
+        setRotate : (rotation) ->
 
             @rotation    = rotation
             @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation
 
             @setPosition { x : 0, y: 0 }
 
-        setPosition : ( delta ) ->
+        setPosition : (delta) ->
 
             @position =
                 x : @position.x + delta.x
@@ -167,9 +167,9 @@ define [
                 width  : config.options.viewport.width
                 height : config.options.viewport.height
 
-            @matrix = utilMath.getMatrix @rotation, @scale, @position, @sizeReal || @sizeCurrent
+            @matrix = utilMath.getMatrix @rotation, @scale, @position, ( @sizeReal or @sizeCurrent )
 
-        setPositionConstrain : ( grid ) ->
+        setPositionConstrain : (grid) ->
 
             ratio =
                 width  : grid.width  - this.sizeRotated.width

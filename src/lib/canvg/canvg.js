@@ -258,16 +258,6 @@ function()
 						return n;
 					}
 
-				// time extensions
-					// get the time as milliseconds
-					svg.Property.prototype.toMilliseconds = function() {
-						if (!this.hasValue()) return 0;
-						var s = this.value+'';
-						if (s.match(/s$/)) return this.numValue() * 1000;
-						if (s.match(/ms$/)) return this.numValue();
-						return this.numValue();
-					}
-
 				// angle extensions
 					// get the angle as radians
 					svg.Property.prototype.toRadians = function() {
@@ -1452,66 +1442,6 @@ function()
 			}
 			svg.Element.defs.prototype = new svg.Element.ElementBase;
 
-
-			// image element
-			svg.Element.image = function(node) {
-				this.base = svg.Element.RenderedElementBase;
-				this.base(node);
-
-				var href = this.getHrefAttribute().value;
-				var isSvg = href.match(/\.svg$/)
-
-				svg.Images.push(this);
-				this.loaded = false;
-				if (!isSvg) {
-					this.img = document.createElement('img');
-					var self = this;
-					this.img.onload = function() { self.loaded = true; }
-					this.img.onerror = function() { if (typeof(console) != 'undefined') { console.log('ERROR: image "' + href + '" not found'); self.loaded = true; } }
-					this.img.src = href;
-				}
-				else {
-					this.img = svg.ajax(href);
-					this.loaded = true;
-				}
-
-				this.renderChildren = function(ctx) {
-					var x = this.attribute('x').toPixels('x');
-					var y = this.attribute('y').toPixels('y');
-
-					var width = this.attribute('width').toPixels('x');
-					var height = this.attribute('height').toPixels('y');
-					if (width == 0 || height == 0) return;
-
-					ctx.save();
-					if (isSvg) {
-						ctx.drawSvg(this.img, x, y, width, height);
-					}
-					else {
-						ctx.translate(x, y);
-						svg.AspectRatio(ctx,
-										this.attribute('preserveAspectRatio').value,
-										width,
-										this.img.width,
-										height,
-										this.img.height,
-										0,
-										0);
-						ctx.drawImage(this.img, 0, 0);
-					}
-					ctx.restore();
-				}
-
-				this.getBoundingBox = function() {
-					var x = this.attribute('x').toPixels('x');
-					var y = this.attribute('y').toPixels('y');
-					var width = this.attribute('width').toPixels('x');
-					var height = this.attribute('height').toPixels('y');
-					return new svg.BoundingBox(x, y, x + width, y + height);
-				}
-			}
-			svg.Element.image.prototype = new svg.Element.RenderedElementBase;
-
 			// group element
 			svg.Element.g = function(node) {
 				this.base = svg.Element.RenderedElementBase;
@@ -1651,18 +1581,6 @@ function()
 					if (window.scrollX) p.x += window.scrollX;
 					if (window.scrollY) p.y += window.scrollY;
 					return p;
-				}
-
-				// bind mouse
-				if (svg.opts['ignoreMouse'] != true) {
-					ctx.canvas.onclick = function(e) {
-						var p = mapXY(new svg.Point(e != null ? e.clientX : event.clientX, e != null ? e.clientY : event.clientY));
-						svg.Mouse.onclick(p.x, p.y);
-					};
-					ctx.canvas.onmousemove = function(e) {
-						var p = mapXY(new svg.Point(e != null ? e.clientX : event.clientX, e != null ? e.clientY : event.clientY));
-						svg.Mouse.onmousemove(p.x, p.y);
-					};
 				}
 
 				var e = svg.CreateElement(dom.documentElement);
