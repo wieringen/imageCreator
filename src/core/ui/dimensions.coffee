@@ -100,7 +100,15 @@ define [
             #
             $dimensionsRotate.trigger "setPosition", [Math.round(layerCurrent.rotation.degrees)]
             $dimensionsScale.trigger "setScale", [module.options.scale[layerCurrent.type]]
-            $dimensionsScale.trigger "setPosition", [layerCurrent.fontSize or layerCurrent.scale]
+
+            if layerCurrent.scaleByFontSize
+
+                $dimensionsScale.trigger "setPosition", [layerCurrent.fontSize]
+
+            else
+
+                $dimensionsScale.trigger "setPosition", [layerCurrent.scale]
+
 
     dimensionsRotate = (event, rotation, setUI) ->
 
@@ -127,7 +135,7 @@ define [
 
         if module.enabled and layerCurrent and layerCurrent.visible
 
-            if layerCurrent.setFontSize
+            if layerCurrent.scaleByFontSize
 
                 layerCurrent.setFontSize scale
 

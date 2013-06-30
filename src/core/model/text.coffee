@@ -37,6 +37,8 @@ define [
         canHaveText   : true
         canHaveImage  : false
 
+        scaleByFontSize : true
+
         constructor : (options = {}) ->
 
             super options

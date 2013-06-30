@@ -49,6 +49,7 @@ define [
         $imageCreatorCanvas.on "tap", selectionTap
         $imageCreatorSelection.delegate ".gripScale", "mousedown", selectionScale
         $imageCreatorSelection.delegate ".gripRotate", "mousedown", selectionRotate
+        $imageCreatorSelection.delegate ".gripRemove", "tap", selectionRemove
         $imageCreatorViewport.on "dragstart", selectionPosition
         $imageCreatorViewport.on "transformstart", selectionPinch
         $imageCreatorViewport.on "mousedown mousemove", ( event ) ->
@@ -68,11 +69,11 @@ define [
 
         # Get snippets.
         #
-        module.snippets.$gripSnippet = $imageCreatorSelection.find(".grip").remove()
+        #module.snippets.$gripSnippet = $imageCreatorSelection.find(".grip").remove()
 
         # Populate the module UI.
         #
-        populateUI()
+        #populateUI()
 
     populateUI = ->
 
@@ -101,10 +102,12 @@ define [
         if layer
 
             $imageCreatorSelection.css
-                left   : layer.positionRotated.x  - module.options.offset
-                top    : layer.positionRotated.y  - module.options.offset
-                width  : layer.sizeRotated.width  + module.options.offset
-                height : layer.sizeRotated.height + module.options.offset
+                left   : layer.position.x  - module.options.offset
+                top    : layer.position.y  - module.options.offset
+                width  : layer.sizeCurrent.width  + module.options.offset
+                height : layer.sizeCurrent.height + module.options.offset
+                transform  : "rotate(#{layer.rotation.degrees}deg)"
+
 
         $imageCreatorSelection.toggle layer && layer.visible and not layer.locked
 
@@ -137,61 +140,80 @@ define [
 
     selectionScale = (event) ->
 
-        layerCurrent    = cache.getLayerActive()
-        layerScaleStart = layerCurrent.fontSize or layerCurrent.scale
-        gripName        = $(event.target).parent().data("grip")
-        scaleSliceY     = 2 / ( layerCurrent.sizeRotated.height / layerScaleStart )
-        scaleSliceX     = 2 / ( layerCurrent.sizeRotated.width  / layerScaleStart )
-        deltaScale      = 0
-        mouse           =
-            x : event.pageX
-            y : event.pageY
+        layerCurrent = cache.getLayerActive()
+        layerWidth   = layerCurrent.sizeCurrent.width
+        layerHeight  = layerCurrent.sizeCurrent.height
+        layerScale   = layerCurrent.scale
+        aspectRatio  = layerWidth / layerHeight
+        mouseX       = event.pageX
+        mouseY       = event.pageY
+
+        # Get the current grip and compensate if the layer is rotated.
+        #
+        gripPosition =
+            x : event.pageX - $imageCreatorSelection.offset().left - (layerCurrent.sizeRotated.width  / 2)
+            y : event.pageY - $imageCreatorSelection.offset().top  - (layerCurrent.sizeRotated.height / 2)
+
+        gripRadians = utilMath.sanitizeRadians Math.atan2(gripPosition.x, -gripPosition.y)
+        gripDegrees = utilMath.toDegrees gripRadians
+        gripIndex   = Math.round(gripDegrees / (360 / module.options.grips.length))
+        gripIndex   = 0 if gripIndex is module.options.grips.length
+        gripName    = module.options.grips[gripIndex].toLowerCase()
+
+        # Mapping of in which direction the width and height need to scale when a grip is triggerd.
+        #
+        dir =
+            e: (dx, dy) -> width: layerWidth + dx
+            w: (dx, dy) -> width: layerWidth - dx
+            n: (dx, dy) -> height: layerHeight - dy
+            s: (dx, dy) -> height: layerHeight + dy
+            se: (dx, dy) -> $.extend dir.s(dx, dy), dir.e(dx, dy)
+            sw: (dx, dy) -> $.extend dir.s(dx, dy), dir.w(dx, dy)
+            ne: (dx, dy) -> $.extend dir.n(dx, dy), dir.e(dx, dy)
+            nw: (dx, dy) -> $.extend dir.n(dx, dy), dir.w(dx, dy)
 
         $("body").addClass "noSelect"
 
-        # Mehhh....
-        #
         $(document).on "mousemove.selection", (event) ->
 
-            quantifierY = scaleSliceY * Math.abs(event.pageY - mouse.y)
-            quantifierX = scaleSliceX * Math.abs(event.pageX - mouse.x)
+            # We need to multiply these values by 2 because we are not scaling from a corner but from the center.
+            #
+            dx = ( (event.pageX - mouseX) or 0 ) * 2
+            dy = ( (event.pageY - mouseY) or 0 ) * 2
 
-            if gripName is "N"
+            # The layer's adjusted dimensions
+            #
+            LayerDimNew = dir[gripName] dx, dy
 
-                deltaScale = if event.pageY > mouse.y then (deltaScale - quantifierY) else (deltaScale + quantifierY)
+            # Make sure the layer respects the aspect ratio.
+            #
+            if LayerDimNew.width
 
-            # if gripName === "NE"
+                LayerDimNew.height = LayerDimNew.width / aspectRatio
 
-            if gripName is "E"
+            else if LayerDimNew.height
 
-                deltaScale = if event.pageX > mouse.x then (deltaScale + quantifierX) else (deltaScale - quantifierX)
+                LayerDimNew.width  = LayerDimNew.height * aspectRatio
 
-            # if gripName === "SE"
+            # Scale by fontsize or dimensions?
+            #
+            if layerCurrent.scaleByFontSize
 
-            if gripName is "S"
+                newFontSize = Math.round( LayerDimNew.width * layerCurrent.fontSize / layerCurrent.sizeCurrent.width )
+                layerCurrent.setFontSize newFontSize
 
-                deltaScale = if event.pageY > mouse.y then (deltaScale + quantifierY) else (deltaScale - quantifierY)
+                $.publish "selectionScale", [ layerCurrent.fontSize, true]
 
-            # if( gripName === "SW" )
-
-            if gripName is "W"
-
-                deltaScale = if event.pageX > mouse.x then (deltaScale - quantifierX) else (deltaScale + quantifierX)
-
-            # if( gripName === "NW" )
-
-            if layerCurrent.setFontSize
-
-                layerCurrent.setFontSize layerScaleStart + deltaScale
             else
 
-                layerCurrent.setScale layerScaleStart + deltaScale
+                newScale = ( LayerDimNew.width * 1 / layerCurrent.sizeReal.width )
+                layerCurrent.setScale newScale
 
-            mouse.x = event.pageX
-            mouse.y = event.pageY
+                $.publish "selectionScale", [ layerCurrent.scale, true]
 
+            # Redraw, Cache
+            #
             $.publish "layerUpdate", [layerCurrent]
-            $.publish "selectionScale", [layerCurrent.fontSize or layerCurrent.scale, true]
 
         $(document).on "mouseup.selection", (event) ->
 
@@ -280,6 +302,14 @@ define [
             $("html").removeClass "noSelect cursorGrabbing"
 
             return false
+
+    selectionRemove = (event) ->
+
+        event.preventDefault()
+
+        cache.removeLayer cache.getLayerActive()
+
+        return false;
 
     selectionPinch = (event) ->
 
