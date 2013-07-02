@@ -4,7 +4,7 @@ define [
 
     # App core modules.
     #
-    "config"
+    "cs!config"
 ,   "cs!util/math"
 ,   "cs!util/misc"
 

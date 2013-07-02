@@ -7,8 +7,8 @@ define [
 
     # Core.
     #
-,   "config"
-,   "cache"
+,   "cs!config"
+,   "cs!cache"
 ,   "cs!util/math"
 ,   "cs!util/detect"
 
@@ -18,7 +18,6 @@ define [
 
     module =
         options : config.options.ui.selection
-        snippets : {}
 
     $imageCreatorViewport = null
     $imageCreatorCanvas   = null
@@ -67,31 +66,6 @@ define [
         $.subscribe "layerEdit", selectionEdit
         $.subscribe "layerVisibility", selectionVisibility
 
-        # Get snippets.
-        #
-        #module.snippets.$gripSnippet = $imageCreatorSelection.find(".grip").remove()
-
-        # Populate the module UI.
-        #
-        #populateUI()
-
-    populateUI = ->
-
-        # Only create grips if we have mouse events.
-        #
-        if not utilDetect.NO_MOUSEEVENTS
-
-            for grip, index in module.options.grips
-
-                $gripClone = module.snippets.$gripSnippet.clone()
-
-                $gripClone.addClass "grip" + grip
-                $gripClone.data "grip", grip
-
-                $gripClone.find( ".gripScale" ).css( "cursor", grip.toLowerCase() + "-resize" )
-
-                $imageCreatorSelection.append $gripClone
-
     selectionSelect = (event, layer) ->
 
         selectionEdit event, false
@@ -113,14 +87,14 @@ define [
 
     selectionEdit = (event, layer) ->
 
-        $imageCreatorSelection.toggleClass "editing", layer
-
         if layer
             editing  = true
             editLock = layer.canHaveText
         else
             editing  = false
             editLock = false
+
+        $imageCreatorSelection.toggleClass "editing", layer and editing
 
     selectionKeyDown = (event) ->
 
@@ -155,8 +129,7 @@ define [
             y : event.pageY - $imageCreatorSelection.offset().top  - (layerCurrent.sizeRotated.height / 2)
 
         gripRadians = utilMath.sanitizeRadians Math.atan2(gripPosition.x, -gripPosition.y)
-        gripDegrees = utilMath.toDegrees gripRadians
-        gripIndex   = Math.round(gripDegrees / (360 / module.options.grips.length))
+        gripIndex   = Math.round(gripRadians / ( Math.PI * 2 / module.options.grips.length))
         gripIndex   = 0 if gripIndex is module.options.grips.length
         gripName    = module.options.grips[gripIndex].toLowerCase()
 
@@ -211,7 +184,7 @@ define [
 
                 $.publish "selectionScale", [ layerCurrent.scale, true]
 
-            # Redraw, Cache
+            # Redraw
             #
             $.publish "layerUpdate", [layerCurrent]
 
@@ -228,15 +201,18 @@ define [
 
         event.preventDefault()
 
-        layerCurrent            = cache.getLayerActive()
-        layerStartRadians       = layerCurrent.rotation.radians
-        selectionOffset         = $imageCreatorSelection.offset()
-        gripPositionCenterStart =
+        layerCurrent    = cache.getLayerActive()
+        layerRadians    = layerCurrent.rotation.radians
+        selectionOffset = $imageCreatorSelection.offset()
+        slice           = Math.PI * 2 / module.options.grips.length
+
+        # Get the initial angle of the grip
+        #
+        gripPosition =
             x : event.pageX - selectionOffset.left - (layerCurrent.sizeRotated.width  / 2)
             y : event.pageY - selectionOffset.top  - (layerCurrent.sizeRotated.height / 2)
 
-        gripOffsetRadians = utilMath.sanitizeRadians(Math.atan2(gripPositionCenterStart.x, -gripPositionCenterStart.y))
-        slice             = Math.PI * 2 / module.options.grips.length
+        gripRadians = utilMath.sanitizeRadians(Math.atan2(gripPosition.x, -gripPosition.y))
 
         $("html").addClass "noSelect cursorRotate"
 
@@ -244,24 +220,36 @@ define [
 
             event.preventDefault()
 
-            gripPositionCenter =
+            # Find out what angle the grip is pointing now.
+            #
+            gripPositionCurrent =
                 x : event.pageX - $imageCreatorSelection.offset().left - (layerCurrent.sizeRotated.width  / 2)
                 y : event.pageY - $imageCreatorSelection.offset().top  - (layerCurrent.sizeRotated.height / 2)
 
-            gripCurrentRadians = utilMath.sanitizeRadians(Math.atan2(gripPositionCenter.x, -gripPositionCenter.y))
-            radians            = utilMath.sanitizeRadians(layerStartRadians + gripCurrentRadians - gripOffsetRadians)
+            gripRadiansCurrent  = utilMath.sanitizeRadians Math.atan2(gripPositionCurrent.x, -gripPositionCurrent.y)
 
+            # Calculate what angle we need to rotate the layer.
+            #
+            layerRadiansCurrent = utilMath.sanitizeRadians(layerRadians + gripRadiansCurrent - gripRadians)
+
+            # If the shift key is pressed we only want to rotate by magnitudes of 90 degrees.
+            #
             if shiftKeyEnabled
                 radians = Math.round(radians * 1000 / (slice * 1000)) * slice
 
             layerCurrent.setRotate
-                radians : radians
-                degrees : utilMath.toDegrees(radians)
-                sin     : Math.sin(radians)
-                cos     : Math.cos(radians)
+                radians : layerRadiansCurrent
+                degrees : utilMath.toDegrees(layerRadiansCurrent)
+                sin     : Math.sin(layerRadiansCurrent)
+                cos     : Math.cos(layerRadiansCurrent)
 
-            $.publish "layerUpdate", [layerCurrent, true]
+            # Set UI
+            #
             $.publish "selectionRotate", [layerCurrent.rotation, true]
+
+            # Redraw
+            #
+            $.publish "layerUpdate", [layerCurrent, true]
 
         $(document).on "mouseup.selection", (event) ->
 

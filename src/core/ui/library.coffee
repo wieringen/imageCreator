@@ -8,8 +8,8 @@ define [
 
     # Core.
     #
-,   "config"
-,   "cache"
+,   "cs!config"
+,   "cs!cache"
 ,   "cs!model/image"
 ,   "cs!model/balloon"
 
@@ -78,7 +78,7 @@ define [
         $(".imageDecorationsList").delegate "img", "tap", imageAdd
         $(".imageBackgroundsList").delegate "img", "tap", backgroundAdd
         $(".imageBalloonsList").delegate "img", "tap", balloonAdd
-        $(".buttonImageAdd").click () ->
+        $(".buttonImageAdd").click ->
 
             cache.setLayerActive false
 
@@ -90,7 +90,7 @@ define [
 
         $module.addClass "moduleDisabled"
 
-    imageUpload = () ->
+    imageUpload = ->
 
         # Temp!!! Just used for debugging puposes.
         #
@@ -116,7 +116,7 @@ define [
     backgroundAdd = (url) ->
 
         layer =
-            src      : @.src or= url
+            src      : @src or= url
             scale    : 1
             locked   : true
             plane    : "background"
@@ -133,7 +133,7 @@ define [
     imageAdd = (url) ->
 
         layer =
-            src   : @.src or= url
+            src   : @src or= url
             scale : 0.3335
 
         modelImage.fromObject layer, (instance) ->
@@ -145,8 +145,14 @@ define [
     balloonAdd = (url) ->
 
         layer =
-            src   : @.src or= url
+            src   : @src or= url
             scale : 0.3335
+            text  : "Dit is een tekstje"
+            textRegion :
+                height : 325
+                left   : 120
+                top    : 93
+                width  : 535
 
         modelBalloon.fromObject layer, (instance) ->
 

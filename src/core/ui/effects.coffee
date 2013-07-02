@@ -8,8 +8,8 @@ define [
 
     # Core.
     #
-,   "config"
-,   "cache"
+,   "cs!config"
+,   "cs!cache"
 ,   "cs!util/misc"
 
     # Libraries.
@@ -28,10 +28,10 @@ define [
 
     $imageCreatorViewport = null
 
-    $module         = null
     $filterStrength = null
     $filterTypeList = null
     $maskTypeList   = null
+    $module         = null
 
     layerCurrent = false
 

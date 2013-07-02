@@ -4,7 +4,7 @@ define [
 
     # App core modules.
     #
-    "config"
+    "cs!config"
 ,   "cs!util/math"
 ,   "cs!util/misc"
 ,   "cs!model/layer"
@@ -12,7 +12,6 @@ define [
 ], ( config, utilMath, utilMisc, modelLayer ) ->
 
     module =
-
         options : config.options.models.image
 
     # @class Image
@@ -82,7 +81,7 @@ define [
 
         toObject : (propertiesToInclude) ->
 
-            return jQuery.extend super( propertiesToInclude ), {
+            return jQuery.extend super(propertiesToInclude), {
                 src       : @src
                 type      : @type
                 imageType : @imageType
@@ -93,15 +92,15 @@ define [
 
         setScale : (scale = @scale) ->
 
-            @scale = Math.max 0.1, Math.min( 1, scale )
+            @scale = Math.max 0.1, Math.min(1, scale)
 
             sizeNew =
                 width  : Math.round @scale * @sizeReal.width
                 height : Math.round @scale * @sizeReal.height
 
             newPosition =
-                x : ( @sizeCurrent.width  - sizeNew.width  ) / 2
-                y : ( @sizeCurrent.height - sizeNew.height ) / 2
+                x : (@sizeCurrent.width  - sizeNew.width ) / 2
+                y : (@sizeCurrent.height - sizeNew.height) / 2
 
             @sizeCurrent = sizeNew
             @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation

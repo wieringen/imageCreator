@@ -8,7 +8,7 @@ define [
 
     # Core.
     #
-,   "config"
+,   "cs!config"
 
 ], (moduleHTML, config) ->
 

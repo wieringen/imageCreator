@@ -4,7 +4,7 @@
 What you need to build your own version of imageCreator
 --------------------------------------
 
-In order to build imageCreator, you need to have Node.js/npm installed, and git 1.7 or later.
+In order to build imageCreator, you need to have Ruby, Compass, Node.js/npm, and git 1.7 or later installed.
 
 
 How to build your own imageCreator

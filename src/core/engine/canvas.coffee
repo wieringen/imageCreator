@@ -4,8 +4,8 @@ define [
 
     # App core modules
     #
-    "config"
-    "cache"
+    "cs!config"
+    "cs!cache"
     "cs!util/math"
 
     "plugins/canvg/canvg"
@@ -25,6 +25,8 @@ define [
     context      = null
     canvasWidth  = null
     canvasHeight = null
+
+    editing      = false
 
     module.initialize = ->
 
@@ -59,7 +61,8 @@ define [
         # Listen to global app events.
         #
         $.subscribe "layerUpdate.engine", canvasBuildLayers
-        $.subscribe "layerSelect.engine", canvasBuildLayers
+        $.subscribe "layerEdit.engine", layerEdit
+        $.subscribe "layerSelect.engine", layerSelect
         $.subscribe "layerVisibility.engine", canvasBuildLayers
         $.subscribe "layerRemove.engine", canvasBuildLayers
         $.subscribe "layersRedraw.engine", canvasBuildLayers
@@ -67,6 +70,18 @@ define [
         # Do we have any layers allready?
         #
         canvasBuildLayers()
+
+    layerSelect = (event, layer) ->
+
+        editing = false
+
+        canvasBuildLayers event
+
+    layerEdit = (event, layer) ->
+
+        editing = if layer then true else false
+
+        canvasBuildLayers event
 
     canvasBuildLayers = ( event ) ->
 
@@ -93,7 +108,71 @@ define [
 
             canvasLayerSelect event, layerCurrent
 
-    canvasLayerCreate = ( event, layer ) ->
+    wrapText = (context, text, maxWidth, scale) ->
+
+        words   = text.split " "
+        lineNew = ""
+        lines   = []
+
+        # loop trew all the words in the line
+        #
+        for word, wordIndex in words
+
+            # Check the size of the word
+            #
+            wordWidth = context.measureText(word).width * scale
+
+            # If the word is bigger then the actual space we have we not to loop trew all the chars as well
+            # because we need to now on what char to split the word.
+            #
+            if wordWidth > maxWidth
+
+                # Words that are bigger then maxWidth always start on a new line.
+                #
+                if lineNew.length > 0
+                    lines.push {text : lineNew}
+
+                lineNew = ""
+                chars   = word.split ""
+
+                for char, charIndex in chars
+
+                    lineNewWidth = context.measureText(lineNew + char).width * scale
+
+                    if lineNewWidth > maxWidth
+
+                        lines.push {text : lineNew}
+
+                        # New beginning of the next line.
+                        #
+                        lineNew = char
+
+                    else
+                        lineNew += char
+
+                lineNew += " "
+
+            else
+                lineNewWidth = context.measureText(lineNew + word).width * scale
+
+                if lineNewWidth > maxWidth
+
+                    lines.push {text : lineNew}
+
+                    # New beginning of the next line.
+                    #
+                    lineNew = word + " "
+                else
+
+                    # There is still some room in this line so add the word it.
+                    #
+                    lineNew += word + " "
+
+        lines.push {text : lineNew}
+
+        return lines
+
+    canvasLayerCreate = (event, layer) ->
 
         # Save the current state ( matrix, clipping, etc ).
         #
@@ -108,8 +187,8 @@ define [
         #
         if layer.canHaveImage
 
-            # Because this layer is selected we want to show the part that is clipped of a mask.
-            # So lets make sure it gets rerendered
+            # If the layer is selected we also want to show the part that is hiden by the clipping mask.
+            # So we have to rerender the filter and mask to do this.
             #
             if event and event.type is "layerSelect"
 
@@ -121,31 +200,52 @@ define [
             #
             context.drawImage getImage( context, layer ), 0, 0, layer.sizeReal.width, layer.sizeReal.height
 
-        # Create the text part of the layer
+        # Create the text part of the layer. Dont create the text if we are editing a layer.
         #
-        if layer.canHaveText
+        if layer.canHaveText and ( not editing or not layer.selected )
 
             context.fillStyle = layer.color
             context.textAlign = layer.textAlign
-            context.font      = "#{layer.style} #{layer.weight} #{layer.fontSize}px #{layer.font}"
+            textAlignDivider  = {"left" : 0, "center" : 0.5, "right" : 1}[ layer.textAlign ]
+            context.font      = "#{layer.style} #{layer.weight} #{layer.fontSize / layer.scale}px #{layer.font}"
+            realIndex         = -1
+
+            if layer.textRegion
+
+                textLeft      = ((layer.textRegion.left * layer.scale) + ((layer.textRegion.width * layer.scale) * textAlignDivider)) / layer.scale
+                textRegionTop = layer.textRegion.top * layer.scale
+
+            else
+                textLeft      = layer.sizeCurrent.width * textAlignDivider / layer.scale
+                textRegionTop = 0
 
             # We have to create a seperate container for every text line.
             #
             for line, index in layer.textLines
 
-                context.fillText(
-                    # Text line
-                    #
-                    line
+                textTop = (index * Math.floor(layer.fontSize * layer.lineHeight) + layer.fontSize + textRegionTop) / layer.scale
 
-                    # Left
-                    #
-                ,   layer.sizeCurrent.width * {"left" : 0, "center" : 0.5, "right" : 1}[ layer.textAlign ]
+                if layer.textRegion
 
-                    # Top
-                    #
-                ,   index * Math.floor(layer.fontSize * layer.lineHeight) + layer.fontSize
-                )
+                    realIndex += 1
+                    lineParts = wrapText( context, line, layer.textRegion.width * layer.scale, layer.scale )
+
+                    for linePart, linePartIndex in lineParts
+
+                        if linePartIndex > 0
+                            realIndex += 1
+
+                        context.fillText(
+                            linePart.text,
+                            textLeft,
+                            (realIndex * Math.floor(layer.fontSize * layer.lineHeight) + layer.fontSize + textRegionTop) / layer.scale
+                        )
+                else
+                    context.fillText(
+                        line,
+                        textLeft,
+                        textTop
+                    )
 
         # Restore the state of the canvas to the saved state.
         #
@@ -189,7 +289,7 @@ define [
         #
         context.restore()
 
-    getImage = ( context, layer ) ->
+    getImage = (context, layer) ->
 
         # No filter or mask defined return normal image.
         #
@@ -211,7 +311,7 @@ define [
 
                 return layer.imageManipulated
 
-    applyImageManipulations = ( layer ) ->
+    applyImageManipulations = (layer) ->
 
         copyCanvas  = document.createElement "canvas"
         copyContext = copyCanvas.getContext "2d"
@@ -272,11 +372,11 @@ define [
 
         return copyCanvas
 
-    colorDistance = ( scale, dest, src ) ->
+    colorDistance = (scale, dest, src) ->
 
-        return ( scale * dest + (1 - scale) * src )
+        return (scale * dest + (1 - scale) * src)
 
-    processColorFilter = ( binaryData, filter, len ) ->
+    processColorFilter = (binaryData, filter, len) ->
 
         m   = filter.matrix
         s   = filter.strength

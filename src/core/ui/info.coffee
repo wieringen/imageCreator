@@ -8,7 +8,7 @@ define [
 
     # Core.
     #
-,   "config"
+,   "cs!config"
 
 ], (moduleHTML, config) ->
 
@@ -62,7 +62,7 @@ define [
         $layerPositionX.text Math.round(layer and layer.positionRotated.x or 0 )
         $layerPositionY.text Math.round(layer and layer.positionRotated.y or 0)
 
-        if ! partial
+        if not partial
 
             $layerName.text if layer.name then layer.name else ""
 

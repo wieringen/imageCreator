@@ -8,10 +8,10 @@ define [
 
     # App core modules
     #
-    "config"
-    "cache"
+    "cs!config"
+    "cs!cache"
 
-], ( moduleHTML, config, cache ) ->
+], (moduleHTML, config, cache) ->
 
     $ = jQuery
 
@@ -33,8 +33,8 @@ define [
 
         # Get basic app DOM elements.
         #
-        $imageCreatorViewport = $( ".imageCreatorViewport" )
-        $imageCreatorCanvas   = $( ".imageCreatorCanvas" )
+        $imageCreatorViewport = $(".imageCreatorViewport")
+        $imageCreatorCanvas   = $(".imageCreatorCanvas")
 
         # Append module HTML.
         #
@@ -73,6 +73,7 @@ define [
         # Get module snippets.
         #
         module.snippets.svgFilter = $( svgDefs ).find( "filter" )[0]
+        module.snippets.svgMask   = $( svgDefs ).find( "clipPath" )[0]
 
         # Do we have any layers allready?
         #
@@ -110,7 +111,7 @@ define [
 
         # Create DOM object from layer object.
         #
-        if "image" is layer.type
+        if layer.canHaveImage
 
             svgLayerCurrent = document.createElementNS "http://www.w3.org/2000/svg", "image"
             svgLayerCurrent.setAttributeNS "http://www.w3.org/1999/xlink", "href", layer.image.src
@@ -130,7 +131,7 @@ define [
             svgLayerCurrent.setAttribute "width", layer.sizeReal.width
             svgLayerCurrent.setAttribute "height", layer.sizeReal.height
 
-        if "text" is layer.type
+        if layer.canHaveText
 
             svgLayerCurrent = document.createElementNS "http://www.w3.org/2000/svg", "text"
 
@@ -147,7 +148,7 @@ define [
 
         # Update the text part of the layer
         #
-        if "text" is layer.type and ! partial
+        if layer.canHaveText and not partial
 
             $( svgLayerCurrent ).find( "tspan" ).remove()
 
@@ -155,14 +156,14 @@ define [
             svgLayerCurrent.setAttribute "width", layer.sizeCurrent.width
 
             textAnchorMap =
-                "left"   : "start"
-                "center" : "middle"
-                "right"  : "end"
+                left   : "start"
+                center : "middle"
+                right  : "end"
 
             textAlignPositionMap =
-                "start"  : 0
-                "middle" : 0.5
-                "end"    : 1
+                start  : 0
+                middle : 0.5
+                end    : 1
 
             $( svgLayerCurrent ).css({
                 fill       : layer.color
@@ -197,11 +198,11 @@ define [
 
         # Update the image part of the layer
         #
-        if "image" is layer.type and ! partial
+        if layer.canHaveImage and not partial
 
             svgLayerFilterColorMatrix = $( "#" + layer.id + "filter" ).find( "feColorMatrix" )[0]
 
-            if layer.filter.matrix
+            if layer.filter and layer.filter.matrix
 
                 svgLayerFilterColorMatrix.setAttribute "values", layer.filter.matrix.join(" ")
 
@@ -227,7 +228,7 @@ define [
             m = layer.matrix
             svgSelect.setAttribute "transform", "matrix( #{ m[0] }, #{ m[3] }, #{ m[1] }, #{ m[4] }, #{ m[2] }, #{ m[5] } )"
 
-            if "text" is layer.type
+            if layer.canHaveText
 
                 svgSelect.setAttribute "height", layer.sizeCurrent.height
                 svgSelect.setAttribute "width",  layer.sizeCurrent.width
@@ -248,7 +249,7 @@ define [
             # Text layers dont need this because text is not scaled.
             # Since these values never change for the sake of performance we want to set this on layer selection rather then layer update.
             #
-            if "image" is layer.type
+            if layer.canHaveImage
 
                 svgSelect.setAttribute "height", layer.sizeReal.height
                 svgSelect.setAttribute "width", layer.sizeReal.width

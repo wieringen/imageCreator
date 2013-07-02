@@ -89,14 +89,14 @@ module.exports = ( grunt ) ->
                 options :
 
                     include : [
-                        "ui/effects"
-                    ,   "ui/text"
-                    ,   "ui/info"
-                    ,   "ui/layers"
-                    ,   "ui/library"
-                    ,   "ui/dimensions"
-                    ,   "ui/selection"
-                    ,   "ui/message"
+                        "cs!ui/effects"
+                    ,   "cs!ui/text"
+                    ,   "cs!ui/info"
+                    ,   "cs!ui/layers"
+                    ,   "cs!ui/library"
+                    ,   "cs!ui/dimensions"
+                    ,   "cs!ui/selection"
+                    ,   "cs!ui/message"
                     ,   "cs!engine/svg"
                     ,   "cs!engine/canvas"
                     ,   "engine/vml"

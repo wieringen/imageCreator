@@ -7,8 +7,8 @@ define [
 
     # Core.
     #
-,   "config"
-,   "cache"
+,   "cs!config"
+,   "cs!cache"
 ,   "cs!util/math"
 
     # Libraries.

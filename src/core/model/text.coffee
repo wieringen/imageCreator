@@ -4,7 +4,7 @@ define [
 
     # App core modules.
     #
-    "config"
+    "cs!config"
 ,   "cs!util/math"
 ,   "cs!util/misc"
 ,   "cs!model/layer"
@@ -24,6 +24,7 @@ define [
         type       : "text"
         text       : ""
         textLines  : []
+        textRegion : false
         color      : module.options.color
         fontSize   : module.options.fontSize
         lineHeight : module.options.lineHeight
@@ -57,7 +58,7 @@ define [
 
         toObject : (propertiesToInclude) ->
 
-            return jQuery.extend super( propertiesToInclude ), {
+            return jQuery.extend super(propertiesToInclude), {
                 type       : @type
                 text       : @text
                 textLines  : @textLines
@@ -82,15 +83,15 @@ define [
 
         setFontSize : (fontSize = @fontSize) ->
 
-            @fontSize = Math.max 10, Math.min( 99, fontSize )
+            @fontSize = Math.max 10, Math.min(99, fontSize)
 
             sizeNew =
                 width  : utilMisc.measureText @
-                height : ( @textLines.length * Math.floor(@fontSize) ) * @lineHeight
+                height : (@textLines.length * Math.floor(@fontSize)) * @lineHeight
 
             newPosition =
-                x : ( @sizeCurrent.width - sizeNew.width ) / 2
-                y : ( @sizeCurrent.height - sizeNew.height ) / 2
+                x : (@sizeCurrent.width - sizeNew.width) / 2
+                y : (@sizeCurrent.height - sizeNew.height) / 2
 
             @sizeCurrent = sizeNew
             @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation

@@ -7,8 +7,8 @@ define(
 [
     // App core modules
     //
-    "config"
-,   "cache"
+    "cs!config"
+,   "cs!cache"
 ],
 function( config, cache )
 {

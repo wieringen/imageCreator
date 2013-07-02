@@ -4,7 +4,7 @@ define [
 
     # App core modules.
     #
-    "config"
+    "cs!config"
 ,   "cs!util/math"
 ,   "cs!util/misc"
 ,   "cs!model/layer"
@@ -13,7 +13,7 @@ define [
 
     module =
 
-        options : config.options.models.image
+        options : config.options.models.balloon
 
     # @class Image
     # @extends Layer
@@ -34,6 +34,12 @@ define [
 
         text       : ""
         textLines  : []
+        textRegion :
+            height : 0
+            left   : 0
+            top    : 0
+            width  : 0
+
         color      : module.options.color
         fontSize   : module.options.fontSize
         lineHeight : module.options.lineHeight
@@ -44,7 +50,7 @@ define [
 
         canHaveMask   : false
         canHaveFilter : false
-        canHaveText   : false
+        canHaveText   : true
         canHaveImage  : true
 
         scaleByFontSize : false
@@ -70,6 +76,7 @@ define [
 
             @_initConfig options
 
+            @setLines()
             @setScale()
 
         _initConfig : (options = {}) ->
@@ -83,7 +90,46 @@ define [
                 type      : @type
                 imageType : @imageType
                 sizeReal  : @sizeReal
+
+                text       : @text
+                textLines  : @textLines
+                textRegion : @textRegion
+                color      : @color
+                fontSize   : @fontSize
+                lineHeight : @lineHeight
+                font       : @font
+                weight     : @weight
+                style      : @style
             }
+
+        setLines : ->
+            @textLines = @text.replace(/\r\n/g, "\n").split("\n")
+
+        setText : (text = "") ->
+
+            @text = text
+
+            @setLines()
+
+        setFont : (font) ->
+
+            @font = font
+
+        setColor : (hexColor) ->
+
+            @color = hexColor
+
+        setWeight : (weight) ->
+
+            @weight = weight
+
+        setStyle : (style) ->
+
+            @style = style
+
+        setTextAlign : (textAlign) ->
+
+            @textAlign = textAlign
 
         setScale : (scale = @scale) ->
 
@@ -94,8 +140,8 @@ define [
                 height : Math.round @scale * @sizeReal.height
 
             newPosition =
-                x : ( @sizeCurrent.width  - sizeNew.width  ) / 2
-                y : ( @sizeCurrent.height - sizeNew.height ) / 2
+                x : (@sizeCurrent.width  - sizeNew.width ) / 2
+                y : (@sizeCurrent.height - sizeNew.height) / 2
 
             @sizeCurrent = sizeNew
             @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation
@@ -110,7 +156,7 @@ define [
 
         deferred = jQuery.Deferred()
 
-        onload = ( img ) ->
+        onload = (img) ->
 
             model = new Balloon img, object
 

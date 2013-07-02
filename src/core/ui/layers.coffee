@@ -8,8 +8,8 @@ define [
 
     # Core
     #
-,   "config"
-,   "cache"
+,   "cs!config"
+,   "cs!cache"
 
     # Libraries.
     #
@@ -21,8 +21,8 @@ define [
     $ = jQuery
 
     module =
-        options  : config.options.ui.layers
         engines  : config.options.engines
+        options  : config.options.ui.layers
         snippets : {}
 
     $imageCreatorViewport = null
@@ -37,7 +37,7 @@ define [
 
         # Append module HTML.
         #
-        $(module.options.target).replaceWith(moduleHTML)
+        $(module.options.target).replaceWith moduleHTML
 
         # Get main DOM elements.
         #
@@ -138,19 +138,19 @@ define [
 
         if layer.image
 
-            $layerClone.find(".layerName").text(layer.name)
-            $layerClone.find("img").attr("src", layer.image.src)
+            $layerClone.find(".layerName").text layer.name
+            $layerClone.find("img").attr "src", layer.image.src
 
         if layer.text
 
-            $layerClone.find(".layerName").text(layer.text)
+            $layerClone.find(".layerName").text layer.text
             #$layerClone.find( "img" ).attr( "src", objectLayer.image.src )
 
         $layersContainer.prepend($layerClone)
 
     layerSelectByID = (event) ->
 
-        layerID = $(@).attr("id").replace("layer", "")
+        layerID = $(@).attr("id").replace "layer", ""
 
         cache.setLayerActiveByID layerID
 
@@ -158,12 +158,12 @@ define [
 
     layerSelect = (event, layer) ->
 
-        $layersContainer.find(".active").removeClass( "active" )
-        $("#layer" + layer.id).addClass( "active" )
+        $layersContainer.find(".active").removeClass "active"
+        $("#layer" + layer.id).addClass "active"
 
     layerRemoveByID = (event) ->
 
-        layerID = $(@).parent().attr("id").replace("layer", "")
+        layerID = $(@).parent().attr("id").replace "layer", ""
 
         cache.removeLayerByID layerID
 
@@ -181,7 +181,7 @@ define [
 
     layerVisibilityById = (event) ->
 
-        layerID = $(@).parent().attr("id").replace("layer", "")
+        layerID = $(@).parent().attr("id").replace "layer", ""
         layer   = cache.getLayerById layerID
 
         layer.set "visible", not layer.visible
@@ -198,6 +198,6 @@ define [
 
     optionRenderEngineSelect = (event) ->
 
-        $.publish "loadEngine", $(@).find(":selected").data("engine")
+        $.publish "loadEngine", $(@).find(":selected").data "engine"
 
     return module

@@ -8,8 +8,8 @@ define [
 
     # Core.
     #
-,   "config"
-,   "cache"
+,   "cs!config"
+,   "cs!cache"
 ,   "cs!model/text"
 ,   "cs!util/math"
 
@@ -148,18 +148,29 @@ define [
 
         if module.enabled and layer.canHaveText and editing
 
-            $textEdit.css
-                "width"      : layer.sizeCurrent.width
-                "height"     : layer.sizeCurrent.height
-                "left"       : layer.position.x
-                "top"        : layer.position.y
-                "textAlign"  : layer.textAlign
-                "fontWeight" : layer.weight
-                "display"    : "block"
-                "lineHeight" : Math.floor(layer.fontSize * layer.lineHeight) + "px"
-                "fontSize"   : layer.fontSize
-                "fontFamily" : layer.font
-                "transform"  : "rotate(#{layer.rotation.degrees}deg)"
+            editProperties =
+                left       : layer.position.x
+                top        : layer.position.y
+                textAlign  : layer.textAlign
+                fontWeight : layer.weight
+                display    : "block"
+                lineHeight : Math.floor(layer.fontSize * layer.lineHeight) + "px"
+                fontSize   : layer.fontSize
+                fontFamily : layer.font
+                transform  : "rotate(#{layer.rotation.degrees}deg)"
+
+            if layer.textRegion
+
+                editProperties.width   = layer.textRegion.width  * layer.scale
+                editProperties.height  = layer.textRegion.height * layer.scale
+                editProperties.top    += layer.textRegion.top    * layer.scale
+                editProperties.left   += layer.textRegion.left   * layer.scale
+
+            else
+                editProperties.width  = layer.sizeCurrent.width
+                editProperties.height = layer.sizeCurrent.lineHeight
+
+            $textEdit.css editProperties
 
     textAdd = ->
 
@@ -229,7 +240,7 @@ define [
 
         return false
 
-    textSet = ->
+    textSet = (event) ->
 
         if module.enabled and layerCurrent?.visible
 
