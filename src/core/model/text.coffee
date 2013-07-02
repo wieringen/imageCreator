@@ -1,4 +1,5 @@
 # @module text
+# @author mbaijs
 #
 define [
 
@@ -12,7 +13,6 @@ define [
 ], (config, utilMath, utilMisc, modelLayer) ->
 
     module =
-
         options : config.options.models.text
 
     # @class Text

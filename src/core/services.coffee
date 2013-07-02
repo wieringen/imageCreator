@@ -1,9 +1,10 @@
 # @module services
+# @author mbaijs
 #
-define
-[
+define [
+
     "cs!config"
-],
-( config ) ->
+
+], ( config ) ->
 
 

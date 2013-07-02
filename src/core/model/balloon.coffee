@@ -1,4 +1,5 @@
 # @module balloon
+# @author mbaijs
 #
 define [
 
@@ -9,10 +10,9 @@ define [
 ,   "cs!util/misc"
 ,   "cs!model/layer"
 
-], ( config, utilMath, utilMisc, modelLayer ) ->
+], (config, utilMath, utilMisc, modelLayer) ->
 
     module =
-
         options : config.options.models.balloon
 
     # @class Image
@@ -152,7 +152,7 @@ define [
     # @method fromObject
     # @static
     #
-    Balloon.fromObject = ( object, callback ) ->
+    Balloon.fromObject = (object, callback) ->
 
         deferred = jQuery.Deferred()
 
@@ -164,7 +164,7 @@ define [
 
             if callback then callback model
 
-        onerror = () ->
+        onerror = ->
 
             deferred.resolve()
 

@@ -1,4 +1,5 @@
 # @module image
+# @author mbaijs
 #
 define [
 
@@ -9,7 +10,7 @@ define [
 ,   "cs!util/misc"
 ,   "cs!model/layer"
 
-], ( config, utilMath, utilMisc, modelLayer ) ->
+], (config, utilMath, utilMisc, modelLayer) ->
 
     module =
         options : config.options.models.image

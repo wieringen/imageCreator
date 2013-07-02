@@ -1,4 +1,5 @@
 # @module layers
+# @author mbaijs
 #
 define [
 

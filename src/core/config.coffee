@@ -1,4 +1,5 @@
 # @module config
+# @author mbaijs
 #
 define [
     # App core modules.

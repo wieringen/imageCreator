@@ -1,9 +1,4 @@
-#
-# @description
-#
-# @namespace imageCreator
-# @name util.detect
-# @version 1.0
+# @module detect
 # @author mbaijs
 #
 define [], () ->

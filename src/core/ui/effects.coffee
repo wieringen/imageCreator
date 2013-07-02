@@ -1,4 +1,5 @@
 # @module effects
+# @author mbaijs
 #
 define [
 

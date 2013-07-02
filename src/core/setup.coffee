@@ -1,4 +1,5 @@
 # @module setup
+# @author mbaijs
 #
 define [
     # App core modules.
@@ -12,7 +13,7 @@ define [
 ,   "plugins/jquery.pubsub"
 ,   "plugins/jquery.hammer"
 
-], ( config, cache, utilMisc ) ->
+], (config, cache, utilMisc) ->
 
     $       = jQuery
     ui      = null
@@ -26,7 +27,7 @@ define [
             #
             engine.initialize()
 
-            callback && callback engine
+            callback and callback engine
 
     $(document).ready ->
 

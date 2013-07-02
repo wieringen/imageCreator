@@ -1,4 +1,5 @@
 # @module layer
+# @author mbaijs
 #
 define [
 
@@ -8,10 +9,9 @@ define [
 ,   "cs!util/math"
 ,   "cs!util/misc"
 
-], ( config, utilMath, utilMisc ) ->
+], (config, utilMath, utilMisc) ->
 
     module =
-
         options : {}
 
     # @class Layer

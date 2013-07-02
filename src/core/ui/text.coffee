@@ -1,4 +1,5 @@
 # @module text
+# @author mbaijs
 #
 define [
 

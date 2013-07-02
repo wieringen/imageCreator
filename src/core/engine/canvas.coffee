@@ -1,4 +1,5 @@
 # @module canvas
+# @author mbaijs
 #
 define [
 
@@ -8,7 +9,7 @@ define [
     "cs!cache"
     "cs!util/math"
 
-    "plugins/canvg/canvg"
+    "plugins/canvg"
 
 ], (config, cache, utilMath) ->
 
@@ -251,7 +252,7 @@ define [
         #
         context.restore()
 
-    canvasLayerSelect = ( event, layer ) ->
+    canvasLayerSelect = (event, layer) ->
 
         # Save the current state ( matrix, clipping, etc ).
         #
@@ -281,8 +282,8 @@ define [
         context.strokeRect(
             0
         ,   0
-        ,   ( if layer.sizeReal then layer.sizeReal.width else layer.sizeCurrent.width )
-        ,   ( if layer.sizeReal then layer.sizeReal.height else layer.sizeCurrent.height )
+        ,   (if layer.sizeReal then layer.sizeReal.width else layer.sizeCurrent.width)
+        ,   (if layer.sizeReal then layer.sizeReal.height else layer.sizeCurrent.height)
         )
 
         # Restore the state of the canvas to the saved state.

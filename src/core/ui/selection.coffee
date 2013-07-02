@@ -1,4 +1,5 @@
 # @module selection
+# @author mbaijs
 #
 define [
     # Template.

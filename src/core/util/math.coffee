@@ -1,16 +1,11 @@
-#
-# @description
-#
-# @namespace imageCreator
-# @name util.math
-# @version 1.0
+# @module math
 # @author mbaijs
 #
 define [], () ->
 
     module = {}
 
-    module.sanitizeRadians = ( radians ) ->
+    module.sanitizeRadians = (radians) ->
 
         max = 2 * Math.PI
 
@@ -18,15 +13,15 @@ define [], () ->
         then ( max + radians )
         else ( if radians > max then radians - max else radians )
 
-    module.toRadians = ( degrees ) ->
+    module.toRadians = (degrees) ->
 
         return degrees * ( Math.PI / 180 )
 
-    module.toDegrees = ( radians ) ->
+    module.toDegrees = (radians) ->
 
         return radians * 180 / Math.PI
 
-    module.getBoundingBox = ( sizeUnrotated, rotation ) ->
+    module.getBoundingBox = (sizeUnrotated, rotation) ->
 
         sin = Math.abs rotation.sin
         cos = Math.abs rotation.cos
@@ -34,7 +29,7 @@ define [], () ->
         width  : sizeUnrotated.height * sin + sizeUnrotated.width * cos
         height : sizeUnrotated.height * cos + sizeUnrotated.width * sin
 
-    module.getMatrix = ( rotation, scale, position, size ) ->
+    module.getMatrix = (rotation, scale, position, size) ->
 
         sin = scale * rotation.sin
         cos = scale * rotation.cos
@@ -68,7 +63,7 @@ define [], () ->
 
         return module.matrixMultiply( matrixPre, module.matrixMultiply( matrix, matrixPost ) )
 
-    module.matrixMultiply = ( a, b ) ->
+    module.matrixMultiply = (a, b) ->
 
         # Cache matrix values.
         #
@@ -108,18 +103,18 @@ define [], () ->
         ,   a6 * b2 + a7 * b5 + a8 * b8
         ]
 
-    module.getDistance = ( pos1, pos2 ) ->
+    module.getDistance = (pos1, pos2) ->
 
         x = pos2.x - pos1.x
         y = pos2.y - pos1.y
 
         return Math.sqrt x * x + y * y
 
-    module.getRandomInt = ( min, max ) ->
+    module.getRandomInt = (min, max) ->
 
         return Math.floor( Math.random() * (max - min + 1) ) + min
 
-    module.isPointInPath = ( mouse, size, position, radians ) ->
+    module.isPointInPath = (mouse, size, position, radians) ->
 
         dx   = mouse.x - ( position.x + ( size.width / 2 ) )
         dy   = mouse.y - ( position.y + ( size.height / 2 ) )

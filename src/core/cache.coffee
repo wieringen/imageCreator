@@ -1,4 +1,5 @@
 # @module cache
+# @author mbaijs
 #
 define [
 

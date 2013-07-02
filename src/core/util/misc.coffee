@@ -1,16 +1,11 @@
- #
- # @description
- #
- # @namespace imageCreator
- # @name util.misc
- # @version 1.0
- # @author mbaijs
- #
+# @module misc
+# @author mbaijs
+#
 define [], () ->
 
     module = {}
 
-    module.populateWithProperties = ( source, destination, properties ) ->
+    module.populateWithProperties = (source, destination, properties) ->
 
         if properties and Object.prototype.toString.call( properties ) is "[object Array]"
 
@@ -18,7 +13,7 @@ define [], () ->
 
                 destination[ property ] = source[ property ]
 
-    module.measureText = ( layer ) ->
+    module.measureText = (layer) ->
 
         measureDiv = document.createElement "measureDiv"
 
@@ -47,7 +42,7 @@ define [], () ->
         return textWidth
 
 
-    module.whenAll = ( promises ) ->
+    module.whenAll = (promises) ->
 
         return jQuery.when.apply( jQuery, promises ).pipe () ->
 
@@ -55,7 +50,7 @@ define [], () ->
 
                 return (value)
 
-    module.loadModules = ( modules, prefix, callback ) ->
+    module.loadModules = (modules, prefix, callback) ->
 
         urls  = []
         names = []
@@ -75,17 +70,17 @@ define [], () ->
 
             callback resultSet
 
-    module.getImageFromURL = ( url, success, error ) ->
+    module.getImageFromURL = (url, success, error) ->
 
         img = document.createElement "img"
 
-        img.onload = () ->
+        img.onload = ->
 
             if success then success img
 
             img = img.onload = img.onerror = null
 
-        img.onerror = () ->
+        img.onerror = ->
 
             if error then error
 

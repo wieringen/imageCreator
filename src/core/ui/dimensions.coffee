@@ -1,4 +1,5 @@
 # @module dimensions
+# @author mbaijs
 #
 define [
     # Template.
@@ -93,7 +94,6 @@ define [
         $module.toggleClass "moduleDisabled", not module.enabled
 
         if module.enabled
-
             layerCurrent = layer
 
             # Set the UI to match the selected layers properties.
@@ -102,11 +102,9 @@ define [
             $dimensionsScale.trigger "setScale", [module.options.scale[layerCurrent.type]]
 
             if layerCurrent.scaleByFontSize
-
                 $dimensionsScale.trigger "setPosition", [layerCurrent.fontSize]
 
             else
-
                 $dimensionsScale.trigger "setPosition", [layerCurrent.scale]
 
 

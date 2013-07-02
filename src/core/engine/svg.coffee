@@ -1,4 +1,5 @@
 # @module svg
+# @author mbaijs
 #
 define [
 
@@ -29,7 +30,7 @@ define [
     canvasWidth  = null
     canvasHeight = null
 
-    module.initialize = () ->
+    module.initialize = ->
 
         # Get basic app DOM elements.
         #
@@ -79,7 +80,7 @@ define [
         #
         svgBuildLayers()
 
-    svgBuildLayers = () ->
+    svgBuildLayers = ->
 
         $( svgContainer ).find( "text, filter, image" ).remove()
 
@@ -89,7 +90,7 @@ define [
 
             svgLayerCheck { type : eventType }, layer
 
-    svgLayerCheck = ( event, layer, partial ) ->
+    svgLayerCheck = (event, layer, partial) ->
 
         if layer
 
@@ -107,7 +108,7 @@ define [
         #
         svgLayerSelect event, layer
 
-    svgLayerCreate = ( event, layer ) ->
+    svgLayerCreate = (event, layer) ->
 
         # Create DOM object from layer object.
         #
@@ -142,7 +143,7 @@ define [
         svgContainer.appendChild svgLayerCurrent
         svgContainer.appendChild svgSelect
 
-    svgLayerUpdate = ( event, layer, partial ) ->
+    svgLayerUpdate = (event, layer, partial) ->
 
         svgLayerCurrent = $( "#" + layer.id + module.name )[0]
 
@@ -219,7 +220,7 @@ define [
         m = layer.matrix
         svgLayerCurrent.setAttribute "transform", "matrix( #{ m[0] }, #{ m[3] }, #{ m[1] }, #{ m[4] }, #{ m[2] }, #{ m[5] } )"
 
-    svgLayerSelect = ( event, layer ) ->
+    svgLayerSelect = (event, layer) ->
 
         # If we have a layer change selection properties to match its dimensions.
         #
@@ -254,7 +255,7 @@ define [
                 svgSelect.setAttribute "height", layer.sizeReal.height
                 svgSelect.setAttribute "width", layer.sizeReal.width
 
-    svgLayerVisibility = ( event, layer ) ->
+    svgLayerVisibility = (event, layer) ->
 
         $( "#" + layer.id + module.name ).attr "visibility", if layer.visible then "visible" else "hidden"
 
@@ -264,7 +265,7 @@ define [
 
             svgSelect.setAttribute "visibility", if layer.visible then "visible" else "hidden"
 
-    svgLayerRemove = ( event, layerId ) ->
+    svgLayerRemove = (event, layerId) ->
 
         $( "#" + layerId + module.name ).remove()
         $( "#" + layerId + "filter" ).remove()
