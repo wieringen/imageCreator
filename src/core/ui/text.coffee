@@ -169,7 +169,7 @@ define [
 
             else
                 editProperties.width  = layer.sizeCurrent.width
-                editProperties.height = layer.sizeCurrent.lineHeight
+                editProperties.height = layer.sizeCurrent.height
 
             $textEdit.css editProperties
 
