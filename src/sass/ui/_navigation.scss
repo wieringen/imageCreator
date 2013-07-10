@@ -1,0 +1,24 @@
+/*********************** UI : Navigation ***********************/
+
+.imageCreatorUINavigation {
+    clear: both;
+    padding: 10px 0 0;
+    text-align: center;
+}
+
+.buttonNext {
+    float: right;
+}
+
+.buttonPrev {
+    float: left;
+}
+
+.tools {
+    overflow: hidden;
+    display: inline-block;
+
+    .button {
+        float: left;
+    }
+}
