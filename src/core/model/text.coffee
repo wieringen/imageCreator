@@ -22,6 +22,8 @@ define [
     class Text extends modelLayer
 
         type       : "text"
+        plane      : "baseline"
+
         text       : ""
         textLines  : []
         textRegion : false
@@ -61,7 +63,9 @@ define [
             return jQuery.extend super(propertiesToInclude), {
                 type       : @type
                 text       : @text
+                plane      : @plane
                 textLines  : @textLines
+                textAlign  : @textAlign
                 color      : @color
                 fontSize   : @fontSize
                 lineHeight : @lineHeight
@@ -86,7 +90,7 @@ define [
             @fontSize = Math.max 10, Math.min(99, fontSize)
 
             sizeNew =
-                width  : utilMisc.measureText @
+                width  : utilMisc.measureText(@).width
                 height : (@textLines.length * Math.floor(@fontSize)) * @lineHeight
 
             newPosition =

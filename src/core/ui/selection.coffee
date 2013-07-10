@@ -52,27 +52,35 @@ define [
         $imageCreatorSelection.delegate ".gripRemove", "tap", selectionRemove
         $imageCreatorViewport.on "dragstart", selectionPosition
         $imageCreatorViewport.on "transformstart", selectionPinch
-        $imageCreatorViewport.on "mousedown mousemove", ( event ) ->
+        $imageCreatorViewport.on "mousedown mousemove", (event) ->
 
             if not editLock
                 event.preventDefault()
 
         $(document).on "keydown", selectionKeyDown
         $(document).on "keyup", selectionKeyUp
+        $(document).on "touchmove", (event) ->
+            event.preventDefault()
 
         # Listen for global events.
         #
-        $.subscribe "layerUpdate", selectionUpdate
-        $.subscribe "layerSelect", selectionSelect
-        $.subscribe "layerEdit", selectionEdit
-        $.subscribe "layerVisibility", selectionVisibility
+        $.subscribe "layerUpdate", layerUpdate
+        $.subscribe "layerSelect", layerSelect
+        $.subscribe "layerEdit", layerEdit
+        $.subscribe "layerVisibility", layerVisibility
 
-    selectionSelect = (event, layer) ->
+        # Scaling and rotating will be done by pinching.
+        #
+        if utilDetect.NO_MOUSEEVENTS
 
-        selectionEdit event, false
-        selectionUpdate event, layer
+            $(".gripScale, .gripRotate").hide()
 
-    selectionUpdate = (event, layer) ->
+    layerSelect = (event, layer) ->
+
+        layerEdit event, false
+        layerUpdate event, layer
+
+    layerUpdate = (event, layer) ->
 
         if layer
 
@@ -83,10 +91,9 @@ define [
                 height : layer.sizeCurrent.height + module.options.offset
                 transform  : "rotate(#{layer.rotation.degrees}deg)"
 
+        $imageCreatorSelection.toggle layer and layer.visible and not layer.locked
 
-        $imageCreatorSelection.toggle layer && layer.visible and not layer.locked
-
-    selectionEdit = (event, layer) ->
+    layerEdit = (event, layer) ->
 
         if layer
             editing  = true
@@ -96,6 +103,12 @@ define [
             editLock = false
 
         $imageCreatorSelection.toggleClass "editing", layer and editing
+
+    layerVisibility = (event, layer) ->
+
+        if layer.selected and not layer.locked
+
+            $imageCreatorSelection.toggle layer.visible
 
     selectionKeyDown = (event) ->
 
@@ -107,81 +120,40 @@ define [
 
         shiftKeyEnabled = false
 
-    selectionVisibility = (event, layer) ->
-
-        if layer.selected and not layer.locked
-
-            $imageCreatorSelection.toggle layer.visible
-
     selectionScale = (event) ->
 
-        layerCurrent = cache.getLayerActive()
-        layerWidth   = layerCurrent.sizeCurrent.width
-        layerHeight  = layerCurrent.sizeCurrent.height
-        layerScale   = layerCurrent.scale
-        aspectRatio  = layerWidth / layerHeight
-        mouseX       = event.pageX
-        mouseY       = event.pageY
+        event.preventDefault()
 
-        # Get the current grip and compensate if the layer is rotated.
-        #
-        gripPosition =
-            x : event.pageX - $imageCreatorSelection.offset().left - (layerCurrent.sizeRotated.width  / 2)
-            y : event.pageY - $imageCreatorSelection.offset().top  - (layerCurrent.sizeRotated.height / 2)
+        layerCurrent   = cache.getLayerActive()
+        layerRotation  = layerCurrent.rotation
+        viewportOffset = $imageCreatorViewport.offset()
 
-        gripRadians = utilMath.sanitizeRadians Math.atan2(gripPosition.x, -gripPosition.y)
-        gripIndex   = Math.round(gripRadians / ( Math.PI * 2 / module.options.grips.length))
-        gripIndex   = 0 if gripIndex is module.options.grips.length
-        gripName    = module.options.grips[gripIndex].toLowerCase()
-
-        # Mapping of in which direction the width and height need to scale when a grip is triggerd.
-        #
-        dir =
-            e: (dx, dy) -> width: layerWidth + dx
-            w: (dx, dy) -> width: layerWidth - dx
-            n: (dx, dy) -> height: layerHeight - dy
-            s: (dx, dy) -> height: layerHeight + dy
-            se: (dx, dy) -> $.extend dir.s(dx, dy), dir.e(dx, dy)
-            sw: (dx, dy) -> $.extend dir.s(dx, dy), dir.w(dx, dy)
-            ne: (dx, dy) -> $.extend dir.n(dx, dy), dir.e(dx, dy)
-            nw: (dx, dy) -> $.extend dir.n(dx, dy), dir.w(dx, dy)
+        layerCenterPosition =
+            y : layerCurrent.positionRotated.y + layerCurrent.sizeRotated.height / 2
+            x : layerCurrent.positionRotated.x + layerCurrent.sizeRotated.width  / 2
 
         $("body").addClass "noSelect"
 
         $(document).on "mousemove.selection", (event) ->
 
-            # We need to multiply these values by 2 because we are not scaling from a corner but from the center.
+            event.preventDefault()
+
+            # Position of the grip relative to the viewport of the selection.
             #
-            dx = ( (event.pageX - mouseX) or 0 ) * 2
-            dy = ( (event.pageY - mouseY) or 0 ) * 2
+            gripPosition =
+                x : event.pageX - viewportOffset.left
+                y : event.pageY - viewportOffset.top
 
-            # The layer's adjusted dimensions
-            #
-            LayerDimNew = dir[gripName] dx, dy
+            localPoint   = utilMath.rotateAroundPoint gripPosition, layerCenterPosition, layerRotation
+            lastDistance = layerCurrent.position.x + layerCurrent.sizeCurrent.width + layerCurrent.position.y + layerCurrent.sizeCurrent.height
+            NewDistance  = localPoint.x + localPoint.y
 
-            # Make sure the layer respects the aspect ratio.
-            #
-            if LayerDimNew.width
-
-                LayerDimNew.height = LayerDimNew.width / aspectRatio
-
-            else if LayerDimNew.height
-
-                LayerDimNew.width  = LayerDimNew.height * aspectRatio
-
-            # Scale by fontsize or dimensions?
-            #
             if layerCurrent.scaleByFontSize
-
-                newFontSize = Math.round( LayerDimNew.width * layerCurrent.fontSize / layerCurrent.sizeCurrent.width )
-                layerCurrent.setFontSize newFontSize
+                layerCurrent.setFontSize layerCurrent.fontSize * NewDistance / lastDistance
 
                 $.publish "selectionScale", [ layerCurrent.fontSize, true]
-
             else
-
-                newScale = ( LayerDimNew.width * 1 / layerCurrent.sizeReal.width )
-                layerCurrent.setScale newScale
+                layerCurrent.setScale layerCurrent.scale * NewDistance / lastDistance
 
                 $.publish "selectionScale", [ layerCurrent.scale, true]
 
@@ -207,13 +179,15 @@ define [
         selectionOffset = $imageCreatorSelection.offset()
         slice           = Math.PI * 2 / module.options.grips.length
 
-        # Get the initial angle of the grip
+        # Position of the grip relative to the center of the selection.
         #
         gripPosition =
-            x : event.pageX - selectionOffset.left - (layerCurrent.sizeRotated.width  / 2)
-            y : event.pageY - selectionOffset.top  - (layerCurrent.sizeRotated.height / 2)
+            x : event.pageX - selectionOffset.left - layerCurrent.sizeRotated.width  / 2
+            y : event.pageY - selectionOffset.top  - layerCurrent.sizeRotated.height / 2
 
-        gripRadians = utilMath.sanitizeRadians(Math.atan2(gripPosition.x, -gripPosition.y))
+        # Get the initial angle of the current grip.
+        #
+        gripRadians = utilMath.sanitizeRadians Math.atan2(gripPosition.x, -gripPosition.y)
 
         $("html").addClass "noSelect cursorRotate"
 
@@ -224,10 +198,10 @@ define [
             # Find out what angle the grip is pointing now.
             #
             gripPositionCurrent =
-                x : event.pageX - $imageCreatorSelection.offset().left - (layerCurrent.sizeRotated.width  / 2)
-                y : event.pageY - $imageCreatorSelection.offset().top  - (layerCurrent.sizeRotated.height / 2)
+                x : event.pageX - $imageCreatorSelection.offset().left - layerCurrent.sizeRotated.width  / 2
+                y : event.pageY - $imageCreatorSelection.offset().top  - layerCurrent.sizeRotated.height / 2
 
-            gripRadiansCurrent  = utilMath.sanitizeRadians Math.atan2(gripPositionCurrent.x, -gripPositionCurrent.y)
+            gripRadiansCurrent = utilMath.sanitizeRadians Math.atan2(gripPositionCurrent.x, -gripPositionCurrent.y)
 
             # Calculate what angle we need to rotate the layer.
             #
@@ -236,7 +210,7 @@ define [
             # If the shift key is pressed we only want to rotate by magnitudes of 90 degrees.
             #
             if shiftKeyEnabled
-                radians = Math.round(radians * 1000 / (slice * 1000)) * slice
+                layerRadiansCurrent = Math.round(layerRadiansCurrent * 1000 / (slice * 1000)) * slice
 
             layerCurrent.setRotate
                 radians : layerRadiansCurrent
@@ -298,7 +272,7 @@ define [
 
         cache.removeLayer cache.getLayerActive()
 
-        return false;
+        return false
 
     selectionPinch = (event) ->
 
@@ -306,9 +280,9 @@ define [
 
         layerCurrent      = cache.getLayerActive()
         layerRadiansStart = layerCurrent.rotation.radians
-        layerScaleStart   = layerCurrent.fontSize or layerCurrent.scale
+        layerScaleStart   = if layerCurrent.scaleByFontSize then layerCurrent.fontSize else layerCurrent.scale
         deltaScale        = event.gesture.scale
-        multiplierScale   = if layerCurrent.fontSize then 20 else 0.75
+        multiplierScale   = if layerCurrent.scaleByFontSize then 20 else 0.75
 
         $(document).on "transform.selection", (event) ->
 
@@ -320,20 +294,18 @@ define [
                 sin     : Math.sin( radians )
                 cos     : Math.cos( radians )
 
-            if not editLock and layerCurrent and layerCurrent.visible
-
+            if not editLock and layerCurrent and layerCurrent.visible and layerCurrent.plane is "baseline"
                 layerCurrent.setRotate rotation
 
-                if layerCurrent.setFontSize
-
+                if layerCurrent.scaleByFontSize
                     layerCurrent.setFontSize scale
-                else
 
-                    layerCurrent.setScalescale
+                else
+                    layerCurrent.setScale scale
 
                 $.publish "layerUpdate", [layerCurrent]
                 $.publish "selectionRotate", [layerCurrent.rotation, true]
-                $.publish "selectionScale", [layerCurrent.fontSize or layerCurrent.scale, true]
+                $.publish "selectionScale", [(if layerCurrent.scaleByFontSize then layerCurrent.fontSize else layerCurrent.scale), true]
 
             return false
 
@@ -345,31 +317,48 @@ define [
 
     selectionTap = (event) ->
 
-        layerActive = cache.getLayerActive()
-        offset      = $imageCreatorViewport.offset()
-        layerFound  = false
-        mouse       =
+        layerActive    = cache.getLayerActive()
+        offset         = $imageCreatorViewport.offset()
+        layersToEdit   = []
+        layersToSelect = []
+        mouse          =
             x : event.gesture.center.pageX - offset.left
             y : event.gesture.center.pageY - offset.top
 
         for layer, index in cache.getLayers()
 
-            if layer.plane is "baseline"
+            if utilMath.isPointInPath mouse, layer.sizeCurrent, layer.position, layer.rotation.radians
 
-                if utilMath.isPointInPath(mouse, layer.sizeCurrent, layer.position, layer.rotation.radians)
+                if layerActive.id is layer.id
 
-                    if layerActive.id is layer.id
+                    layersToEdit.push layer
 
-                        $.publish "layerEdit", [layerActive]
+                else
+                    layersToSelect.push layer
 
-                    else
+        # Editing of layers has precendence above selecting a new layer
+        #
+        if layersToEdit.length > 0 and
+           layerActive.canHaveText or
+           layerActive.canHaveMask and
+           layerActive.mask.src
 
-                        cache.setLayerActiveByID layer.id
+            $.publish "layerEdit", [layersToEdit.pop()]
 
-                    layerFound = true
+        # If there are no layers to edit try to select a new one
+        #
+        else if layersToSelect.length > 0
 
-        if not layerFound and editing
+            document.activeElement.blur()
+
+            cache.setLayerActiveByID layersToSelect.pop().id
+
+        else if editing
+
+            document.activeElement.blur()
 
             $.publish "layerEdit", [false]
+
+        return false
 
     return module

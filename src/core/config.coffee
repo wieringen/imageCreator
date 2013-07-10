@@ -13,10 +13,6 @@ define [
 
         defaults :
 
-            viewport :
-                width  : 700
-                height : 500
-
             # Render engines
             #
             engines :
@@ -73,6 +69,9 @@ define [
 
                 message :
                     target : ".imageCreatorUIMessage"
+
+                navigation :
+                    target : ".imageCreatorUINavigation"
 
                 dimensions :
                     target : ".imageCreatorUIDimensions"

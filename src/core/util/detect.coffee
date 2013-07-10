@@ -36,17 +36,19 @@ define [], () ->
 
     module.IS_PRE_IE9 = ( () ->
 
-        window.attachEvent and !window.addEventListener;
+        (window.attachEvent and !window.addEventListener)
     )()
 
     module.HAS_POINTEREVENTS = ( () ->
 
-        navigator.pointerEnabled or navigator.msPointerEnabled;
+        element = document.createElement 'x'
+        element.style.cssText = 'pointer-events:auto'
+        return element.style.pointerEvents is 'auto'
     )()
 
     module.HAS_TOUCHEVENTS = ( () ->
 
-        ( "ontouchstart" of window )
+        ("ontouchstart" of window)
     )()
 
     module.NO_MOUSEEVENTS = ( () ->

@@ -3,6 +3,8 @@
 #
 define [], () ->
 
+    $ = jQuery
+
     module = {}
 
     module.populateWithProperties = (source, destination, properties) ->
@@ -13,9 +15,9 @@ define [], () ->
 
                 destination[ property ] = source[ property ]
 
-    module.measureText = (layer) ->
+    module.measureText = (layer, overwrite) ->
 
-        measureDiv = document.createElement "measureDiv"
+        measureDiv = document.createElement "div"
 
         measureDiv.className = "imageCreatorMeasureText"
 
@@ -24,22 +26,30 @@ define [], () ->
         measureDiv.style.fontSize   = layer.fontSize + "px"
         measureDiv.style.fontFamily = layer.font
         measureDiv.style.fontWeight = layer.weight
+        measureDiv.style.lineHeight = layer.lineHeight
+        measureDiv.style.backgroundColor = "#ccc"
+
+        if overwrite and overwrite.width
+            measureDiv.style.width      = overwrite.width + "px"
+            measureDiv.style.whiteSpace = "pre-wrap"
+            measureDiv.style.wordWrap   = "break-word"
+        else
+            measureDiv.style.width = "auto"
 
         if window.attachEvent and not window.addEventListener
 
-            measureDiv.innerText = layer.text
-
+            measureDiv.innerHTML = (overwrite and overwrite.text) or layer.text
         else
+            jQuery( measureDiv ).text (overwrite and overwrite.text) or layer.text
 
-            jQuery( measureDiv ).text layer.text
-
-        textWidth = measureDiv.clientWidth + 10
+        textWidth  = measureDiv.clientWidth  + 10
+        textHeight = measureDiv.clientHeight
 
         document.body.removeChild measureDiv
 
         measureDiv = null
 
-        return textWidth
+        return { width : textWidth, height : textHeight }
 
 
     module.whenAll = (promises) ->

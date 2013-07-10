@@ -60,7 +60,7 @@ define [
 
     infoUpdate = (event, layer, partial) ->
 
-        $layerPositionX.text Math.round(layer and layer.positionRotated.x or 0 )
+        $layerPositionX.text Math.round(layer and layer.positionRotated.x or 0)
         $layerPositionY.text Math.round(layer and layer.positionRotated.y or 0)
 
         if not partial

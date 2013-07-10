@@ -8,7 +8,7 @@ define [
 
 ,   "plugins/jquery.storage"
 
-], ( config, utilMisc ) ->
+], (config, utilMisc) ->
 
     $ = jQuery
 
@@ -21,9 +21,25 @@ define [
     # Private cache variables
     #
     project =
-        views :
-            front :
+        viewport :
+            width  : 700
+            height : 500
+
+        views : [
+            {
+                name   : "front"
                 layers : []
+            }
+        ,   {
+                name   : "inside1"
+                layers : []
+            }
+        ,   {
+                name   : "inside2"
+                layers : []
+            }
+        ]
+
     layers = []
 
     viewActive  = false
@@ -65,11 +81,17 @@ define [
 
     module.setViewActive = (viewName) ->
 
-        if project and project.views and project.views[viewName]
+        module.storeProject()
 
-            viewActive = project.views[viewName]
+        if project and project.views
 
-            module.loadLayers viewActive.layers
+            for view in project.views
+
+                if view.name is viewName
+
+                    viewActive = view
+
+                    module.loadLayers viewActive.layers
 
     module.getViewActive = ->
 
@@ -107,6 +129,10 @@ define [
 
     module.setLayers = (layersData) ->
 
+        module.setLayerActive false
+
+        layers = []
+
         for layer, layerIndex in layersData
 
             module.setLayer layer
@@ -121,17 +147,32 @@ define [
 
             # We only want 1 background layer so remove all others.
             #
-            for layer, layerIndex in layers
-
-                if layer.plane is "background"
-
-                    module.removeLayer layer
+            layers = layers.filter (layer) -> layer.plane isnt "background"
 
             layers.unshift layerData
 
             $.publish "layersRedraw"
 
-        else
+        else if layerData.plane is "baseline"
+
+            layerFound = false
+
+            for layer, layerIndex in layers
+
+                if layer.plane is "foreground"
+
+                    layerFound = { index : layerIndex }
+
+                    break
+
+            if layerFound
+                layers.splice layerFound.index, 0, layerData
+            else
+                layers.push layerData
+
+            $.publish "layersRedraw"
+
+        else if layerData.plane is "foreground"
 
             layers.push layerData
 
@@ -161,9 +202,7 @@ define [
             #
             if isNewLayer
 
-                module.setLayer layerData
-
-                layerActive = layerData
+                layerActive = module.setLayer layerData
 
             layerActive.set "selected", true
 
@@ -201,7 +240,7 @@ define [
 
         layerIndex = $.inArray layerData, layers
 
-        if layer.selected
+        if layerData.selected
 
             module.setLayerActive false
 

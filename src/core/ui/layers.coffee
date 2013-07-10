@@ -31,7 +31,6 @@ define [
     $module             = null
     $layersContainer    = null
     $selectRenderEngine = null
-    $buttonImageSave    = null
     $emptyMessage       = null
 
     module.initialize = ->
@@ -49,7 +48,6 @@ define [
         $module             = $(module.options.target)
         $layersContainer    = $module.find ".layersContainer"
         $selectRenderEngine = $module.find ".selectRenderEngine"
-        $buttonImageSave    = $(".buttonImageSave")
         $emptyMessage       = $module.find ".emptyMessage"
 
         # Initialize module UI.
@@ -65,14 +63,6 @@ define [
         $layersContainer.delegate ".layerToggle", "tap", layerVisibilityById
         $layersContainer.delegate ".layerRemove", "tap", layerRemoveByID
         $selectRenderEngine.change optionRenderEngineSelect
-        $buttonImageSave.bind "tap", () ->
-            cache.storeProject()
-
-            $.publish "message", {
-                message : JSON.stringify( cache.getProject() )
-                status  : "error"
-                fade    : false
-            }
 
         # Listen for global events.
         #
@@ -119,6 +109,12 @@ define [
 
         $.each cache.getLayers(), layerCheck
 
+        # Show empty message if we have no more layers.
+        #
+        if 0 is cache.getLayers().length
+
+            $emptyMessage.show()
+
     layerCheck = (event, layer) ->
 
         if layer and 0 is $("#layer" + layer.id).length
@@ -147,7 +143,7 @@ define [
             $layerClone.find(".layerName").text layer.text
             #$layerClone.find( "img" ).attr( "src", objectLayer.image.src )
 
-        $layersContainer.prepend($layerClone)
+        $layersContainer.prepend $layerClone
 
     layerSelectByID = (event) ->
 
@@ -187,7 +183,7 @@ define [
 
         layer.set "visible", not layer.visible
 
-        $.publish "layerVisibility", [ layer ]
+        $.publish "layerVisibility", [layer]
 
         return false
 
@@ -199,6 +195,6 @@ define [
 
     optionRenderEngineSelect = (event) ->
 
-        $.publish "loadEngine", $(@).find(":selected").data "engine"
+        $.publish "loadEngine", [$(@).find(":selected").data("engine")]
 
     return module

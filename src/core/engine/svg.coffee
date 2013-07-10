@@ -23,6 +23,8 @@ define [
     $imageCreatorViewport = null
     $imageCreatorCanvas   = null
 
+    project       = null
+
     svgContainer = null
     svgDefs      = null
     svgSelect    = null
@@ -31,6 +33,8 @@ define [
     canvasHeight = null
 
     module.initialize = ->
+
+        project = cache.getProject()
 
         # Get basic app DOM elements.
         #
@@ -49,8 +53,8 @@ define [
 
         # Set the viewport's dimensions.
         #
-        canvasWidth  = config.options.viewport.width
-        canvasHeight = config.options.viewport.height
+        canvasWidth  = project.viewport.width
+        canvasHeight = project.viewport.height
 
         svgContainer.setAttribute "width", canvasWidth
         svgContainer.setAttribute "height", canvasHeight
@@ -73,8 +77,8 @@ define [
 
         # Get module snippets.
         #
-        module.snippets.svgFilter = $( svgDefs ).find( "filter" )[0]
-        module.snippets.svgMask   = $( svgDefs ).find( "clipPath" )[0]
+        module.snippets.svgFilter = $(svgDefs).find("filter").remove()[0]
+        module.snippets.svgMask   = $(svgDefs).find("clipPath").remove()[0]
 
         # Do we have any layers allready?
         #
@@ -82,13 +86,13 @@ define [
 
     svgBuildLayers = ->
 
-        $( svgContainer ).find( "text, filter, image" ).remove()
+        $(svgContainer).find("text, filter, image").remove()
 
         for layer in cache.getLayers()
 
             eventType = if layer.selected then "layerSelect" else "layerUpdate"
 
-            svgLayerCheck { type : eventType }, layer
+            svgLayerCheck {type : eventType}, layer
 
     svgLayerCheck = (event, layer, partial) ->
 
@@ -116,18 +120,25 @@ define [
 
             svgLayerCurrent = document.createElementNS "http://www.w3.org/2000/svg", "image"
             svgLayerCurrent.setAttributeNS "http://www.w3.org/1999/xlink", "href", layer.image.src
-            svgLayerCurrent.setAttribute "filter", "url(#" + layer.id + "filter)"
+            svgLayerCurrent.setAttribute "filter", "url(##{layer.id}filter)"
+            #svgLayerCurrent.setAttribute "clip-path", "url(##{layer.id}mask)"
 
-            svgLayerFilter = $( module.snippets.svgFilter ).clone()
+            svgLayerFilter = $(module.snippets.svgFilter).clone()
             svgLayerFilter.attr "id", layer.id + "filter"
 
-            svgLayerFilterColorMatrix = svgLayerFilter.find( "feColorMatrix" )[0]
+            svgLayerFilterColorMatrix = svgLayerFilter.find("feColorMatrix")[0]
             svgLayerFilterColorMatrix.setAttribute "result", layer.id + "result"
 
-            svgLayerFilterComposite = svgLayerFilter.find( "feComposite" )[0]
+            svgLayerFilterComposite = svgLayerFilter.find("feComposite")[0]
             svgLayerFilterComposite.setAttribute "in", layer.id + "result"
 
             svgDefs.appendChild svgLayerFilter[0]
+
+            svgLayerMask = $(module.snippets.svgMask).clone()
+            svgLayerMask.attr "id", layer.id + "mask"
+
+            svgLayerMaskUse = svgLayerMask.find("use")[0]
+            svgDefs.appendChild svgLayerMask[0]
 
             svgLayerCurrent.setAttribute "width", layer.sizeReal.width
             svgLayerCurrent.setAttribute "height", layer.sizeReal.height
@@ -145,7 +156,7 @@ define [
 
     svgLayerUpdate = (event, layer, partial) ->
 
-        svgLayerCurrent = $( "#" + layer.id + module.name )[0]
+        svgLayerCurrent = $("#" + layer.id + module.name)[0]
 
         # Update the text part of the layer
         #
@@ -166,7 +177,7 @@ define [
                 middle : 0.5
                 end    : 1
 
-            $( svgLayerCurrent ).css({
+            $(svgLayerCurrent).css({
                 fill       : layer.color
                 fontSize   : layer.fontSize
                 fontFamily : layer.font
@@ -202,6 +213,7 @@ define [
         if layer.canHaveImage and not partial
 
             svgLayerFilterColorMatrix = $( "#" + layer.id + "filter" ).find( "feColorMatrix" )[0]
+            svgLayerMaskUse = $( "#" + layer.id + "mask" ).find( "use" )[0]
 
             if layer.filter and layer.filter.matrix
 
@@ -212,8 +224,15 @@ define [
                 svgLayerFilterComposite.setAttribute "k3", 1 - layer.filter.strength
 
             else
-
                 svgLayerFilterColorMatrix.removeAttribute "values"
+
+
+            if layer.mask and layer.mask.src
+
+                svgLayerMaskUse.setAttributeNS "http://www.w3.org/1999/xlink", "href", layer.mask.src
+            else
+                svgLayerMaskUse.removeAttributeNS "http://www.w3.org/1999/xlink", "href"
+
 
         svgLayerCurrent.setAttribute "visibility", if layer.visible then "visible" else "hidden"
 

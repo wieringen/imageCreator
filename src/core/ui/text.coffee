@@ -13,13 +13,15 @@ define [
 ,   "cs!cache"
 ,   "cs!model/text"
 ,   "cs!util/math"
+,   "cs!util/misc"
+,   "cs!util/detect"
 
     # Libraries.
     #
 ,   "plugins/jquery.tabular"
 ,   "plugins/jquery.colorPicker"
 
-], (moduleHTML, config, cache, modelText, utilMath) ->
+], (moduleHTML, config, cache, modelText, utilMath, utilMisc, utilDetect) ->
 
     $ = jQuery
 
@@ -138,7 +140,11 @@ define [
 
             layerUpdate event, layer
 
-            $textEdit.focus()
+            # Tablets automatically focus on the textarea
+            #
+            if utilDetect.HAS_POINTEREVENTS
+
+                $textEdit.focus()
 
         else
             editing = false
@@ -162,10 +168,10 @@ define [
 
             if layer.textRegion
 
-                editProperties.width   = layer.textRegion.width  * layer.scale
-                editProperties.height  = layer.textRegion.height * layer.scale
-                editProperties.top    += layer.textRegion.top    * layer.scale
-                editProperties.left   += layer.textRegion.left   * layer.scale
+                editProperties.width   = Math.round(layer.textRegion.width  * layer.scale)
+                editProperties.height  = Math.round(layer.textRegion.height * layer.scale)
+                editProperties.top    += layer.textRegion.top  * layer.scale
+                editProperties.left   += layer.textRegion.left * layer.scale
 
             else
                 editProperties.width  = layer.sizeCurrent.width
@@ -177,7 +183,8 @@ define [
 
         text  = module.options.defaultText
         layer =
-            text : text.slice 0, utilMath.getRandomInt(10, text.length)
+            text  : text.slice 0, utilMath.getRandomInt(10, text.length)
+            plane : "foreground"
 
         cache.setLayerActive new modelText(layer)
 
@@ -185,7 +192,7 @@ define [
 
     textStyle = (event) ->
 
-        if module.enabled and layerCurrent?.visible
+        if module.enabled and layerCurrent and layerCurrent.visible
 
             isItalic = layerCurrent.style is "italic"
 
@@ -199,7 +206,7 @@ define [
 
     textWeight = (event) ->
 
-        if module.enabled and layerCurrent?.visible
+        if module.enabled and layerCurrent and layerCurrent.visible
 
             isBold = layerCurrent.weight is "bold"
 
@@ -213,7 +220,7 @@ define [
 
     textFont = (event) ->
 
-        if module.enabled and layerCurrent?.visible
+        if module.enabled and layerCurrent and layerCurrent.visible
 
             layerCurrent.setFont @.value
 
@@ -221,7 +228,7 @@ define [
 
     textColor = (event, color) ->
 
-        if module.enabled and layerCurrent?.visible
+        if module.enabled and layerCurrent and layerCurrent.visible
 
             layerCurrent.setColor color
 
@@ -229,7 +236,7 @@ define [
 
     textAlign = (event) ->
 
-        if module.enabled and layerCurrent?.visible
+        if module.enabled and layerCurrent and layerCurrent.visible
 
             layerCurrent.setTextAlign $(@).attr("data-align")
 
@@ -243,9 +250,27 @@ define [
 
     textSet = (event) ->
 
-        if module.enabled and layerCurrent?.visible
+        if module.enabled and layerCurrent and layerCurrent.visible
 
-            layerCurrent.setText @.value
+            # when the text is in a restricted box we want to make sure the text cant be larger than the box.
+            #
+            if layerCurrent.textRegion
+
+                overwrite =
+                    width : Math.round(layerCurrent.textRegion.width * layerCurrent.scale)
+                    text  : @value
+
+                textHeight = utilMisc.measureText(layerCurrent, overwrite).height
+
+                if textHeight >= Math.round(layerCurrent.textRegion.height * layerCurrent.scale)
+
+                    if event.keyCode isnt 8
+
+                        $textEdit.val layerCurrent.text
+
+                        return false
+
+            layerCurrent.setText @value
 
             $.publish "layerUpdate", [layerCurrent]
 

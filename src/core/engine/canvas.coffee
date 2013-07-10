@@ -22,6 +22,7 @@ define [
     $imageCreatorViewport = null
     $imageCreatorCanvas   = null
 
+    project      = null
     canvas       = null
     context      = null
     canvasWidth  = null
@@ -31,6 +32,8 @@ define [
 
     module.initialize = ->
 
+        project = cache.getProject()
+
         # Get basic app DOM elements.
         #
         $imageCreatorViewport = $(".imageCreatorViewport")
@@ -38,8 +41,8 @@ define [
 
         # Set the viewport's dimensions.
         #
-        canvasWidth  = config.options.viewport.width
-        canvasHeight = config.options.viewport.height
+        canvasWidth  = project.viewport.width
+        canvasHeight = project.viewport.height
 
         $imageCreatorViewport.css
             width  : canvasWidth
@@ -109,7 +112,9 @@ define [
 
             canvasLayerSelect event, layerCurrent
 
-    wrapText = (context, text, maxWidth, scale) ->
+    # Canvas is unformiliar with text wrapping so we need to implement our own logic for this :/
+    #
+    wrapText = (context, text, maxWidth) ->
 
         words   = text.split " "
         lineNew = ""
@@ -121,7 +126,7 @@ define [
 
             # Check the size of the word
             #
-            wordWidth = context.measureText(word).width * scale
+            wordWidth = context.measureText(word).width
 
             # If the word is bigger then the actual space we have we not to loop trew all the chars as well
             # because we need to now on what char to split the word.
@@ -138,7 +143,7 @@ define [
 
                 for char, charIndex in chars
 
-                    lineNewWidth = context.measureText(lineNew + char).width * scale
+                    lineNewWidth = context.measureText(lineNew + char).width
 
                     if lineNewWidth > maxWidth
 
@@ -154,7 +159,7 @@ define [
                 lineNew += " "
 
             else
-                lineNewWidth = context.measureText(lineNew + word).width * scale
+                lineNewWidth = context.measureText(lineNew + word).width
 
                 if lineNewWidth > maxWidth
 
@@ -165,7 +170,7 @@ define [
                     lineNew = word + " "
                 else
 
-                    # There is still some room in this line so add the word it.
+                    # There is still some room in this line so add the to word it.
                     #
                     lineNew += word + " "
 
@@ -199,21 +204,24 @@ define [
 
             # Draw the image and use its real size the matrix applied above will do the scaling for us.
             #
-            context.drawImage getImage( context, layer ), 0, 0, layer.sizeReal.width, layer.sizeReal.height
+            context.drawImage getImage(context, layer), 0, 0, layer.sizeReal.width, layer.sizeReal.height
 
         # Create the text part of the layer. Dont create the text if we are editing a layer.
         #
-        if layer.canHaveText and ( not editing or not layer.selected )
+        if layer.canHaveText and (not editing or not layer.selected)
 
             context.fillStyle = layer.color
             context.textAlign = layer.textAlign
-            textAlignDivider  = {"left" : 0, "center" : 0.5, "right" : 1}[ layer.textAlign ]
-            context.font      = "#{layer.style} #{layer.weight} #{layer.fontSize / layer.scale}px #{layer.font}"
+            textAlignDivider  = {left : 0, center : 0.5, right : 1}[ layer.textAlign ]
+            context.font      = "#{layer.style} #{layer.weight} #{layer.fontSize}px #{layer.font}"
             realIndex         = -1
 
             if layer.textRegion
+                # Cancel out the text scaling
+                #
+                context.scale(1 / layer.scale, 1 / layer.scale)
 
-                textLeft      = ((layer.textRegion.left * layer.scale) + ((layer.textRegion.width * layer.scale) * textAlignDivider)) / layer.scale
+                textLeft      = (layer.textRegion.left + (layer.textRegion.width * textAlignDivider)) * layer.scale
                 textRegionTop = layer.textRegion.top * layer.scale
 
             else
@@ -224,12 +232,12 @@ define [
             #
             for line, index in layer.textLines
 
-                textTop = (index * Math.floor(layer.fontSize * layer.lineHeight) + layer.fontSize + textRegionTop) / layer.scale
+                textTop = Math.floor(layer.fontSize * layer.lineHeight)
 
                 if layer.textRegion
 
                     realIndex += 1
-                    lineParts = wrapText( context, line, layer.textRegion.width * layer.scale, layer.scale )
+                    lineParts = wrapText context, line, Math.round(layer.textRegion.width * layer.scale)
 
                     for linePart, linePartIndex in lineParts
 
@@ -237,15 +245,15 @@ define [
                             realIndex += 1
 
                         context.fillText(
-                            linePart.text,
-                            textLeft,
-                            (realIndex * Math.floor(layer.fontSize * layer.lineHeight) + layer.fontSize + textRegionTop) / layer.scale
+                            linePart.text
+                        ,   textLeft
+                        ,   realIndex * textTop + layer.fontSize + textRegionTop
                         )
                 else
                     context.fillText(
-                        line,
-                        textLeft,
-                        textTop
+                        line
+                    ,   textLeft
+                    ,   index * textTop + layer.fontSize + textRegionTop
                     )
 
         # Restore the state of the canvas to the saved state.
@@ -254,7 +262,12 @@ define [
 
     canvasLayerSelect = (event, layer) ->
 
-        # Save the current state ( matrix, clipping, etc ).
+        # The size of the selection is either based on the normal image size or in case of text on the actual container size.
+        #
+        selectionWidth  = if layer.sizeReal then layer.sizeReal.width else layer.sizeCurrent.width
+        selectionheight = if layer.sizeReal then layer.sizeReal.height else layer.sizeCurrent.height
+
+        # Save the current state (matrix, clipping, etc).
         #
         context.save()
 
@@ -263,28 +276,24 @@ define [
         m = layer.matrix
         context.setTransform m[ 0 ], m[ 3 ], m[ 1 ], m[ 4 ], m[ 2 ], m[ 5 ]
 
-        # Set the color of the selection
+        # Create white color rectangle for the selection
         #
-        context.strokeStyle = module.options.selectionColor
+        context.strokeStyle = "#fff"
+        context.strokeRect 0, 0, selectionWidth, selectionheight
 
         # We want a dashed line for our stroke. To bad that not all browsers support this so we have to check can use it.
         #
         if context.setLineDash
-
-           context.setLineDash [ module.options.selectionDash / layer.scale ]
+           context.setLineDash [Math.round(module.options.selectionDash / layer.scale)]
 
         # The stroke must stay consistent in size so we need to cancel out the scaling effect.
         #
         context.lineWidth = 1 / layer.scale
 
-        # Create the actual selection the size is either based on the actual normal image size or in case of text on the actual container size.
+        # Create the (dashed) selection
         #
-        context.strokeRect(
-            0
-        ,   0
-        ,   (if layer.sizeReal then layer.sizeReal.width else layer.sizeCurrent.width)
-        ,   (if layer.sizeReal then layer.sizeReal.height else layer.sizeCurrent.height)
-        )
+        context.strokeStyle = module.options.selectionColor
+        context.strokeRect 0, 0, selectionWidth, selectionheight
 
         # Restore the state of the canvas to the saved state.
         #

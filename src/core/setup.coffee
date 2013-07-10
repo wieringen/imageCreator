@@ -23,8 +23,6 @@ define [
 
         require ["cs!engine/" + engineName], (engine) ->
 
-            # Fire up the engine.
-            #
             engine.initialize()
 
             callback and callback engine
@@ -37,6 +35,10 @@ define [
 
         ui      = config.options.ui
         engines = config.options.engines
+
+        # Listen for global app events.
+        #
+        $.subscribe "loadEngine", loadEngine
 
         # Setup (touch) events and gestures.
         #
@@ -67,7 +69,3 @@ define [
                     cache.initialize()
 
                 return false
-
-        # Listen for global app events.
-        #
-        $.subscribe "loadEngine", loadEngine

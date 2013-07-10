@@ -6,13 +6,16 @@ define [
     # App core modules.
     #
     "cs!config"
+,   "cs!cache"
 ,   "cs!util/math"
 ,   "cs!util/misc"
 
-], (config, utilMath, utilMisc) ->
+], (config, cache, utilMath, utilMisc) ->
 
     module =
         options : {}
+
+    project = cache.getProject()
 
     # @class Layer
     # @constructor
@@ -22,7 +25,6 @@ define [
         id    : ""
         name  : ""
         type  : ""
-        plane : "baseline"
 
         visible : true
 
@@ -92,7 +94,6 @@ define [
 
                 id              : @id
                 name            : @name
-                plane           : @plane
 
                 locked          : @locked
 
@@ -164,16 +165,16 @@ define [
                 y : @position.y - @offset.y
 
             @setPositionConstrain
-                width  : config.options.viewport.width
-                height : config.options.viewport.height
+                width  : project.viewport.width
+                height : project.viewport.height
 
             @matrix = utilMath.getMatrix @rotation, @scale, @position, ( @sizeReal or @sizeCurrent )
 
         setPositionConstrain : (grid) ->
 
             ratio =
-                width  : grid.width  - this.sizeRotated.width
-                height : grid.height - this.sizeRotated.height
+                width  : grid.width  - @sizeRotated.width
+                height : grid.height - @sizeRotated.height
 
             if @positionRotated.x <= 0 + ( if ratio.width < 0 then ratio.width else 0 )
 

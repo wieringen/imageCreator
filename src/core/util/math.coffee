@@ -114,6 +114,14 @@ define [], () ->
 
         return Math.floor( Math.random() * (max - min + 1) ) + min
 
+    module.rotateAroundPoint = (point, origin, rotation) ->
+
+        cos =  rotation.cos
+        sin = -rotation.sin
+
+        x : cos * (point.x-origin.x) - sin * (point.y-origin.y) + origin.x
+        y : sin * (point.x-origin.x) + cos * (point.y-origin.y) + origin.y
+
     module.isPointInPath = (mouse, size, position, radians) ->
 
         dx   = mouse.x - ( position.x + ( size.width / 2 ) )

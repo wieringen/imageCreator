@@ -136,6 +136,7 @@ define [
         layer =
             src   : @src or= url
             scale : 0.3335
+            plane : "baseline"
 
         modelImage.fromObject layer, (instance) ->
 
@@ -148,6 +149,7 @@ define [
         layer =
             src   : @src or= url
             scale : 0.3335
+            plane : "foreground"
             text  : "Dit is een tekstje"
             textRegion :
                 height : 325

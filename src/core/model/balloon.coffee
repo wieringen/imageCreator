@@ -21,8 +21,9 @@ define [
     #
     class Balloon extends modelLayer
 
-        type : "balloon"
-        src  : ""
+        type  : "balloon"
+        src   : ""
+        plane : "baseline"
 
         # These properties will hold img or canvas objects.
         #
@@ -35,10 +36,12 @@ define [
         text       : ""
         textLines  : []
         textRegion :
+            textHeight : 0
             height : 0
             left   : 0
             top    : 0
             width  : 0
+            matrix : 0
 
         color      : module.options.color
         fontSize   : module.options.fontSize
@@ -85,11 +88,12 @@ define [
 
         toObject : (propertiesToInclude) ->
 
-            return jQuery.extend super( propertiesToInclude ), {
-                src       : @src
-                type      : @type
-                imageType : @imageType
-                sizeReal  : @sizeReal
+            return jQuery.extend super(propertiesToInclude), {
+                src        : @src
+                type       : @type
+                plane      : @plane
+                imageType  : @imageType
+                sizeReal   : @sizeReal
 
                 text       : @text
                 textLines  : @textLines
@@ -133,20 +137,30 @@ define [
 
         setScale : (scale = @scale) ->
 
-            @scale = Math.max 0.1, Math.min( 1, scale )
+            overwrite =
+                width : Math.round(@textRegion.width * scale)
+                text  : @text
 
-            sizeNew =
-                width  : Math.round @scale * @sizeReal.width
-                height : Math.round @scale * @sizeReal.height
+            textHeight = utilMisc.measureText(@, overwrite).height
 
-            newPosition =
-                x : (@sizeCurrent.width  - sizeNew.width ) / 2
-                y : (@sizeCurrent.height - sizeNew.height) / 2
+            if textHeight < Math.round(@textRegion.height * scale) || scale > @scale
 
-            @sizeCurrent = sizeNew
-            @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation
+                @scale = Math.max 0.1, Math.min(1, scale)
 
-            @setPosition newPosition
+                sizeNew =
+                    width  : Math.round @scale * @sizeReal.width
+                    height : Math.round @scale * @sizeReal.height
+
+                newPosition =
+                    x : (@sizeCurrent.width  - sizeNew.width) / 2
+                    y : (@sizeCurrent.height - sizeNew.height) / 2
+
+                @sizeCurrent = sizeNew
+                @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation
+
+                @setPosition newPosition
+
+                true
 
 
     # @method fromObject

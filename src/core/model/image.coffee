@@ -21,8 +21,9 @@ define [
     #
     class Image extends modelLayer
 
-        type : "image"
-        src  : ""
+        type  : "image"
+        src   : ""
+        plane : "baseline"
 
         # These properties will hold img or canvas objects.
         #
@@ -85,7 +86,8 @@ define [
             return jQuery.extend super(propertiesToInclude), {
                 src       : @src
                 type      : @type
-                imageType : @imageType
+                plane     : @plane
+
                 sizeReal  : @sizeReal
                 filter    : @filter
                 mask      : @mask
@@ -107,6 +109,8 @@ define [
             @sizeRotated = utilMath.getBoundingBox @sizeCurrent, @rotation
 
             @setPosition newPosition
+
+            return true
 
         setFilter : (filter) ->
 

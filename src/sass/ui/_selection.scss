@@ -25,9 +25,11 @@
     z-index: 1000;
     display: none;
     zoom: 1;
+    @include border-radius(0);
     white-space: pre-wrap;
     word-wrap: break-word;
-    min-height: auto;
+    min-height: 0;
+    -webkit-appearance:none;
 }
 
 .grip {
@@ -51,10 +53,9 @@
 }
 
 .gripScale {
-
-    left: 0%;
-    top: 100%;
+    left: 100%;
     margin: -15px 0 0 -15px;
+    top:100%;
 }
 
 .gripRemove {
@@ -64,9 +65,9 @@
 }
 
 .gripRotate {
-    left: 100%;
+    left: 0%;
+    top: 100%;
     margin: -15px 0 0 -15px;
-    top:100%;
     cursor: url('../images/cursor-rotate.cur'), auto;
 }
 
