@@ -1,0 +1,37 @@
+/*********************** UI : Regions ***********************/
+
+.imageCreatorUIRegions.moduleDisabled {
+    display: none;
+}
+
+
+/* Clipart */
+.imageCreatorUIRegions .regionsList {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.imageCreatorUIRegions .regionsList li {
+    list-style: none;
+    float: left;
+    width: 47px;
+    height: 50px;
+    border: 2px solid #ccc;
+    margin: 0 2px 2px 0;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.imageCreatorUIRegions .regionsList li:hover {
+    background-color: #ccc;
+}
+
+.imageCreatorUIRegions .regionsList img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+}
